@@ -1,0 +1,152 @@
+\usepgfplotslibrary{groupplots}
+%\usepgfplotslibrary{fillbetween}
+
+\pgfplotsset{compat=newest}
+\IfLanguageName{german}{
+  \pgfplotsset{
+    x tick label style={/pgf/number format/use comma, /pgf/number format/1000 sep=\,},
+    y tick label style={/pgf/number format/use comma, /pgf/number format/1000 sep=\,},
+    z tick label style={/pgf/number format/use comma, /pgf/number format/1000 sep=\,}
+  }
+}{}
+\IfLanguageName{ngerman}{
+  \pgfplotsset{
+    x tick label style={/pgf/number format/use comma, /pgf/number format/1000 sep=\,},
+    y tick label style={/pgf/number format/use comma, /pgf/number format/1000 sep=\,},
+    z tick label style={/pgf/number format/use comma, /pgf/number format/1000 sep=\,}
+  }
+}{}
+
+\edef\pgfdatafolder{./Bilder/Daten} % Verzeichnis in dem die csv Dateien für pgfplots liegen
+
+\newcommand{\xmin}{1e-2}
+\newcommand{\xmax}{1e2}
+\newcommand{\mywidth}{0.8\textwidth}
+\newcommand{\myheight}{60mm}
+
+\newcommand{\omegaD}{1}
+
+\newcommand{\bodestyle}{
+  \pgfplotsset{
+    major grid style={line width=0.3pt, color=gray},
+    minor grid style={line width=0.3pt, color=gray},
+    major tick style={line width=0.4pt, color=black},
+    major tick length={4pt},
+    minor tick length={3pt},
+    tick label style={font=\small}
+  }
+}
+
+\newcommand{\nyquiststyle}{
+  \pgfplotsset{
+    major grid style={line width=0.3pt, color=gray},
+    minor grid style={line width=0.3pt, color=gray},
+    major tick style={line width=0.4pt, color=black},
+    major tick length={4pt},
+    minor tick length={3pt},
+    tick label style={font=\small}
+  }
+}
+
+\newcommand{\plotstyle}{
+  \pgfplotsset{
+    major grid style={line width=0.3pt, color=gray},
+    minor grid style={line width=0.3pt, color=gray},
+    major tick style={line width=0.4pt, color=black},
+    major tick length={4pt},
+    minor tick length={3pt},
+    tick label style={font=\small}
+  }
+}
+
+\newcommand{\plotyystyle}{
+  \pgfplotsset{
+    every non boxed y axis/.style={ytick align=inside,y axis line style={-}},
+    every boxed y axis/.style={}
+  }
+}
+
+\newenvironment{bodeAmpDB}[1][]{
+\bodestyle
+\begin{semilogxaxis}[
+  ylabel=$|G(\mathrm{j}\omega)|_{\mathrm{dB}}$,
+  %ylabel=Amplitude in dB,
+  ylabel style={yshift=2pt},
+  enlarge x limits=false,
+  xminorgrids=true,
+  xmajorgrids=true,
+  ymajorgrids=true,
+  yminorgrids=true,
+  xticklabels=\empty,
+  width=\mywidth,
+  height=\myheight,#1]
+}{\end{semilogxaxis}}
+
+\newenvironment{bodeAmpLOG}[1][]{
+\begin{loglogaxis}[
+  ylabel=$|G(\mathrm{j}\omega)|$,
+  %ylabel=Amplitude,
+  ylabel style={yshift=2pt},
+  enlarge x limits=false,
+  xminorgrids=true,
+  xmajorgrids=true,
+  ymajorgrids=true,
+  yminorgrids=true,
+  xticklabels=\empty,
+  y tick label style={font=\small},
+  width=\mywidth,
+  height=\myheight,#1]
+}{\end{loglogaxis}}
+
+\newenvironment{bodePhase}[1][]{
+\begin{scope}[yshift=-\myheight+12mm]  % zweiten Plot (Phase) unter den Amplitudengang setzen
+  \bodestyle
+  \begin{semilogxaxis}[
+    xlabel=Frequenz $\omega$ in \ensuremath{\mathrm{{\frac{rad}{s}}}},
+    %ylabel=Phase in $^\circ$,
+    ylabel=$\angle{G(\mathrm{j}\omega)}$,
+    ylabel style={yshift=2pt},
+    enlarge x limits=false,
+    xminorgrids=true,
+    xmajorgrids=true,
+    ymajorgrids=true,
+    yminorgrids=true,
+    ytick={-360, -315,..., 360},
+    yticklabel={$\pgfmathprintnumber{\tick}^\circ$},% ° als Einheitenzeichen an alle yticks
+    width=\mywidth,
+    height=\myheight,#1]
+}{\end{semilogxaxis}\end{scope}}
+
+\newenvironment{plotyyLeft}[1][]{
+\plotyystyle
+\begin{axis}[
+  scale only axis,
+  enlarge x limits=0,
+  axis y line=left,
+  width=\mywidth,
+  height=\myheight,#1]
+}{\end{axis}}
+
+\newenvironment{plotyyRight}[1][]{
+\plotyystyle
+\begin{axis}[
+  scale only axis,
+  enlarge x limits=0,
+  axis y line=right,
+  axis x line=none,
+  width=\mywidth,
+  height=\myheight,#1]
+}{\end{axis}}
+
+\newcommand{\TikZpole}[1][blue]{
+\begin{tikzpicture}
+  \draw[#1, very thick, line cap=round] (-1,1)  -- (1,-1);
+  \draw[#1, very thick, line cap=round] (-1,-1) -- (1,1);
+\end{tikzpicture}
+}
+
+\newcommand{\TikZzero}[1][blue]{
+\begin{tikzpicture}
+  \draw[#1, very thick] (0,0) circle (5pt);
+\end{tikzpicture}
+}

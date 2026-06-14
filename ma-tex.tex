@@ -1,0 +1,122 @@
+% !TeX program = lualatex
+\documentclass[
+  ngerman,
+  ruledheaders=section,%Ebene bis zu der die Überschriften mit Linien abgetrennt werden, vgl. DEMO-TUDaPub
+  class=report,% Basisdokumentenklasse. Wählt die Korrespondierende KOMA-Script Klasse
+  thesis={type=master},% Dokumententyp Thesis (projektseminar, proseminar, bachelor, master)
+  accentcolor=2c, % Akzentfarbe FG rtm
+  custommargins=false,
+  marginpar=false,
+  BCOR=10mm, % Bindekorrektur (etwas größere mittlere Ränder)
+  parskip=half-, % Absatzkennzeichnung durch Abstand vgl. KOMA-Sript
+  fontsize=11pt, % Basisschriftgröße laut Corporate Design ist mit 9pt häufig zu klein
+  twoside,
+  numbers=noendperiod,
+  fleqn,
+  captions=oneline, % Einzeilige Captions zentrieren
+  captions=tableheading,
+  IMRAD=false,
+  pdfa=false,
+]{tudapub}
+
+
+% Der folgende Block ist nur bei pdfTeX auf Versionen vor April 2018 notwendig
+\usepackage{iftex}
+\ifPDFTeX
+\usepackage[utf8]{inputenc}%kompatibilität mit TeX Versionen vor April 2018
+\fi
+
+%%%%%%%%%%%%%%%%%%%
+%Sprachanpassung & Verbesserte Trennregeln
+%%%%%%%%%%%%%%%%%%%
+\usepackage[english, main=ngerman]{babel}
+\usepackage[autostyle]{csquotes}% Anführungszeichen vereinfacht
+\usepackage{microtype}
+
+
+%%%%%%%%%%%%%%%%%%%
+%Literaturverzeichnis
+%%%%%%%%%%%%%%%%%%%
+% ACHTUNG: bei Problemen ggf. den ieee Style nachinstallieren oder einen anderen nutzen
+\catcode30=12  % Workaround for current biblatex problem (https://tex.stackexchange.com/questions/564990/error-after-miktex-reinstall-text-line-contains-an-invalid-character)
+\usepackage[backend=biber,style=ieee,bibencoding=utf8]{biblatex}
+\addbibresource{literature.bib}
+
+
+\input{common/includes.tex}
+
+\input{common/include_and_setup_lstlistings.tex}
+\input{common/include_and_setup_pgf.tex}
+
+\input{common/commonmacros.tex}
+\input{common/custommacros.tex}
+
+
+
+% \Metadata{  % Metadaten im erzeugten PDF/A
+%   title=Hinweise zum Abfassen einer (Abschluss-)Arbeit am IAT,
+%   author=Josua Christoph Lindemann,
+%   keywords={TU Darmstadt \sep Corporate Design \sep LaTeX},
+% }
+
+\title{Hinweise zum Verfassen einer (Abschluss-)Arbeit am IAT}
+\author{Josua Christoph Lindemann}
+\date{Stand: 01.08.2026}
+\reviewer{Prof. Dr.-Ing. Rolf Findeisen \and Hendrik Alsmeier M.Sc.}
+
+\department{etit}
+
+\addTitleBox{\includegraphics[width=\linewidth]{CCPS_logo}}
+
+\date{\today}
+\submissiondate{16. August 2026}
+
+\lowertitleback{
+  Technische Universität Darmstadt\\
+  Institut für Automatisierungstechnik und Mechatronik\\
+  Fachgebiet Control and Cyber-Physical Systems\\
+  Prof. Dr.-Ing. Rolf Findeisen\\
+}
+
+\begin{document}
+
+\frontmatter
+\maketitle
+
+\cleardoublepage
+\tableofcontents
+
+\cleardoublepage
+
+\mainmatter
+
+\input{./inc/abstract.tex}
+\input{./inc/introduction.tex}
+\input{./inc/mpc.tex}
+\input{./inc/machine-learning.tex}
+\input{./inc/formal-verification.tex}
+\input{./inc/methodology.tex}
+\input{./inc/results.tex}
+\input{./inc/discussion.tex}
+\input{./inc/conclusion.tex}
+
+
+% =================================================================================
+% Anhang
+% =================================================================================
+\appendix % Damit wird der Anhang begonnen. Die Kapitel werden ab jetzt mit Buchstaben nummeriert
+
+\input{./inc/appendix.tex}
+
+% =================================================================================
+% Literaturverzeichnis
+% =================================================================================
+\cleardoublepage        % Auf eine leere Seite einfügen
+\phantomsection         % Für Aufnahme ins Inhaltsverzeichnis
+\addcontentsline{toc}{chapter}{\bibname}  % In Inhaltsverzeichnis von
+                                          % Dokument und pdf aufnehmen
+\printbibliography 
+% =================================================================================
+
+  
+\end{document}

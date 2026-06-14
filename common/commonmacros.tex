@@ -1,0 +1,205 @@
+% Diese Datei dient zum Definieren nützlicher Befehle.
+% Sie soll lediglich als Beispiel dienen, wie Befehle definiert werden, und welche Befehle nützlich sein können.
+
+% Inhalt
+% ======
+%  Makros für Referenzen (Abbildungen, Zitate, ...)
+%  Makros für Abbildungen
+%  Makros für Einheiten, Exponenten
+%  Makros für Formeln
+%  Makros für Entwurf
+%   Definitionen für Umgebungen
+
+% Allgemeine Abkürzungen
+% ======================
+  \newcommand{\bzw}{bzw.\@\xspace}
+  \newcommand{\Bzw}{Bzw.\@\xspace}
+  \newcommand{\bzgl}{bzgl.\@\xspace}
+  \newcommand{\ca}{ca.\@\xspace}
+  \newcommand{\dah}{d.\thinspace{}h.\@\xspace}
+  \newcommand{\Dah}{D.\thinspace{}h.\@\xspace}
+  \newcommand{\ds}{d.\thinspace{}s.\@\xspace}
+  \newcommand{\evtl}{evtl.\@\xspace}
+  \newcommand{\ua}{u.\thinspace{}a.\@\xspace}
+  \newcommand{\Ua}{U.\thinspace{}a.\@\xspace}
+  \newcommand{\uU}{u.\thinspace{}U.\@\xspace}
+  \newcommand{\UU}{U.\thinspace{}U.\@\xspace}
+  \newcommand{\usw}{usw.\@\xspace}
+  \newcommand{\etc}{etc.\@\xspace}
+  \newcommand{\va}{v.\thinspace{}a.\@\xspace}
+  \newcommand{\Vgl}{Vgl.\@\xspace}
+  \newcommand{\vgl}{vgl.\@\xspace}
+  \newcommand{\zB}{z.\thinspace{}B.\@\xspace}
+  \newcommand{\ZB}{Zum Beispiel\xspace}
+  \newcommand{\sa}{s.\thinspace{}a.\@\xspace}
+  \newcommand{\ia}{i.\thinspace{}a.\@\xspace}
+  \newcommand{\bspw}{bspw.\@\xspace}
+  \newcommand{\Bspw}{Bspw.\@\xspace}
+  \newcommand{\ggf}{ggf.\@\xspace}
+  \newcommand{\Ggf}{Ggf.\@\xspace}
+  \newcommand{\zT}{z.\thinspace{}T.\@\xspace}
+  \newcommand{\ZT}{Z.\thinspace{}T.\@\xspace}
+  \newcommand{\iA}{i.\thinspace{}A.\@\xspace}
+  \newcommand{\IA}{I.\thinspace{}A.\@\xspace}
+
+  \newcommand{\ie}{i.\thinspace{}e.\@\xspace}
+  \newcommand{\Ie}{I.\thinspace{}e.\@\xspace}
+  \newcommand{\eg}{e.\thinspace{}g.\@\xspace}
+
+
+
+
+
+
+% Makros für Referenzen (Abbildungen, Zitate, ...)
+% ================================================
+
+  % Referenzierung auf Abbildungen, Tabellen, etc. (Hyperref-fähig)
+  \newcommand{\figref}[1]{\hyperref[#1]{\figurename\ \ref*{#1}}}
+  \newcommand{\tabref}[1]{\hyperref[#1]{\tablename\ \ref*{#1}}}
+  \newcommand{\equref}[1]{\hyperref[#1]{Gl.~(\ref*{#1})}}
+  \newcommand{\defref}[1]{\hyperref[#1]{Definition~\ref*{#1}}}
+  \newcommand{\thrref}[1]{\hyperref[#1]{Satz~\ref*{#1}}}
+  \newcommand{\figvref}[1]{\hyperref[#1]{\figurename\ }\vref{#1}}
+  \newcommand{\tabvref}[1]{\hyperref[#1]{\tablename\ }\vref{#1}}
+  \newcommand{\eqvref}[1]{\hyperref[#1]{Gl.~(\ref*{#1}) auf Seite~\pageref*{#1}}}
+  \newcommand{\pagerefh}[1]{\hyperref[#1]{Seite~\pageref*{#1}}}
+  
+  \newcommand{\charef}[1]{\hyperref[#1]{\chaptername~\ref*{#1}}}
+  \newcommand{\secref}[1]{\hyperref[#1]{Abschnitt~\ref*{#1}}}
+  \newcommand{\appref}[1]{\hyperref[#1]{Anhang~\ref*{#1}}}
+
+  \newcommand{\lstref}[1]{\hyperref[#1]{Listing~\ref*{#1}}}
+  \newcommand{\algoref}[1]{\hyperref[#1]{Algorithmus~\ref*{#1}}}
+  \newcommand{\ftnref}[1]{\hyperref[#1]{Fußnote~\ref*{#1}}}
+  
+  
+% Makros für Abbildungen
+% ======================
+
+% Textbausteine
+% =============
+  % Produktnamen
+  \newcommand*{\Matlab}{\textsc{Matlab}}
+  \newcommand*{\Matlabreg}{\textsc{Matlab}\textsuperscript{\tiny \textregistered}}
+  \newcommand*{\MatSim}{\textsc{Matlab/Simulink}}
+  \newcommand*{\Simulink}{\textsc{Simulink}}
+  \newcommand*{\Simulinkreg}{\textsc{Simulink}\textsuperscript{\tiny \textregistered}}
+  
+  % Das Makro |\name|\marg{person} formatiert einen Personennamen bspw. eines Erfinders oder Entdeckers gemäß |\name{Euler}| \arrow\ \name{Euler}.
+  \newcommand*{\name}[1]{\textsc{#1}}
+
+
+
+% Makros für Einheiten, Exponenten
+% ================================
+
+  \newcommand*{\unit}[1]{\ensuremath{\mathrm{#1}}}
+  
+  % Wert mit Einheit (mit kleinem Leerzeichen dazwischen), aus Text- UND Math-Modus
+  \newcommand*{\valunit}[2]{\ensuremath{#1\,\mrm{#2}}}
+
+
+  % "°C", im Text- oder Mathe-Modus
+  \newcommand*{\degC}{
+    \ifmmode
+      ^\circ \mrm{C}%
+    \else
+      \textdegree C%
+    \fi}
+
+  \newcommand*{\degree}{
+    \ifmmode
+      ^\circ%
+    \else
+      \textdegree%
+    \fi}
+  
+  % Für Exponentenschreibweise ( Anwendung: 123\E{3} )
+  \newcommand*{\E}[1]{\ensuremath{\cdot 10^{#1}}}
+  
+  \newcommand*{\eexp}[1]{\ensuremath{\mathrm{e}^{#1}}}
+  \newcommand*{\iu}{\ensuremath{\mathrm{j}}}
+
+  \newcommand*{\todots}{\ensuremath{,\,\hdots,\,}}
+
+
+% Makros für Formeln
+% ==================
+
+  % Definition für Vektor und Matizen
+    \newcommand*{\mat}[1]{\ensuremath{\boldsymbol{\mathrm{#1}}}}
+    \newcommand*{\ma}[1]{\ensuremath{\boldsymbol{\mathrm{#1}}}}
+    \newcommand*{\mas}[1]{\ensuremath{\boldsymbol{#1}}}
+    \newcommand*{\ve}[1]{\ensuremath{\boldsymbol{\mathrm{#1}}}}
+    \newcommand*{\ves}[1]{\ensuremath{\boldsymbol{#1}}}
+
+  \newcommand*{\AP}{\ensuremath{\mathrm{AP}}}
+  \newcommand*{\doti}{\ensuremath{(i)^\cdot}}
+  
+  \newcommand*{\inprod}[2]{\ensuremath{\langle #1,\,#2 \rangle}}
+  
+  \newcommand*{\ul}[1]{\underline{#1}}
+
+  % gerades "d" (z.B. für Integral)
+  \newcommand*{\ud}{\ensuremath{\mathrm{d}}}
+  
+  % normaler Text in Formeln
+  \newcommand*{\tn}[1]{\textnormal{#1}}
+  
+  % nicht-kursive Schrift in Formeln
+  \newcommand*{\mrm}[1]{\ensuremath{\mathrm{#1}}}
+  
+  % gerades "T" für Transponiert
+  \newcommand*{\transp}{\ensuremath{\mathrm{T}}}
+  
+  % gerades "rg"
+  \newcommand*{\rang}{\ensuremath{\operatorname{rg}}}
+
+  % Für geklammerte Ausdrücke mit Index (Subscript)
+  % (einmal mit kursiven Index, einmal mit geradem Index)
+  \newcommand*{\grpsb}[2]{\ensuremath{\left(#1\right)_{#2}}}
+  \newcommand*{\grprsb}[2]{\ensuremath{\left(#1\right)_{\mathrm{#2}}}}
+
+  % Ableitungen und Integrale
+    % "normale" Ableitung (mit geraden "d"s)
+    \newcommand*{\normd}[2]{\ensuremath{\frac{\mathrm{d}#1}{\mathrm{d}#2}}}
+    \newcommand*{\normdat}[3]{\ensuremath{\left.\frac{\mathrm{d} #1}{\mathrm{d} #2}\right|_{#3}}}
+  
+    % Materielle Ableitung
+    \newcommand*{\matd}[2]{\ensuremath{\frac{\mathrm{D} #1}{\mathrm{D} #2}}}
+    \newcommand*{\matdat}[3]{\ensuremath{\left.\frac{\mathrm{D} #1}{\mathrm{D} #2}\right|_{#3}}}
+  
+    % Partielle Ableitung
+    \newcommand*{\partiald}[2]{\ensuremath{\frac{\partial #1}{\partial #2}}}
+    \newcommand*{\partialdat}[3]{\ensuremath{\left.\frac{\partial #1}{\partial #2}\right|_{#3}}}
+  
+  
+  % Transformationen
+  \newcommand*{\FT}[1]{\ensuremath{\mathcal{F}\left(#1\right)}}
+  \newcommand*{\FTabs}[1]{\ensuremath{\left|\mathcal{F}\left(#1\right)\right|}}
+  \newcommand*{\IFT}[1]{\ensuremath{\mathcal{F}^{-1}\left(#1\right)}}
+  \newcommand*{\DFT}[1]{\ensuremath{\mathrm{DFT}\left(#1\right)}}
+  \newcommand*{\DFTabs}[1]{\ensuremath{\left|\mathrm{DFT}\left(#1\right)\right|}}
+  \newcommand*{\Laplace}[1]{\ensuremath{\mathcal{L}\left(#1\right)}}
+  \newcommand*{\InvLaplace}[1]{\ensuremath{\mathcal{L}^{-1}\left(#1\right)}}
+  \newcommand*{\invtrans}{\ensuremath{\quad\bullet\!\!-\!\!\!-\!\!\circ\quad}}
+  \newcommand*{\trans}{\ensuremath{\quad\circ\!\!-\!\!\!-\!\!\bullet\quad}}
+
+
+  % Manche textcomp-Zeichen funktionieren mit dem TU-Design nicht, diese können dann mit diesem
+  % Befehl gesetzt werden.
+  \newcommand*{\textcompstdfont}[1]{{\fontfamily{cmr} \fontseries{m} \fontshape{n} \selectfont #1}}
+  
+
+
+% =================================================================================
+% Definitionen für Tabellen
+% =================================================================================
+% Spaltenstil zum Ausrichten von Zahlen am Dezimaltrennzeichen
+\newcolumntype{d}[1]{D{.}{,}{#1}}
+
+%\newcolumntype{L}[1]{>{\raggedright\arraybackslash}m{#1}}
+%\newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}
+%\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}m{#1}}
+

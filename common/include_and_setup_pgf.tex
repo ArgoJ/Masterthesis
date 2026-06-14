@@ -1,0 +1,43 @@
+\usepackage{fp} 
+\usepackage{tikz}        % Zum Erzeugen von Bildern mit TikZ
+\usepackage{pgf}
+\usepackage{pgfplots}      % Zum Erzeugen von Diagrammen mit pgfplots
+\usepackage{pgfplotstable}
+\usetikzlibrary{arrows}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{calc}
+\usetikzlibrary{circuits}
+\usetikzlibrary{circuits.ee.IEC}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{decorations.shapes}
+\usetikzlibrary{decorations.text}
+\usetikzlibrary{fadings}
+\usetikzlibrary{fit}
+\usetikzlibrary{intersections}
+\usetikzlibrary{matrix}
+\usetikzlibrary{patterns}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes}
+\usetikzlibrary{shadows}
+\usetikzlibrary{spy}
+\IfLanguageName{german}{
+  \tikzset{
+    /pgf/number format/use comma,
+    /pgf/number format/1000 sep=\,
+  }
+}{}
+\IfLanguageName{ngerman}{
+  \tikzset{
+    /pgf/number format/use comma,
+    /pgf/number format/1000 sep=\,
+  }
+}{}
+
+\input{common/pgfplotssetup.tex}
+
+% Blockschaltbilder
+\newcommand{\TikZscale}{1}
+\newcommand{\mm}{*\TikZscale mm}
+\input{common/TikZ_BSBnormal.tex}
+

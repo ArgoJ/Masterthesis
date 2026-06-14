@@ -1,0 +1,79 @@
+% TikZstyles f�r Blockschaltbilder
+
+\renewcommand{\TikZscale}{1}
+\tikzset{every picture/.style={node distance=4\mm, >=stealth'}}
+
+%% Bl�cke
+  % Rechteckige Bl�cke
+  \tikzstyle{block}      = [draw, semithick, rectangle, minimum height=8\mm, minimum width=8\mm, inner sep=3pt]
+  \tikzstyle{NLblock}    = [draw, semithick, rectangle, minimum height=8\mm, minimum width=8\mm, inner sep=3pt, double distance=1.2pt]
+  \tikzstyle{PICblock}   = [draw, semithick, rectangle, minimum height=8\mm, minimum width=8\mm, inner sep=2pt]
+  \tikzstyle{NLPICblock} = [draw, semithick, rectangle, minimum height=8\mm, minimum width=8\mm, inner sep=3pt, double distance=1.2pt]
+  \tikzstyle{noblock}     = [rectangle, inner sep=-0.6pt]
+
+  % Dreieckige Bl�cke
+  \tikzstyle{Rgain}       = [draw, semithick, isosceles triangle, inner sep=1pt, minimum height=8\mm, isosceles triangle apex angle=60]
+  \tikzstyle{Lgain}       = [draw, semithick, isosceles triangle, inner sep=1pt, minimum height=8\mm, isosceles triangle apex angle=60, shape border rotate=180]
+  \tikzstyle{Ugain}       = [draw, semithick, isosceles triangle, inner sep=1pt, minimum height=8\mm, isosceles triangle apex angle=60, shape border rotate=90]
+  \tikzstyle{Dgain}       = [draw, semithick, isosceles triangle, inner sep=1pt, minimum height=8\mm, isosceles triangle apex angle=60, shape border rotate=-90]
+
+  % Runde Bl�cke
+  \tikzstyle{sum}        = [draw, semithick, circle, inner sep=1pt, minimum size=3\mm]
+  \tikzstyle{branch}     = [draw, circle, inner sep=0pt, minimum size=1\mm, fill=black]
+  \tikzstyle{BRANCH}     = [coordinate]
+
+
+%% Verbindungselemente
+  % Linien mit Pfeil
+  \tikzstyle{to}      = [->, thick]
+  \tikzstyle{toNL}    = [->, thick, shorten >=0.9pt]
+  \tikzstyle{NLto}    = [->, thick, shorten <=0.9pt]
+  \tikzstyle{NLtoNL}  = [->, thick, shorten <=0.9pt, shorten >=0.9pt]
+  
+  \tikzstyle{TO}      = [semithick, double distance=2pt, shorten >=2mm, decoration={markings,mark=at position 1 with {\arrow[semithick]{open triangle 60}}}, preaction={decorate},postaction={draw, line width=2pt, white, shorten >= 1.5mm}]
+  
+  \tikzstyle{TONL}      = [semithick, double distance=2pt, shorten >=2.2mm, decoration={markings,mark=at position 1 with {\arrow[semithick]{open triangle 60}}, transform={xshift=-0.7pt}}, preaction={decorate},postaction={draw, line width=2pt, white, shorten >= 1.5mm}]
+  
+  \tikzstyle{NLTO}      = [semithick, double distance=2pt, shorten <=0.9pt, shorten >=2mm, decoration={markings,mark=at position 1 with {\arrow[semithick]{open triangle 60}}}, preaction={decorate}, postaction={draw, line width=2pt, white, shorten >= 1.5mm}]
+  
+  \tikzstyle{NLTONL}      = [semithick, double distance=2pt, shorten <=0.9pt, shorten >=2.2mm, decoration={markings,mark=at position 1 with {\arrow[semithick]{open triangle 60}}}, preaction={decorate},postaction={draw, line width=2pt, white, shorten >= 1.5mm}]
+  
+  \tikzstyle{innerWhite} = [semithick, white,line width=2pt, shorten >= 2mm, shorten <= 2mm]
+  
+  %\tikzstyle{TO}      = [semithick, double distance=2pt, shorten >=2mm, decoration={markings,mark=at position 1 with {\arrow[semithick]{open triangle 60}}}, postaction={decorate}]
+    %
+  %\tikzstyle{TONL} = [semithick, double distance=2pt, shorten >=2.2mm, decoration={markings,mark=at position 1 with {\arrow[semithick]{open triangle 60}}, transform={xshift=-0.7pt}}, postaction={decorate}]
+  %
+  %\tikzstyle{NLTO} = [semithick, double distance=2pt, shorten <=0.79pt, shorten >=2mm, decoration={markings,mark=at position 1 with {\arrow[semithick]{open triangle 60}}}, postaction={decorate}]
+  %
+  %\tikzstyle{NLTONL} = [semithick, double distance=2pt, shorten <=0.79pt, shorten >=2.2mm, decoration={markings,mark=at position 1 with {\arrow[semithick]{open triangle 60}}, transform={xshift=-0.7pt}}, postaction={decorate}]
+  
+
+  % Linien ohne Pfeil 
+  \tikzstyle{line}       = [thick]
+  \tikzstyle{lineNL}     = [thick, shorten >= 0.6pt]
+  \tikzstyle{NLline}     = [thick, shorten <= 0.6pt]
+  \tikzstyle{NLlineNL}   = [thick, shorten <= 0.6pt, shorten >= 0.6pt]
+  
+  % Doppellinien ohne Pfeil
+  \tikzstyle{LINE}       = [semithick, double distance=2pt]
+  \tikzstyle{LINENL}     = [semithick, double distance=2pt, shorten >= 0.9pt]
+  \tikzstyle{NLLINE}     = [semithick, double distance=2pt, shorten <= 0.9pt]
+  \tikzstyle{NLLINENL}   = [semithick, double distance=2pt, shorten <= 0.9pt, shorten >= 0.9pt]
+  
+  \tikzstyle{neg}         = [postaction={decorate,decoration={markings, mark=at position 1 with{\draw[-](-2pt,-3pt)--(-2pt,-7pt);}}}]
+  
+  \tikzstyle{labelabove} = [above, anchor=base, yshift=0.75ex]
+  \tikzstyle{labelbelow} = [below, anchor=base, yshift=-2ex]
+  \tikzstyle{labelright} = [right]
+  \tikzstyle{labelleft}  = [left]
+  
+  
+  % Pins und Labels
+  \tikzstyle{every pin edge}  = [<-, thick]
+  \tikzstyle{every pin}         = [pin distance=5\mm]
+  \tikzstyle{every label}      = [font=\small]
+  \tikzstyle{terminal}        = [coordinate]
+  
+  % extra Symbole f�r circuits-Library
+  \tikzstyle{jack}  = [draw, circle, minimum size=1.5mm, inner sep=0]

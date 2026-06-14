@@ -1,0 +1,53 @@
+
+\usepackage{iflang}
+\usepackage{xspace}
+
+\usepackage{scrhack}
+\usepackage{bibgerm}    % Für deutsche Literaturverwaltung
+
+
+\usepackage{graphicx}    % zum Einbinden von Postscript
+
+\usepackage{subfig}      % Für Unterabbildungen
+%  \captionsetup[subtable]{position=top}
+\usepackage{rotating}    % Zum Drehen von Objekten
+\usepackage{placeins}    % Für \FloatBarrier
+
+
+\usepackage{booktabs}
+\usepackage{array}      % Für Zellentyp "m{}" in tabular-Umgebungen (Vertikal zentriert)
+\usepackage{ltxtable}   % Vereinigt TabularX und Longtable
+\usepackage{multirow}    % Für mehrzeilige Felder in Tabellen
+\usepackage{cellspace}  % Für gescheiten Abstand von Formeln zu Tabellen-
+                        % rändern
+              
+
+\usepackage{amsmath}    % Mehr mathematischen Formelsatz
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{icomma}      % Damit nach Dezimalkommas kein Abstand eingefügt wird
+                        % (in math-Umgebungen)
+                        
+% =========================================================
+% Workaround für Problem mit amsmath und doppelten Akzenten
+\makeatletter
+\protected\def\mathaccentV#1#2#3#4#5%
+  {%
+    \ifmmode
+      \mathaccentV@do{#2}{#3}{#4}{#5}%
+    \else
+      \@xp\nonmatherr@\csname #1\endcsname
+    \fi
+  }
+\def\mathaccentV@do#1#2#3#4%
+  {%
+    \global\let\macc@nucleus\@empty
+    \mathaccent"\accentclass@#1#2#3{#4}\macc@nucleus
+  }
+\makeatother
+% =========================================================
+
+\usepackage{upgreek}    % Für nicht-kursive kleine griechischen Buchstaben
+
+
+\usepackage[ngerman]{varioref}
