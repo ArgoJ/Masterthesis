@@ -1,6 +1,6 @@
 % !TeX program = lualatex
 \documentclass[
-  ngerman,
+  english,
   ruledheaders=section,%Ebene bis zu der die Überschriften mit Linien abgetrennt werden, vgl. DEMO-TUDaPub
   class=report,% Basisdokumentenklasse. Wählt die Korrespondierende KOMA-Script Klasse
   thesis={type=master},% Dokumententyp Thesis (projektseminar, proseminar, bachelor, master)
@@ -29,7 +29,7 @@
 %%%%%%%%%%%%%%%%%%%
 %Sprachanpassung & Verbesserte Trennregeln
 %%%%%%%%%%%%%%%%%%%
-\usepackage[english, main=ngerman]{babel}
+\usepackage[ngerman, main=english]{babel}
 \usepackage[autostyle]{csquotes}% Anführungszeichen vereinfacht
 \usepackage{microtype}
 
@@ -51,6 +51,8 @@
 \input{common/commonmacros.tex}
 \input{common/custommacros.tex}
 
+\usepackage[capitalize,nameinlink]{cleveref}
+
 
 
 % \Metadata{  % Metadaten im erzeugten PDF/A
@@ -61,7 +63,6 @@
 
 \title{Certification of Imitation Controllers Using Learned Lyapunov Functions}
 \author{Josua Christoph Lindemann}
-\date{Stand: 01.08.2026}
 \reviewer{Prof. Dr.-Ing. Rolf Findeisen \and Hendrik Alsmeier M.Sc.}
 
 \department{etit}

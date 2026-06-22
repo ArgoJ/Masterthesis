@@ -1,8 +1,41 @@
 \section{System Modeling and Problem Formulation}
 \label{sec:system-modeling}
 
+For our experimental setup, two benchmark systems are selected: the double integrator and the cartpole. 
+These systems provide a good balance between simplicity and complexity 
+allowing us to certify the stability of the closed-loop system.
+
+
+% ================================================================================
+% Double Integrator
+% ================================================================================
 \subsection{Double Integrator}
 \label{sec:double-integrator}
 
+The double integrator is a simple second order linear system, therefore it serves as the ideal baseline 
+system in the learning and certification pipeline. The continuous-time dynamics are described by the following state-space equation:
+
+\begin{align}
+    \label{eq:double-integrator}
+    \dot{x}(t) = \begin{bmatrix}0 & 1 \\
+    0 & 0\end{bmatrix} x(t) + \begin{bmatrix}0 \\ 1\end{bmatrix} u(t)
+\end{align}
+
+where $x(t) = \begin{bmatrix}p(t) & v(t)\end{bmatrix}^\top$ is the state vector containing the position and velocity of the system, 
+respectively, and $u(t)$ denotes the scalar control input (acceleration).  
+
+For the \textit{discretization} of the continuous-time system, either Euler's method or the RK4 method with 
+a sampling time of $T_s = 0.1\,\text{s}$ is chosen, depending on certification or simulation purposes. 
+Applying Euler's method (\cref{eq:euler-general}) yields the discrete-time dynamics $x_{k+1} = f_\text{Euler}(x_k, u_k)$, 
+whereas the RK4 method (\cref{eq:rk4-general}) results in $x_{k+1} = f_\text{RK4}(x_k, u_k)$.
+
+The \textit{MPC Formulation} is defined based on \cref{eq:double-integrator} with a prediction horizon of $N = 10$ steps.
+
+
+
+
+% ================================================================================
+% Cartpole
+% ================================================================================
 \subsection{Cartpole}
 \label{sec:cartpole}
