@@ -29,8 +29,10 @@ a sampling time of $T_s = 0.1\,\text{s}$ is chosen, depending on certification o
 Applying Euler's method (\cref{eq:euler-general}) yields the discrete-time dynamics $x_{k+1} = f_\text{Euler}(x_k, u_k)$, 
 whereas the RK4 method (\cref{eq:rk4-general}) results in $x_{k+1} = f_\text{RK4}(x_k, u_k)$.
 
-The \textit{MPC Formulation} is defined based on \cref{eq:double-integrator} with a prediction horizon of $N = 10$ steps.
-
+The \textit{MPC setup} is formulated according to the problem in \cref{eq:mpc-problem} 
+subject to the double-integrator dynamics in \cref{eq:double-integrator}. 
+A prediction horizon of $N = 20$ steps is chosen, and the states and inputs are penalized using 
+the weighting matrices $Q = \operatorname{diag}(15, 1)$ and $R = 0.1$.
 
 
 

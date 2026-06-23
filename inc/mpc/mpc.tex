@@ -4,5 +4,21 @@
 \subsection{Problem Formulation}
 \label{subsec:problem-formulation}
 
+\begin{equation}
+    \label{eq:mpc-problem}
+    \begin{aligned}
+        \{ x_k^* \}_0^N, \{ u_k^* \}_0^{N-1} = & \operatorname*{argmin}_{\{ x_k \}_0^N, \{ u_k \}_0^{N-1}} 
+        \sum_{k=0}^{N-1} \ell(x_k, u_k) + V(x_N) \quad \quad \\
+        \text{s.t.} \quad & x_{k+1} = f(x_k, u_k) && \forall k \in [0, \dots, N-1] \\
+        & x_k \in \boldsymbol{\mathcal{X}_k} && \forall k \in [0, \dots, N] \\
+        & u_k \in \boldsymbol{\mathcal{U}_k} && \forall k \in [0, \dots, N-1] \\
+        & x_0 = x_{init}.
+    \end{aligned}
+\end{equation}
+
+
 \subsection{Terminal Set and Terminal Cost Constraints}
 \label{subsec:terminal-set-cost}
+
+\subsection{Closed-Loop Stability}
+\label{subsec:closed-loop-stability}

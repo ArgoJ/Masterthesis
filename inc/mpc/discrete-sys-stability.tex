@@ -1,9 +1,19 @@
 \section{Discrete-Time Dynamical Systems and Stability}
 \label{sec:discrete-sys-stability}
 
+To implement an optimal control scheme on digital hardware, the continuous-time system dynamics must be discretized. 
+Therefore, a general nonlinear system is considered to be:
+\begin{equation}
+    \label{eq:continuous-time-system}
+    \dot{x}(t) = f(x(t), u(t))
+\end{equation}
+where $x(t) \in \mathcal{X}$ and $u(t) \in \mathcal{U}$ are the constrained state and input vectors, respectively. 
+
+
+TODO: MISSING TEXT
 \begin{equation}
     \label{eq:euler-general}
-    x_{k+1} = x_k + T_s f(x_k, u_k).
+    x_{k+1} = x_k + T_s f(x_k, u_k)
 \end{equation}
 
 \begin{equation}
@@ -21,8 +31,36 @@ where the intermediate slopes $k_1$ through $k_4$ are defined as:
     \end{aligned}
 \end{equation}
 
+In the following, the resulting discrete-time system can be expressed in the general mapping form:
+\begin{equation}
+    \label{eq:discrete-time-system}
+    x_{k+1} = f_d(x_k, u_k).
+\end{equation}
+
 \subsection{Lyapunov Stability}
 \label{subsec:lyapunov-stability}
 
-\subsection{Asymptotic Stability}
-\label{subsec:asymptotic-stability}
+Let the origin $(x, u) = (\mathbf{0}, \mathbf{0})$ be an equilibrium point of the system 
+such that $f_d(\mathbf{0}, \mathbf{0}) = \mathbf{0}$.
+Suppose the system is controlled by a state-feedback control policy $u_k = \kappa(x_k)$.
+The closed-loop system is said to be \textit{Lyapunov stable} if there exists a 
+positive definite Lyapunov function $V(x_k)$ such that:
+\begin{equation}
+    \label{eq:lyapunov-stability}
+    \begin{aligned}
+        V(\mathbf{0}) &= 0 \quad \quad && \\
+        V(x_k) &> 0 \quad \quad && \forall x_k \in \mathcal{X} \setminus \{\mathbf{0}\} \\
+        V(f_d(x_k, \kappa(x_k))) - V(x_k) &\leq 0 \quad \quad && \forall x_k \in \mathcal{X} \setminus \{\mathbf{0}\}.
+    \end{aligned}
+\end{equation}
+
+Furthermore, the equilibrium point is \textit{locally asymptotically stable} 
+if the Lyapunov function additionally satisfies a strictly negative definite decrease condition 
+along the closed-loop trajectories:
+\begin{equation}
+    \label{eq:asymptotic-lyapunov-stability}
+    V(f_d(x_k, \kappa(x_k))) - V(x_k) < 0 \quad \quad \forall x_k \in \mathcal{X} \setminus \{\mathbf{0}\}.
+\end{equation}
+
+Asymptotic stability is typically the desired property for control systems, 
+as it ensures that the system will converge to the equilibrium point over time.
