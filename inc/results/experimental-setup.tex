@@ -15,6 +15,7 @@ allowing us to certify the stability of the closed-loop system.
 The double integrator is a simple second order linear system, therefore it serves as the ideal baseline 
 system in the learning and certification pipeline. The continuous-time dynamics are described by the following state-space equation:
 
+TODO: FIX to Discrete-Time Dynamics
 \begin{align}
     \label{eq:double-integrator}
     \dot{x}(t) = \begin{bmatrix}0 & 1 \\
@@ -22,12 +23,7 @@ system in the learning and certification pipeline. The continuous-time dynamics 
 \end{align}
 
 where $x(t) = \begin{bmatrix}p(t) & v(t)\end{bmatrix}^\top$ is the state vector containing the position and velocity of the system, 
-respectively, and $u(t)$ denotes the scalar control input (acceleration).  
-
-For the \textit{discretization} of the continuous-time system, either Euler's method or the RK4 method with 
-a sampling time of $T_s = 0.1\,\text{s}$ is chosen, depending on certification or simulation purposes. 
-Applying Euler's method (\cref{eq:euler-general}) yields the discrete-time dynamics $x_{k+1} = f_\text{Euler}(x_k, u_k)$, 
-whereas the RK4 method (\cref{eq:rk4-general}) results in $x_{k+1} = f_\text{RK4}(x_k, u_k)$.
+respectively, and $u(t)$ denotes the scalar control input (acceleration).
 
 The \textit{MPC setup} is formulated according to the problem in \cref{eq:mpc-problem} 
 subject to the double-integrator dynamics in \cref{eq:double-integrator}. 
