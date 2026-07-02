@@ -1,2 +1,22 @@
 \section{Stability without Terminal Constraints}
 \label{sec:stability-without-terminal}
+
+only for no terminal constraints -> not asymptotically stable, but can be shown to be practically stable
+
+\begin{equation}
+    \label{eq:without-terminal-alpha}
+    \alpha_N = 1 - \frac{(\gamma - 1)^N}{\gamma^{N-1} - (\gamma - 1)^N}
+\end{equation}
+
+if $\alpha_N > 0$ then  
+\begin{equation}
+    \label{eq:without-terminal-N}
+    N < 2 + \frac{\ln(\gamma - 1)}{\ln(\gamma) - \ln(\gamma - 1)},
+\end{equation}
+
+then holds
+
+\begin{equation}
+    \label{eq:general-stability-condition}
+    V_N(x_k) \leq \gamma \ell^*(x_k)
+\end{equation}

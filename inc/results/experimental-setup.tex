@@ -12,18 +12,18 @@ allowing us to certify the stability of the closed-loop system.
 \subsection{Double Integrator}
 \label{sec:double-integrator}
 
-The double integrator is a simple second order linear system, therefore it serves as the ideal baseline 
-system in the learning and certification pipeline. The continuous-time dynamics are described by the following state-space equation:
+The double integrator is a simple second-order linear system; therefore, it serves as the ideal baseline 
+system in the learning and certification pipeline. Discretizing the continuous-time dynamics using the 
+explicit Euler method with a sampling time of $\Delta t = 0.1$, leads to the discrete-time state-space equation:
 
-TODO: FIX to Discrete-Time Dynamics
-\begin{align}
+\begin{equation}
     \label{eq:double-integrator}
-    \dot{x}(t) = \begin{bmatrix}0 & 1 \\
-    0 & 0\end{bmatrix} x(t) + \begin{bmatrix}0 \\ 1\end{bmatrix} u(t)
-\end{align}
+    x_{k+1} = f_{\text{DI},d}(x_k, u_k) = \begin{bmatrix}1 & \Delta t \\
+    0 & 1\end{bmatrix} x_k + \begin{bmatrix}0 \\ \Delta t\end{bmatrix} u_k
+\end{equation}
 
-where $x(t) = \begin{bmatrix}p(t) & v(t)\end{bmatrix}^\top$ is the state vector containing the position and velocity of the system, 
-respectively, and $u(t)$ denotes the scalar control input (acceleration).
+where $x_k = \begin{bmatrix}p_k & v_k\end{bmatrix}^\top$ is the state vector containing the position and velocity of the system, 
+respectively, and $u_k$ denotes acceleration.
 
 The \textit{MPC setup} is formulated according to the problem in \cref{eq:mpc-problem} 
 subject to the double-integrator dynamics in \cref{eq:double-integrator}. 
@@ -37,3 +37,32 @@ the weighting matrices $Q = \operatorname{diag}(15, 1)$ and $R = 0.1$.
 % ================================================================================
 \subsection{Cartpole}
 \label{sec:cartpole}
+
+The inverted pendulum on a cart, commonly referred to as the cartpole system, is used as a nonlinear benchmark system in this work. 
+There are four states in the system: the cart position $p$, the cart velocity $v$, the pendulum angle $\theta$, 
+and the pendulum angular velocity $\omega$. 
+Here, the state vector is defined as $x = \begin{bmatrix}p & v & \theta & \omega\end{bmatrix}^\top$,
+and the input $u$ is the force $F$ applied to the cart. This leads to the following continuous-time dynamics of the cartpole system:
+
+\begin{equation}
+    \label{eq:cartpole-continuous}
+    f_{\text{CP}}(x, u) =
+    \begin{bmatrix}\dot{p} \\ \dot{v} \\ \dot{\theta} \\ \dot{\omega}\end{bmatrix} = 
+    \begin{bmatrix}v \\ \frac{F + m l \omega^2 \sin(\theta) - m g \sin(\theta) \cos(\theta)}{M + m - m \cos^2(\theta)} \\ 
+    \omega \\ \frac{-F \cos(\theta) - m l \omega^2 \sin(\theta) \cos(\theta) + (M + m) g \sin(\theta)}{l (M + m - m \cos^2(\theta))}\end{bmatrix}
+\end{equation}
+
+where $M = 1\,\text{kg}$ is the mass of the cart, $m = 0.1\,\text{kg}$ is the mass of the pendulum, $l = 0.8\,\text{m}$ is the length of the pendulum, 
+and $g = 9.81\,\text{m/s}^2$ is the acceleration due to gravity.  
+Discretizing the continuous-time dynamics using the explicit Euler method with a sampling time of $\Delta t = 0.05\,\text{s}$, 
+leads to the discrete-time state-space equation:
+
+\begin{equation}
+    \label{eq:cartpole}
+    x_{k+1} = f_{\text{CP},d}(x_k, u_k) = x_k + \Delta t f_{\text{CP}}(x_k, u_k)
+\end{equation}
+
+For the nonlinear benchmark, a prediction horizon of $N = 40$ stages is chosen. 
+The system states and control inputs are penalized within the optimization framework of \cref{eq:mpc-problem} 
+using the weighting matrices $Q = \operatorname{diag}(10,\, 1,\, 10,\, 0.01)$ and $R = 0.5$, respectively, 
+subject to the dynamics defined in \cref{eq:cartpole}.

@@ -1,24 +1,143 @@
 \section{Model Predictive Control and Stability}
 \label{sec:mpc-stability}
 
+This section provides a brief overview of the Model Predictive Control (\textit{MPC}) framework and its stability properties. 
+First, the general MPC problem is formulated, followed by a discussion on the terminal set and terminal cost constraints. 
+Afterwards, the closed-loop stability of the MPC scheme is analyzed.
+
+
 \subsection{Problem Formulation}
 \label{subsec:problem-formulation}
 
+For the nominal MPC setup considered in this work, the following finite-horizon optimal control problem  
+is solved at each time step $k$ given the current system state $x_k$:
 \begin{equation}
     \label{eq:mpc-problem}
     \begin{aligned}
-        \{ x_k^* \}_0^N, \{ u_k^* \}_0^{N-1} = & \operatorname*{argmin}_{\{ x_k \}_0^N, \{ u_k \}_0^{N-1}} 
-        \sum_{k=0}^{N-1} \ell(x_k, u_k) + V(x_N) \quad \quad \\
-        \text{s.t.} \quad & x_{k+1} = f(x_k, u_k) && \forall k \in [0, \dots, N-1] \\
-        & x_k \in \boldsymbol{\mathcal{X}_k} && \forall k \in [0, \dots, N] \\
-        & u_k \in \boldsymbol{\mathcal{U}_k} && \forall k \in [0, \dots, N-1] \\
-        & x_0 = x_{init}.
+        \min_{\{x_i\}_{i=0}^N, \{u_i\}_{i=0}^{N-1}} \quad &
+        \sum_{i=0}^{N-1} \ell(x_i, u_i) + V_f(x_N) \\
+        \text{s.t.} \quad & x_{i+1} = f_d(x_i, u_i), && i = 0, \dots, N-1, \\
+        & x_i \in \mathcal{X}, && i = 0, \dots, N, \\
+        & u_i \in \mathcal{U}, && i = 0, \dots, N-1, \\
+        & x_0 = x_k.
     \end{aligned}
 \end{equation}
+Here, $N$ denotes the prediction horizon, $\ell(x_i, u_i)$ is the stage cost function, and $V_f(x_N)$ represents the terminal cost function. 
+The system dynamics are represented by the discrete-time function $f_d(x_i, u_i)$, 
+while $\mathcal{X}$ and $\mathcal{U}$ denote the state and input constraint sets, respectively. 
+
+A quadratic cost function is used for the stage cost, defined as 
+\begin{equation}
+    \label{eq:stage-cost}
+    \ell(x_i, u_i) = x_i^\top Q x_i + u_i^\top R u_i,
+\end{equation}
+where $Q \succeq 0$ and $R \succ 0$ are the state and input weighting matrices, respectively. 
+Following the receding horizon principle, only the first control input $u_0^*$ from the optimal sequence is applied to the system, 
+and the optimization is repeated at the next sampling instance.
 
 
-\subsection{Terminal Set and Terminal Cost Constraints}
-\label{subsec:terminal-set-cost}
+\subsection{Terminal Ingredients for Stability}
+\label{subsec:terminal-set-cost} 
+
+To ensure stability of a closed-loop system of a nominal MPC, a terminal set $\mathcal{X}_f \subseteq \mathcal{X}$ 
+and a terminal cost function $V_f(x_N)$ are introduced. 
+The terminal set $\mathcal{X}_f$ is a positively invariant set for the system under a local control law $u = \mu(x_k)$, 
+and the terminal cost $V_f(x_N)$ is a Lyapunov function for the system within this set. 
+However, to include these terminal ingredients, \cref{eq:mpc-problem} must be augmented with the following terminal constraint:
+\begin{equation}
+    \label{eq:terminal-constraint}
+    x_N \in \mathcal{X}_f.
+\end{equation}  
+
+The property of a positive invariant set $\mathcal{X}_f$ is defined as a set of states where a state $x_k \in \mathcal{X}_f$ remains in $\mathcal{X}_f$ 
+for all future time steps under the local control law $\mu(x_k)$, 
+\begin{equation}
+    \label{eq:positive-invariance}
+    f_d(x, \mu(x)) \in \mathcal{X}_f \quad \forall x \in \mathcal{X}_f.
+\end{equation}
+
+This predictive mechanism is visualized in \cref{fig:terminal-set-comparison}. 
+While the initial state $x_0$ and the intermediate predicted states $x_1, x_2$ are only restricted to the safe state space $\mathcal{X}$, 
+the terminal constraint \cref{eq:terminal-constraint} forces the final predicted state $x_N$ to terminate strictly inside the invariant terminal set $\mathcal{X}_f$. 
+Together with the terminal cost $V_f(x_N)$, which acts as a local Lyapunov function inside $\mathcal{X}_f$, 
+these ingredients establish a mathematical bridge. 
+
+For nonlinear systems, the terminal set $\mathcal{X}_f$ is typically computed using linearized system dynamics around the equilibrium point 
+$(x, u) = (\mathbf{0}, \mathbf{0})$, yielding the linear discrete-time state-space model:
+\begin{equation}
+    \label{eq:linearized-system}
+    x_{k+1} = A x_k + B u_k.
+\end{equation}
+A widely used choice for these terminal ingredients is then derived from the Linear-Quadratic Regulator (\textit{LQR}). 
+Here, the local control law $\mu(x_k)$ is chosen as a linear state-feedback policy $\mu(x_k) = -K x_k$, where the optimal LQR gain $K$ is given by
+\begin{equation}
+    \label{eq:lqr-feedback}
+    K = \left(R + B^\top P B\right)^{-1} B^\top P A.
+\end{equation}
+
+The matrix $P \succ 0$ is obtained as the unique positive definite solution to the discrete-time Algebraic Riccati Equation (\textit{DARE}):
+\begin{equation}
+    \label{eq:riccati-equation}
+    P = A^\top P A - A^\top P B \left(R + B^\top P B\right)^{-1} B^\top P A + Q.
+\end{equation}
+
+This matrix parameterizes the quadratic terminal cost function $V_f(x_N) = x_N^\top P x_N$. 
+Accordingly, the terminal set $\mathcal{X}_f$ is defined as an ellipsoidal sub-level set of this cost function:
+\begin{equation}
+    \label{eq:terminal-ellipse}
+    \mathcal{X}_f = \left\{ x \in \mathbb{R}^n \ \middle|\ x^\top P x \leq \alpha \right\}.
+\end{equation}
+To satisfy the positive invariance condition \cref{eq:positive-invariance} for the original nonlinear system, 
+the scaling parameter $\alpha > 0$ must be chosen sufficiently small. This ensures not only that all states within $\mathcal{X}_f$ 
+satisfy the state constraints $\mathcal{X}$ and input constraints $\mathcal{U}$, but also that the local quadratic 
+Lyapunov descent condition dominates the higher-order linearization errors of the nonlinear dynamics.
+
+\newcommand{\boundellipse}[3]% center, xdim, ydim
+{(#1) ellipse (#2 and #3)
+}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        dot/.style={circle, fill=black!80, inner sep=1pt, minimum size=6pt},
+        red-dot/.style={circle, fill=red!80, inner sep=1pt, minimum size=6pt}
+    ]
+        % State constraint set X (Large blue ellipse centered at 0,0)
+        \fill[blue!10, fill opacity=0.4] \boundellipse{0,0}{5}{3};
+        \draw[blue!60, thick] \boundellipse{0,0}{5}{3};
+        \node[text=blue, font=\footnotesize] at (3, 0) 
+            {$\mathcal{X}$};
+        
+        % Terminal set Xf (Smaller red ellipse shifted to the bottom-left)
+        \fill[red!10, fill opacity=0.4] \boundellipse{-1,-0.5}{2}{1.5};
+        \draw[red!60, thick] \boundellipse{-1,-0.5}{2}{1.5};
+        \node[text=red, font=\footnotesize] at (0, -1) 
+            {$\mathcal{X}_f$};
+
+        % Nodes
+        % Syntax: \node[Style, label=Position:Text] (Name) at (Koordinaten) {};
+        \node[dot, label=above right:$x_0$]    (x0)  at (3.5, 1.0)  {};
+        \node[dot, label=above right:$x_1$]    (x1)  at (2.0, 1.2)  {};
+        \node[dot, label=above right:$x_2$]    (x2)  at (0.5, 0.5)  {};
+        \node[red-dot, label=below left:$x_N$] (xN) at (-1.0, -0.5) {};
+
+        % Automatically connect the nodes by their names (without typing coordinates!)
+        \draw[->, black!80, thick] (x0) -- (x1);
+        \draw[->, black!70, thick] (x1) -- (x2);
+        \draw[->, red!80, thick, dashed] (x2) -- (xN);
+        
+    \end{tikzpicture}
+    \caption{Comparison of the terminal set $\mathcal{X}_f$ (red) with the entire state space $\mathcal{X}$ (blue).}
+    \label{fig:terminal-set-comparison}
+\end{figure}
+
 
 \subsection{Closed-Loop Stability}
 \label{subsec:closed-loop-stability}
+
+TODO: ADD FORMULATION FOR RELAXED MPC STABILITY CONDITION
+
+\begin{equation}
+    \label{eq:relaxed-mpc-stability}
+    V_N(f_d(x_k, \mu(x_k))) \leq  V_N(x_k) - \alpha_N \cdot \ell(x_k, \mu(x_k)), \quad \forall x_k \in \mathcal{X}_f
+\end{equation}
