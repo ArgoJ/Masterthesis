@@ -1,8 +1,33 @@
 \section{Lyapunov Learning for Stability Certification}
 \label{sec:lyapunov-learning}
 
+To achieve formal stability with learned controllers, 
+a Lyapunov function is learned to certify stability. 
+For this purpose, a neural network, as described in \cref{subsec:mlp}, 
+is trained to approximate a Lyapunov function. 
+The Counterexample-Guided Inductive Synthesis (\textit{CEGIS}) framework is used to find 
+stability violations and therefore make the Lyapunov function a valid certificate for stability.
+
 \subsection{Lyapunov Network Architecture}
 \label{subsec:lyapunov-network-architecture}
+
+Ensuring that the learned Lyapunov function is positive definite is crucial for stability certification.
+To achieve this, a neural network architecture is designed to guarantee positive definiteness by construction, 
+following the approach in \cite{lyapunov-stable-nn}. The architecture combines the flexibility of neural networks 
+while ensuring the mathematical properties required for Lyapunov functions. 
+Resulting from this design, the Lyapunov function is defined as:
+\begin{equation}
+    V(x_k) = \left| \phi_V(x_k) - \phi_V(x^*) \right| 
+        + \left\|  (\epsilon I + R^\top R) (x_k - x^*)  \right\|_1,
+\end{equation}
+where $\phi_V : \mathbb{R}^n \to \mathbb{R}$ is a neural network, $x_k \in \mathbb{R}^n$ is the current state, 
+$x^* \in \mathbb{R}^n$ is the equilibrium, $\epsilon > 0$ is a small regularization constant, 
+and $R \in \mathbb{R}^{n \times n}$ is a learnable matrix. 
+While the first term is only positive semi-definite and may vanish away from the equilibrium, 
+the second term guarantees strict positive definiteness $\forall x_k \in \mathcal{X} \setminus \{x^*\}$, 
+as the matrix $(\epsilon I + R^\top R)$ is strictly 
+positive definite by construction for any $\epsilon > 0$.
+
 
 \subsection{Loss Formulation and CEGIS Training}
 \label{subsec:lyapunov-formulation}
