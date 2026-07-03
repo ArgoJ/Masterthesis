@@ -2,20 +2,20 @@
 \label{sec:lyapunov-learning}
 
 To achieve formal stability with learned controllers, 
-a Lyapunov function is learned to certify stability. 
+a Lyapunov candidate is learned to certify stability. 
 For this purpose, a neural network, as described in \cref{subsec:mlp}, 
-is trained to approximate a Lyapunov function. 
+is trained to approximate a Lyapunov candidate. 
 The Counterexample-Guided Inductive Synthesis (\textit{CEGIS}) framework is used to find 
-stability violations and therefore make the Lyapunov function a valid certificate for stability.
+stability violations and therefore make the Lyapunov candidate a valid certificate for stability.
 
 \subsection{Lyapunov Network Architecture}
 \label{subsec:lyapunov-network-architecture}
 
-Ensuring that the learned Lyapunov function is positive definite is crucial for stability certification.
+Ensuring that the learned Lyapunov candidate is positive definite is crucial for stability certification.
 To achieve this, a neural network architecture is designed to guarantee positive definiteness by construction, 
 following the approach in \cite{lyapunov-stable-nn}. The architecture combines the flexibility of neural networks 
 while ensuring the mathematical properties required for Lyapunov functions. 
-Resulting from this design, the Lyapunov function is defined as:
+Resulting from this design, the Lyapunov candidate is defined as:
 \begin{equation}
     V(x_k) = \left| \phi_V(x_k) - \phi_V(x^*) \right| 
         + \left\|  (\epsilon I + R^\top R) (x_k - x^*)  \right\|_1,
