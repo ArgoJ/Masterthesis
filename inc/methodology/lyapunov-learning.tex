@@ -17,6 +17,7 @@ following the approach in \cite{lyapunov-stable-nn}. The architecture combines t
 while ensuring the mathematical properties required for Lyapunov functions. 
 Resulting from this design, the Lyapunov candidate is defined as:
 \begin{equation}
+    \label{eq:lyapunov-candidate}
     V(x_k) = \left| \phi_V(x_k) - \phi_V(x^*) \right| 
         + \left\|  (\epsilon I + R^\top R) (x_k - x^*)  \right\|_1,
 \end{equation}
@@ -31,3 +32,55 @@ positive definite by construction for any $\epsilon > 0$.
 
 \subsection{Loss Formulation and CEGIS Training}
 \label{subsec:lyapunov-formulation}
+
+Enabling the Lyapunov candidate described in \cref{eq:lyapunov-candidate} to be certifieable for stability, 
+the loss function needs to have multiple components. 
+
+\paragraph{Relative Lyapunov Decrease Loss} is designed to ensure that the Lyapunov candidate decreases along the system trajectories.
+This is achieved by minimizing the relative difference between the Lyapunov candidate evaluated at the current state and the next state. 
+For this purpose, the lyapunov decrease term is defined as
+\begin{equation}
+    \label{eq:lyapunov-decrease}
+    e_V(x_k, x_{k+1}) = V(x_{k+1}) - (1 -  \kappa) \cdot V(x_k) + \epsilon,
+\end{equation}
+where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease, and $\epsilon \ge 0$ is a safety margin. 
+To balance the optimization scale across different magnitudes of $V$, we normalize this violation to obtain the relative decrease loss:
+\begin{equation}
+    \label{eq:rel-lyapunov-decrease}
+    \mathcal{L}_{\text{dec}}(x_k, x_{k+1}) = \left[\frac{e_V(x_k, x_{k+1})}{|V(x_k)| + \epsilon_{\text{rel}}}\right]_+,
+\end{equation}
+where $\epsilon_{\text{rel}} > 0$ prevents division by zero and $[\cdot]_+$ denotes the ReLU function.
+
+\paragraph{Relative State Invariance Loss} penalizes trajectories that escape the admissible state space 
+$\mathcal{X} = \{x \in \mathbb{R}^n \mid \underline{x} \le x \le \bar{x}\}$. 
+The relative one-step state-constraint violation for the next state $x_{k+1}$ is formulated as
+\begin{equation}
+    \label{eq:rel-invariance}
+    \mathcal{L}_{\text{inv}}(x_{k+1}) = \sum_{i=1}^{n} 
+    \frac{\left[x_{k+1,i} - \bar{x}_i\right]_+ + \left[\underline{x}_i - x_{k+1,i}\right]_+}{\bar{x}_i - \underline{x}_i}.
+\end{equation}
+
+\paragraph{Combined $\rho$-Gated Condition Loss} is the sample wise combination of 
+the relative Lyapunov decrease loss from \cref{eq:rel-lyapunov-decrease} and the relative state invariance loss from \cref{eq:rel-invariance},
+\begin{equation}
+    \label{eq:comnbined-condition-violation}
+    \mathcal{L}_{cond}(x_k, x_{k+1}) = 
+        \mathcal{L}_{\text{dec}}(x_k, x_{k+1}) + 
+        \omega_{\text{inv}} \cdot \mathcal{L}_{\text{inv}}(x_{k+1}),
+\end{equation}
+where $\omega_{\text{inv}}$ is a hyperparameter balancing the relative importance of the two loss components.
+
+However, to gate the loss by $\rho$ and weight the samples accordingly, the combined condition loss is weighted by 
+\begin{equation}
+    \label{eq:rho-gate}
+    w_{\rho}(x_k)
+    = \mathbf{1}\{V(x_k) \geq \rho\} \left(1 - \frac{V(x_k)}{\rho}\right).
+\end{equation}
+
+The weighted mean of the combined condition loss from \cref{eq:comnbined-condition-violation} 
+and the $\rho$-gating weight from \cref{eq:rho-gate} are then used, resulting in the final loss formulation:
+\begin{equation}
+    \label{eq:rho-gated-condition-loss}
+    \mathcal{L}_{\rho\text{-gated}}
+    = \frac{\sum w_{\rho}(x_k) \cdot \mathcal{L}_{cond}(x_k, x_{k+1})}{\sum w_{\rho}(x_k)}
+\end{equation}
