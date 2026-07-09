@@ -98,11 +98,12 @@ results in the final loss formulation:
 \end{equation}
 
 
-\paragraph{ROA-Surrogate Loss} tries to enlarge the region of attraction, by creating samples near the $\rho$-sublevel boundary 
-and 
+\paragraph{ROA-Surrogate Loss} tries to enlarge the region of attraction by creating samples within the 
+boundary layer of the training space, defined as $\mathcal{B}_{\text{boundary}} = \mathcal{B} \setminus 0.6 \mathcal{B}$.
+For a batch of $M$ samples $x_{\text{ROA}}^{(i)} \in \mathcal{B}_{\text{boundary}}$ are generated and evaluated in the following formulation:
 \begin{equation}
     \label{eq:roa-loss}
     \mathcal{L}_{\text{ROA}} = \frac{1}{M} \sum_{i=1}^{M} \left[
         \frac{V(x_{\text{ROA}}^{(i)})}{\rho} - 1
-    \right]_+
+    \right]_+.
 \end{equation}
