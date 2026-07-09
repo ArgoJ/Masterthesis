@@ -30,57 +30,79 @@ as the matrix $(\epsilon I + R^\top R)$ is strictly
 positive definite by construction for any $\epsilon > 0$.
 
 
+
 \subsection{Loss Formulation and CEGIS Training}
 \label{subsec:lyapunov-formulation}
 
-Enabling the Lyapunov candidate described in \cref{eq:lyapunov-candidate} to be certifieable for stability, 
-the loss function needs to have multiple components. 
+To ensure that the Lyapunov candidate described in \cref{eq:lyapunov-candidate} can be certified for stability, 
+the loss function must comprise multiple components. 
+It utilizes the ReLU function $[\cdot]_+$ for specific penalties, 
+alongside a weighted mean to aggregate the sample losses.
+Throughout the entire loss formulation, we consider a target sublevel value $\rho$, 
+which is constrained by a lower bound $\rho_{\text{min}} > 0$ to ensure numerical stability.
+
 
 \paragraph{Relative Lyapunov Decrease Loss} is designed to ensure that the Lyapunov candidate decreases along the system trajectories.
 This is achieved by minimizing the relative difference between the Lyapunov candidate evaluated at the current state and the next state. 
-For this purpose, the lyapunov decrease term is defined as
+For this purpose, the per-sample Lyapunov decrease term is defined as
 \begin{equation}
     \label{eq:lyapunov-decrease}
-    e_V(x_k, x_{k+1}) = V(x_{k+1}) - (1 -  \kappa) \cdot V(x_k) + \epsilon,
+    e_V(x_k, x_{k+1}) = V(x_{k+1}) - (1 -  \kappa) \cdot V(x_k) + \epsilon_m,
 \end{equation}
-where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease, and $\epsilon \ge 0$ is a safety margin. 
+where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease, and $\epsilon_m \ge 0$ is a safety margin. 
 To balance the optimization scale across different magnitudes of $V$, we normalize this violation to obtain the relative decrease loss:
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
-    \mathcal{L}_{\text{dec}}(x_k, x_{k+1}) = \left[\frac{e_V(x_k, x_{k+1})}{|V(x_k)| + \epsilon_{\text{rel}}}\right]_+,
+    \mathcal{L}_{\text{dec}} = \left[
+        \frac{e_V(x_k, x_{k+1})}{|V(x_k)| + \epsilon_{\text{rel}}}
+    \right]_+,
 \end{equation}
-where $\epsilon_{\text{rel}} > 0$ prevents division by zero and $[\cdot]_+$ denotes the ReLU function.
+where $\epsilon_{\text{rel}} > 0$ prevents division by zero.
 
-\paragraph{Relative State Invariance Loss} penalizes trajectories that escape the admissible state space 
-$\mathcal{X} = \{x \in \mathbb{R}^n \mid \underline{x} \le x \le \bar{x}\}$. 
-The relative one-step state-constraint violation for the next state $x_{k+1}$ is formulated as
+
+\paragraph{Relative State Invariance Loss} penalizes trajectories that escape the training state space 
+$\mathcal{B} = \{x \in \mathbb{R}^n \mid \underline{x} \le x \le \bar{x}\}$. 
+Therefore, the relative one-step state-constraint violation loss for the next state $x_{k+1}$ 
+across all dimensions $j = 1, \dots, n$ is formulated per sample as
 \begin{equation}
     \label{eq:rel-invariance}
-    \mathcal{L}_{\text{inv}}(x_{k+1}) = \sum_{i=1}^{n} 
-    \frac{\left[x_{k+1,i} - \bar{x}_i\right]_+ + \left[\underline{x}_i - x_{k+1,i}\right]_+}{\bar{x}_i - \underline{x}_i}.
+    \mathcal{L}_{\text{inv}} = \sum_{j=1}^{n} 
+    \frac{\left[x_{k+1,j} - \bar{x}_j\right]_+ + \left[\underline{x}_j - x_{k+1,j}\right]_+}{\bar{x}_j - \underline{x}_j}.
 \end{equation}
 
-\paragraph{Combined $\rho$-Gated Condition Loss} is the sample wise combination of 
+
+\paragraph{Combined $\rho$-Gated Condition Loss} is the sample-wise $\rho$-gated combination of 
 the relative Lyapunov decrease loss from \cref{eq:rel-lyapunov-decrease} and the relative state invariance loss from \cref{eq:rel-invariance},
 \begin{equation}
-    \label{eq:comnbined-condition-violation}
-    \mathcal{L}_{cond}(x_k, x_{k+1}) = 
-        \mathcal{L}_{\text{dec}}(x_k, x_{k+1}) + 
-        \omega_{\text{inv}} \cdot \mathcal{L}_{\text{inv}}(x_{k+1}),
+    \label{eq:combined-condition-violation}
+    \mathcal{L}_{\text{cond}} = 
+        \mathcal{L}_{\text{dec}} + 
+        \omega_{\text{inv}} \cdot \mathcal{L}_{\text{inv}},
 \end{equation}
 where $\omega_{\text{inv}}$ is a hyperparameter balancing the relative importance of the two loss components.
-
-However, to gate the loss by $\rho$ and weight the samples accordingly, the combined condition loss is weighted by 
+However, to apply the $\rho$-gate appropriately, $\mathcal{L}_{\text{cond}}$ is weighted for each sample using the soft sublevel weight
 \begin{equation}
     \label{eq:rho-gate}
-    w_{\rho}(x_k)
-    = \mathbf{1}\{V(x_k) \geq \rho\} \left(1 - \frac{V(x_k)}{\rho}\right).
+    w_{\rho} = \operatorname{sigmoid} \left(
+        s \cdot \frac{\rho - V(x_k)}{\max (\rho, \epsilon_{\text{rel}})}
+    \right),
 \end{equation}
-
-The weighted mean of the combined condition loss from \cref{eq:comnbined-condition-violation} 
-and the $\rho$-gating weight from \cref{eq:rho-gate} are then used, resulting in the final loss formulation:
+where $s > 0$ denotes the gate sharpness. This smooth formulation ensures that the weights 
+inside the $\rho$-sublevel are $\approx 1$, whereas the weights for states far outside of $\rho$ approach $0$. 
+The weighted mean of the combined condition loss $\mathcal{L}_{\text{cond}}$ and $\rho$-gating weight $w_{\rho}$ 
+results in the final loss formulation:
 \begin{equation}
     \label{eq:rho-gated-condition-loss}
     \mathcal{L}_{\rho\text{-gated}}
-    = \frac{\sum w_{\rho}(x_k) \cdot \mathcal{L}_{cond}(x_k, x_{k+1})}{\sum w_{\rho}(x_k)}
+    = \frac{\sum_{i=1}^{N} w_{\rho}^{(i)} \cdot \mathcal{L}^{(i)}_{\text{cond}}}{\sum_{i=1}^{N} w_{\rho}^{(i)}}
+\end{equation}
+
+
+\paragraph{ROA-Surrogate Loss} tries to enlarge the region of attraction, by creating samples near the $\rho$-sublevel boundary 
+and 
+\begin{equation}
+    \label{eq:roa-loss}
+    \mathcal{L}_{\text{ROA}} = \frac{1}{M} \sum_{i=1}^{M} \left[
+        \frac{V(x_{\text{ROA}}^{(i)})}{\rho} - 1
+    \right]_+
 \end{equation}
