@@ -47,14 +47,14 @@ This is achieved by minimizing the relative difference between the Lyapunov cand
 For this purpose, the per-sample Lyapunov decrease term is defined as
 \begin{equation}
     \label{eq:lyapunov-decrease}
-    e_{V}(x_k, x_{k+1}) = V(x_{k+1}) - (1 -  \kappa) \cdot V(x_k) + \epsilon_m,
+    e_{V} = V(x_{k+1}) - (1 -  \kappa) \cdot V(x_k) + \epsilon_m,
 \end{equation}
 where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease, and $\epsilon_m \ge 0$ is a safety margin. 
 To balance the optimization scale across different magnitudes of $V$, we normalize this violation to obtain the relative decrease loss:
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
     \mathcal{L}_{\text{dec}} = \left[
-        \frac{e_{V}(x_k, x_{k+1})}{|V(x_k)| + \epsilon_{\text{rel}}}
+        \frac{e_{V}}{|V(x_k)| + \epsilon_{\text{rel}}}
     \right]_+,
 \end{equation}
 where $\epsilon_{\text{rel}} > 0$ prevents division by zero.
@@ -109,18 +109,36 @@ For a batch of $M$ samples $x_{\text{ROA}}^{(i)} \in \mathcal{B}_{\text{boundary
 \end{equation}
 
 
-\paragraph{LIRPA-Condition Loss} smoothens the Lyapunov function by including formal violations of the Lyapunov decrease condition 
-as defined in \cref{eq:lyapunov-decrease}, which are found using the LIRPA framework \cite{lirpabook}. 
+\paragraph{LIRPA-Condition Loss} makes the Lyapunov function more verifier-friendly 
+by including formal violations of the Lyapunov decrease condition as defined in \cref{eq:lyapunov-decrease}, 
+which are found using the LIRPA framework \cite{lirpabook}. 
 In order to compute these violations efficiently, the LIRPA framework is provided with a filtered subset of regions. 
-For the filter, the center $x_{\text{center}}$, lower bounds $x_{\text{lower}}$ and upper bounds $x_{\text{upper}}$ 
-are used to evaluate whether the regions lie within the $\rho$-sublevel set or intersect its boundary. 
-If at least one of the three characteristic points satisfies $V(x) \leq \rho$, the region is considered for evaluation. 
-The model used for the LIRPA evaluation a signed Lyapunov decrease loss $-e_V(x_k, x_{k+1})$ as defined in \cref{eq:lyapunov-decrease}. 
+This subset holds regions where either the center $x_{\text{center}}$, lower bounds $x_{\text{lower}}$ or 
+upper bounds $x_{\text{upper}}$ satisfy $V(x) \leq \rho$. 
+The model used for the LIRPA evaluation is the signed Lyapunov decrease loss $-e_V$ as given in \cref{eq:lyapunov-decrease}. 
 This is done such that LIRPA can provide a lower bound $s_{\text{lower}}$ for the Lyapunov decrease condition, 
-which is then used to define the LIRPA-condition loss.
-After formally evaluating the signed Lyapunov decrease lower bound $s_{\text{lower}}$ for all regions, the LIRPA-condition loss is defined as:
+which inturn is used to define the LIRPA-condition loss.
+After formally evaluating the signed Lyapunov decrease lower bound $s_{\text{lower}}$ for all $N_{\text{L}}$ regions, 
+the LIRPA-condition loss is defined as:
 \begin{equation}
     \label{eq:relative-lirpa-condition}
-    \mathcal{L}_{\text{LIRPA}} = \frac{s_{\text{lower}}}{V(x_{\text{center}}) + \epsilon_{\text{rel}}}.
+    \mathcal{M}_{\text{L}} = \frac{[s_{\text{lower}}]_+}{V(x_{\text{center}}) + \epsilon_{\text{rel}}}.
 \end{equation}
-
+The final LIRPA-condition loss is then computed as the weighted mean of all evaluated regions, 
+with the weight formulated as the squared distance between the region center $x_{\text{center}}$ and the equilibrium $x^*$:
+\begin{equation}
+    \label{eq:lirpa-weight}
+    w_{L} = \operatorname{exp} \left(
+        - \alpha_L \cdot \sum_{j=0}^{n} \left( x_{\text{center}, j} - x^*_j \right)^2
+    \right),
+\end{equation}
+where $\alpha_L > 0$ is a hyperparameter controlling the decay rate of the weight with respect to the distance from the equilibrium.
+Finally, the LIRPA-condition loss for $N_{\text{L}}$ regions is computed as:
+\begin{equation}
+    \label{eq:relative-lirpa-condition-loss}
+    \mathcal{L}_{\text{LIRPA}} = \frac{
+        \sum_{i=1}^{N_{\text{L}}} w_{L}^{(i)} \cdot \mathcal{M}_{\text{L}}^{(i)}
+    }{
+        \sum_{i=1}^{N_{\text{L}}} w_{L}^{(i)}
+    }.
+\end{equation}
