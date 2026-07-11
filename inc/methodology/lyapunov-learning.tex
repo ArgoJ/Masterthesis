@@ -111,29 +111,28 @@ For a batch of $M$ samples $x_{\text{ROA}}^{(i)} \in \mathcal{B}_{\text{boundary
 
 \paragraph{LIRPA-Condition Loss} makes the Lyapunov function more verifier-friendly 
 by including formal violations of the Lyapunov decrease condition as defined in \cref{eq:lyapunov-decrease}, 
-which are found using the LIRPA framework \cite{lirpabook}. 
-In order to compute these violations efficiently, the LIRPA framework is provided with a filtered subset of regions. 
-This subset holds regions where either the center $x_{\text{center}}$, lower bounds $x_{\text{lower}}$ or 
-upper bounds $x_{\text{upper}}$ satisfy $V(x) \leq \rho$. 
-The model used for the LIRPA evaluation is the signed Lyapunov decrease loss $-e_V$ as given in \cref{eq:lyapunov-decrease}. 
-This is done such that LIRPA can provide a lower bound $s_{\text{lower}}$ for the Lyapunov decrease condition, 
-which inturn is used to define the LIRPA-condition loss.
-After formally evaluating the signed Lyapunov decrease lower bound $s_{\text{lower}}$ for all $N_{\text{L}}$ regions, 
-the LIRPA-condition loss is defined as:
+which are identified using the LIRPA framework \cite{lirpabook}. 
+In order to compute these violations efficiently, only a filtered subset of regions is evaluated. 
+This subset contains regions for which either the center $x_{\text{center}}$, lower bound $x_{\text{lower}}$ or 
+upper bound $x_{\text{upper}}$ satisfies $V(x) \leq \rho$. 
+LIRPA then provides a formal lower bound $s_{\text{lower}}$ on the 
+signed Lyapunov decrease $-e_V$ for each of these regions. 
+After evaluation, the LIRPA-condition violation for each region is computed as
 \begin{equation}
     \label{eq:relative-lirpa-condition}
-    \mathcal{M}_{\text{L}} = \frac{[s_{\text{lower}}]_+}{V(x_{\text{center}}) + \epsilon_{\text{rel}}}.
+    \mathcal{M}_{\text{L}} = \frac{[-s_{\text{lower}}]_+}{V(x_{\text{center}}) + \epsilon_{\text{rel}}}.
 \end{equation}
-The final LIRPA-condition loss is then computed as the weighted mean of all evaluated regions, 
-with the weight formulated as the squared distance between the region center $x_{\text{center}}$ and the equilibrium $x^*$:
+The final LIRPA-condition loss is then computed as the weighted mean over all evaluated regions, 
+where the weight is defined using an exponential function of the squared Euclidean distance between 
+the region center $x_{\text{center}}$ and the equilibrium $x^*$:
 \begin{equation}
     \label{eq:lirpa-weight}
     w_{L} = \operatorname{exp} \left(
-        - \alpha_L \cdot \sum_{j=0}^{n} \left( x_{\text{center}, j} - x^*_j \right)^2
+        - \alpha_{\text{L}} \cdot \lVert x_{\text{center}} - x^* \rVert^2_2
     \right),
 \end{equation}
-where $\alpha_L > 0$ is a hyperparameter controlling the decay rate of the weight with respect to the distance from the equilibrium.
-Finally, the LIRPA-condition loss for $N_{\text{L}}$ regions is computed as:
+where $\alpha_{\text{L}} > 0$ is a hyperparameter controlling the decay rate of the weight.
+Finally, the LIRPA-condition loss over $N_{\text{L}}$ regions is computed as
 \begin{equation}
     \label{eq:relative-lirpa-condition-loss}
     \mathcal{L}_{\text{LIRPA}} = \frac{
