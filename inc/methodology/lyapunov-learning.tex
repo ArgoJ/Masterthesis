@@ -146,10 +146,12 @@ Finally, the LIRPA-condition loss over $N_{\text{L}}$ regions is computed as
 \paragraph{Scaling Loss} is introduced to ensure that the Lyapunov candidate does not collapse towards $0$. 
 This is achieved by drawing a batch of $M$ quasi-Monte Carlo samples $x_{\text{scale}}^{(i)} \in \mathcal{B}$ 
 and specifying a target value $\ell_{\text{scale}}$ for the logarithm of the average Lyapunov value 
-$\ell_{\text{samples}} = \log \left(\frac{1}{M} \sum_{i=1}^{M} V(x_{\text{scale}}^{(i)})\right)$. 
-Note that $\ell_{\text{scale}}$ is automatically set based on $\ell_{\text{samples}}$ computed 
-using the initial Lyapunov candidate. The scaling loss is then defined as
+$\ell_{\text{samples}} = \log \left(\frac{1}{M} \sum_{i=1}^{M} V(x_{\text{scale}}^{(i)})\right)$.  The scaling loss is then defined as
 \begin{equation}
     \label{eq:scaling-loss}
     \mathcal{L}_{\text{scale}} = \left( \ell_{\text{samples}} - \ell_{\text{scale}} \right)^2.
 \end{equation}
+Note that $\ell_{\text{scale}}$ is automatically set based on $\ell_{\text{samples}}$ computed 
+using the initial Lyapunov candidate. Also, the batch of samples $x_{\text{scale}}^{(i)}$ is 
+newly drawn after specified number of calls to prevent the Lyapunov candidate from overfitting 
+to a fixed set of samples. 
