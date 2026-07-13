@@ -2,9 +2,7 @@
 \label{sec:lyapunov-learning}
 
 To achieve formal stability with learned controllers, 
-a Lyapunov candidate is learned to certify stability. 
-For this purpose, a neural network, as described in \cref{subsec:mlp}, 
-is trained to approximate a Lyapunov candidate. 
+a Lyapunov candidate is trained to certify stability. 
 The Counterexample-Guided Inductive Synthesis (\textit{CEGIS}) framework is used to find 
 stability violations and therefore make the Lyapunov candidate a valid certificate for stability.
 
@@ -18,10 +16,10 @@ while ensuring the mathematical properties required for Lyapunov functions.
 Resulting from this design, the Lyapunov candidate is defined as:
 \begin{equation}
     \label{eq:lyapunov-candidate}
-    V_{\phi}(x_k) = \left| f_{\phi}(x_k) - f_{\phi}(x^*) \right| 
+    V_{\theta}(x_k) = \left| f_{\theta}(x_k) - f_{\theta}(x^*) \right| 
         + \left\|  (\epsilon I + R^\top R) (x_k - x^*)  \right\|_1,
 \end{equation}
-where $f_{\phi} : \mathbb{R}^n \to \mathbb{R}$ is a neural network, $x_k \in \mathbb{R}^n$ is the current state, 
+where $f_{\theta} : \mathbb{R}^n \to \mathbb{R}$ is a neural network, $x_k \in \mathbb{R}^n$ is the current state, 
 $x^* \in \mathbb{R}^n$ is the equilibrium, $\epsilon > 0$ is a small regularization constant, 
 and $R \in \mathbb{R}^{n \times n}$ is a learnable matrix. 
 While the first term is only positive semi-definite and may vanish away from the equilibrium, 
@@ -31,7 +29,7 @@ positive definite by construction for any $\epsilon > 0$.
 
 
 
-\subsection{Loss Formulation and CEGIS Training}
+\subsection{Loss Formulation and Falsification-Guided Training}
 \label{subsec:lyapunov-formulation}
 
 To ensure that the Lyapunov candidate described in \cref{eq:lyapunov-candidate} can be certified for stability, 
@@ -47,14 +45,14 @@ This is achieved by minimizing the relative difference between the Lyapunov cand
 For this purpose, the per-sample Lyapunov decrease term is defined as
 \begin{equation}
     \label{eq:lyapunov-decrease}
-    e_{V} = V(x_{k+1}) - (1 -  \kappa) \cdot V(x_k) + \epsilon_m,
+    e_V = V(x_{k+1}) - (1 -  \kappa) \cdot V(x_k) + \epsilon_m,
 \end{equation}
 where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease, and $\epsilon_m \ge 0$ is a safety margin. 
 To balance the optimization scale across different magnitudes of $V$, we normalize this violation to obtain the relative decrease loss:
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
     \mathcal{L}_{\text{dec}} = \left[
-        \frac{e_{V}}{|V(x_k)| + \epsilon_{\text{rel}}}
+        \frac{e_V}{|V(x_k)| + \epsilon_{\text{rel}}}
     \right]_+,
 \end{equation}
 where $\epsilon_{\text{rel}} > 0$ prevents division by zero.
@@ -98,9 +96,10 @@ results in the final loss formulation:
 \end{equation}
 
 
-\paragraph{ROA-Surrogate Loss} tries to enlarge the region of attraction by creating samples within the 
-boundary layer of the training space, defined as $\mathcal{B}_{\text{boundary}} = \mathcal{B} \setminus 0.6 \mathcal{B}$.
-For a batch of $M$ samples $x_{\text{ROA}}^{(i)} \in \mathcal{B}_{\text{boundary}}$ are generated and evaluated in the following formulation:
+\paragraph{ROA Enlargment Loss} tries to enlarge the region of attraction by creating samples within an ellipsoidal 
+boundary layer inscribed in the training space $\mathcal{B}$. The boundary candidates $x_{\text{ROA}}^{(i)}$ 
+are generated using uniformly distributed directions scaled by a radius $r \in [0.6, 1]$, mapped to the dimensions of $\mathcal{B}$.
+A batch of $M$ candidates is then evaluated using the following formulation:
 \begin{equation}
     \label{eq:roa-loss}
     \mathcal{L}_{\text{ROA}} = \frac{1}{M} \sum_{i=1}^{M} \left[
@@ -135,7 +134,7 @@ where $\alpha_{\text{L}} > 0$ is a hyperparameter controlling the decay rate of 
 Finally, the LIRPA-condition loss over $N_{\text{L}}$ regions is computed as
 \begin{equation}
     \label{eq:relative-lirpa-condition-loss}
-    \mathcal{L}_{\text{LIRPA}} = \frac{
+    \mathcal{L}_{\text{L}} = \frac{
         \sum_{i=1}^{N_{\text{L}}} w_{L}^{(i)} \cdot \mathcal{M}_{\text{L}}^{(i)}
     }{
         \sum_{i=1}^{N_{\text{L}}} w_{L}^{(i)}
@@ -149,9 +148,9 @@ and specifying a target value $\ell_V$ for the logarithm of the average Lyapunov
 $\ell_V = \log \left(\frac{1}{M} \sum_{i=1}^{M} V(x_{V}^{(i)})\right)$.  The scaling loss is then defined as
 \begin{equation}
     \label{eq:scaling-loss}
-    \mathcal{L}_V = \left( \ell_0 - \ell_V \right)^2.
+    \mathcal{L}_V = \left( \ell_{V,0} - \ell_V \right)^2.
 \end{equation}
-Note that $\ell_0$ is automatically set based on $\ell_V$ computed 
+Note that $\ell_{V,0}$ is automatically set based on $\ell_V$ computed 
 using the initial Lyapunov candidate. Also, the batch of samples $x_V^{(i)}$ is 
 newly drawn after specified number of calls to prevent the Lyapunov candidate from overfitting 
 to a fixed set of samples. 
@@ -176,8 +175,44 @@ The loss is then formulated as
 
 \paragraph{$R$-Matrix Loss} tries to prevent the collaps of the $R$ matrix in 
 \cref{eq:lyapunov-candidate} towards a norm of $0$ during training. 
-To achieve this, the Frobenius norm of the $R$ matrix is computed and compared to a target value $\ell_R$
+To achieve this, the Frobenius norm of the $R$ matrix is computed and compared to a target value $\ell_{R,0}$
 \begin{equation}
     \label{eq:r-matrix-loss}
-    \mathcal{L}_R = \left( \ell_R - \lVert R \rVert_F \right)^2.
+    \mathcal{L}_R = \left( \ell_{R,0} - \lVert R \rVert_F \right)^2.
 \end{equation}
+Note that $\ell_{R,0} = \lVert R \rVert_F$ is automatically set based on the initial $R$ matrix.
+
+
+\paragraph{Combined Loss} is the final loss function that combines all the previously defined weighted loss components. 
+It is formulated as
+\begin{equation}
+    \label{eq:combined-loss}
+    \mathcal{L}_{\text{total}} =
+        \omega_{\text{cond}} \cdot \mathcal{L}_{\rho\text{-gated}} +
+        \omega_{\text{ROA}} \cdot \mathcal{L}_{\text{ROA}} +
+        \omega_{\text{L}} \cdot \mathcal{L}_{\text{L}} +
+        \omega_V \cdot \mathcal{L}_V +
+        \omega_{\pi} \cdot \mathcal{L}_{\pi} +
+        \omega_R \cdot \mathcal{L}_R,
+\end{equation}
+where $\omega_{\text{cond}}, \omega_{\text{ROA}}, \omega_{\text{L}}, \omega_V, \omega_{\pi}, \omega_R$ are hyperparameters 
+that balance the relative importance of the individual loss components.
+
+
+\paragraph{Falsification-Guided Training via PGD} is used to find counterexamples that violate the Lyapunov conditions and 
+feed them back into the training loop. For this purpose, this work employs an adversarial training approach using 
+Projected Gradient Descent (PGD) as a fast, heuristic falsifier. 
+During training, PGD actively searches for state configurations $x_{\text{adv}}$ within the bounds $\mathcal{B}$ that maximize 
+the condition violation $\mathcal{L}_{\text{cond}}$. These adversarially generated counterexamples are iteratively 
+added back to the training batch. As a mining objective, the setup uses the sample-wise $\rho$-gated relative Lyapunov 
+condition violation $\mathcal{L}_{\text{cond}}$ from \cref{eq:combined-condition-violation} and \cref{eq:rho-gate}. 
+The per sample PGD objective is then defined as
+\begin{equation}
+    \label{eq:pgd-objective}
+    J_{\text{PGD}} = -w_{\rho} \cdot \mathcal{L}_{\text{cond}}.
+\end{equation}
+
+TODO: Change the following because its $\rho \cdot 1.5$ gated. 
+ 
+In the training itself, the counterexamples are mixed with samples drawn from the training space $\mathcal{B}$,
+which ensures that the Lyapunov candidate is trained on both adversarial and representative samples.

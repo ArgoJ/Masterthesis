@@ -6,3 +6,11 @@
 
 \subsection{Policy Network Architecture and Imitation Objective}
 \label{subsec:imitation-architecture}
+
+\begin{equation}
+    \label{eq:policy-arch}
+    \pi_{\theta}(x) = \operatorname{clamp} \left( 
+        f_{\theta}(x) - f_{\theta}(x) + u^*, 
+        u_{\min}, u_{\max}
+    \right)
+\end{equation}
