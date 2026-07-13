@@ -143,15 +143,41 @@ Finally, the LIRPA-condition loss over $N_{\text{L}}$ regions is computed as
 \end{equation}
 
 
-\paragraph{Scaling Loss} is introduced to ensure that the Lyapunov candidate does not collapse towards $0$. 
-This is achieved by drawing a batch of $M$ quasi-Monte Carlo samples $x_{\text{scale}}^{(i)} \in \mathcal{B}$ 
-and specifying a target value $\ell_{\text{scale}}$ for the logarithm of the average Lyapunov value 
-$\ell_{\text{samples}} = \log \left(\frac{1}{M} \sum_{i=1}^{M} V(x_{\text{scale}}^{(i)})\right)$.  The scaling loss is then defined as
+\paragraph{Lyapunov Scaling Loss} is introduced to ensure that the Lyapunov candidate does not collapse towards $0$. 
+This is achieved by drawing a batch of $M$ quasi-Monte Carlo samples $x_V^{(i)} \in \mathcal{B}$ 
+and specifying a target value $\ell_V$ for the logarithm of the average Lyapunov value 
+$\ell_V = \log \left(\frac{1}{M} \sum_{i=1}^{M} V(x_{V}^{(i)})\right)$.  The scaling loss is then defined as
 \begin{equation}
     \label{eq:scaling-loss}
-    \mathcal{L}_{\text{scale}} = \left( \ell_{\text{samples}} - \ell_{\text{scale}} \right)^2.
+    \mathcal{L}_V = \left( \ell_0 - \ell_V \right)^2.
 \end{equation}
-Note that $\ell_{\text{scale}}$ is automatically set based on $\ell_{\text{samples}}$ computed 
-using the initial Lyapunov candidate. Also, the batch of samples $x_{\text{scale}}^{(i)}$ is 
+Note that $\ell_0$ is automatically set based on $\ell_V$ computed 
+using the initial Lyapunov candidate. Also, the batch of samples $x_V^{(i)}$ is 
 newly drawn after specified number of calls to prevent the Lyapunov candidate from overfitting 
 to a fixed set of samples. 
+
+
+\paragraph{Policy Scaling Loss} keeps the learned policy within a reasonable range 
+to the output of the original imitaion controller $\pi_0$ based on the MPC teacher. 
+For the generation of the $M$ sized sampled batch $x_{\pi}^{(i)} \in \mathcal{B}$, 
+the quasi-Monte Carlo samling is used and also redrawn after a specified number of calls. 
+These samples are then evaluated with the learned policy $\pi_V$ and 
+the original imitaion controller $\pi_0$ by using the normed squared difference. 
+The loss is then formulated as
+\begin{equation}
+    \label{eq:policy-scaling-loss}
+    \mathcal{L}_{\text{\pi}} = \frac{1}{M} \sum_{i=1}^{M} \frac{\left(
+        \pi_V(x_{\pi}^{(i)}) - \pi_0(x_{\pi}^{(i)}) 
+    \right)^2}{\sum_{i=1}^{M} \left(
+         \pi_0(x_{\pi}^{(i)}) 
+    \right)^2}
+\end{equation}
+
+
+\paragraph{$R$-Matrix Loss} tries to prevent the collaps of the $R$ matrix in 
+\cref{eq:lyapunov-candidate} towards a norm of $0$ during training. 
+To achieve this, the Frobenius norm of the $R$ matrix is computed and compared to a target value $\ell_R$
+\begin{equation}
+    \label{eq:r-matrix-loss}
+    \mathcal{L}_R = \left( \ell_R - \lVert R \rVert_F \right)^2.
+\end{equation}
