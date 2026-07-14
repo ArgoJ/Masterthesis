@@ -3,8 +3,8 @@
 
 To achieve formal stability with learned controllers, 
 a Lyapunov candidate is trained to certify stability. 
-The Counterexample-Guided Inductive Synthesis (\textit{CEGIS}) framework is used to find 
-stability violations and therefore make the Lyapunov candidate a valid certificate for stability.
+A falsification-guided framework is used to find stability violations and 
+therefore make the Lyapunov candidate a valid certificate for stability.
 
 \subsection{Lyapunov Network Architecture}
 \label{subsec:lyapunov-network-architecture}
@@ -29,7 +29,7 @@ positive definite by construction for any $\epsilon > 0$.
 
 
 
-\subsection{Loss Formulation and Falsification-Guided Training}
+\subsection{Loss Formulation}
 \label{subsec:lyapunov-formulation}
 
 To ensure that the Lyapunov candidate described in \cref{eq:lyapunov-candidate} can be certified for stability, 
@@ -94,6 +94,7 @@ results in the final loss formulation:
     \mathcal{L}_{\rho\text{-gated}}
     = \frac{\sum_{i=1}^{N} w_{\rho}^{(i)} \cdot \mathcal{L}^{(i)}_{\text{cond}}}{\sum_{i=1}^{N} w_{\rho}^{(i)}}
 \end{equation}
+For this loss, samples are drawn from a counterexample and states mixed replay buffer, described in \cref{subsec:fals-guided-training}.
 
 
 \paragraph{ROA Enlargment Loss} tries to enlarge the region of attraction by creating samples within an ellipsoidal 
@@ -199,20 +200,60 @@ where $\omega_{\text{cond}}, \omega_{\text{ROA}}, \omega_{\text{L}}, \omega_V, \
 that balance the relative importance of the individual loss components.
 
 
-\paragraph{Falsification-Guided Training via PGD} is used to find counterexamples that violate the Lyapunov conditions and 
-feed them back into the training loop. For this purpose, this work employs an adversarial training approach using 
-Projected Gradient Descent (PGD) as a fast, heuristic falsifier. 
-During training, PGD actively searches for state configurations $x_{\text{adv}}$ within the bounds $\mathcal{B}$ that maximize 
-the condition violation $\mathcal{L}_{\text{cond}}$. These adversarially generated counterexamples are iteratively 
-added back to the training batch. As a mining objective, the setup uses the sample-wise $\rho$-gated relative Lyapunov 
-condition violation $\mathcal{L}_{\text{cond}}$ from \cref{eq:combined-condition-violation} and \cref{eq:rho-gate}. 
-The per sample PGD objective is then defined as
+\subsection{Falsification-Guided Training}
+\label{subsec:fals-guided-training}
+
+\paragraph{PGD Falsification} is utilized to identify counterexamples that violate the Lyapunov 
+conditions and iteratively inject them into the counterexample pool $\mathcal{C}$. 
+For this purpose, Projected Gradient Descent (PGD) is employed as a fast, 
+heuristic falsifier, to search for states $x_{\text{adv}} \in \mathcal{B}$ 
+that maximize the condition violation defined in \cref{eq:combined-condition-violation} 
+and \cref{eq:rho-gate}. The per-sample PGD objective is defined as
 \begin{equation}
     \label{eq:pgd-objective}
     J_{\text{PGD}} = -w_{\rho} \cdot \mathcal{L}_{\text{cond}}.
 \end{equation}
+To perform the search, an iterative $L_\infty$-PGD is applied to candidate states recycled 
+from the $\rho$-estimation replay buffer. 
+The algorithm minimizes $J_{\text{PGD}}$ by iteratively updating the input states based on 
+the sign of their local gradient with a constant step size $\alpha$ 
+and projecting them back onto the bounds $\mathcal{B}$. 
+To retain the strongest violations and prevent overshooting, the state achieving the 
+minimum objective value across all $K$ iterations is kept for each candidate. 
+Only states within the current $\rho$-sublevel set that exceed the violation tolerance 
+and lie outside the origin exclusion region are retained as counterexamples.
 
-TODO: Change the following because its $\rho \cdot 1.5$ gated. 
- 
-In the training itself, the counterexamples are mixed with samples drawn from the training space $\mathcal{B}$,
-which ensures that the Lyapunov candidate is trained on both adversarial and representative samples.
+
+\paragraph{Adversarial Replay Buffer} manages the sample distribution for the $\rho$-gated condition loss $\mathcal{L}_{\rho\text{-gated}}$. 
+It maintains two distinct state pools: an explorative pool $\mathcal{S}$ and a counterexample pool $\mathcal{C}$. 
+
+To concentrate the learning of the Lyapunov candidate on relevant regions, the explorative pool $\mathcal{S}$ 
+is initially oversampled uniformly from the training region $\mathcal{B}$ every outer epoch. 
+The final pool is then drawn based on a probabilistic sampling strategy 
+that prioritizes states residing within the expanded boundary $m \cdot \rho$, using a scalar margin $m > 1$. 
+For each candidate, a continuous sampling probability is computed via a sigmoid function. 
+This assigns high probabilities to states inside the sublevel set and smaller probabilities to states further outside.
+
+\begin{algorithm}[htpb]
+    \caption{Probabilistic Explorative State Pool Resampling}
+    \label{alg:state-pool-resample}
+    \SetAlgoLined
+    \KwIn{Lyapunov function $V_\theta$, current ROA estimate $\rho$, margin $m$, sharpness $\beta$, target size $N_x$}
+    \KwOut{Updated state pool $\mathcal{S}$ of size $N_x$}
+
+    \BlankLine
+    Generate $4 N_x$ candidates: $\mathcal{X} \sim \mathcal{U}(\mathcal{B})$\;
+
+    \BlankLine
+    For all $x \in \mathcal{X}$, assign weight $w(x) \leftarrow \sigma \left(
+        \beta \, \frac{m \cdot \rho - V_\theta(x)}{\max(\rho, 10^{-9})}
+    \right) + \epsilon$\;
+
+    \BlankLine
+    $\mathcal{S} \leftarrow$ Sample $N_x$ states from $\mathcal{X}$ with probability $P(x) \propto w(x)$\;
+\end{algorithm}
+
+TODO!!!
+
+The counterexample pool $\mathcal{C}$ is populated with states that violate the Lyapunov conditions,
+which are identified using the PGD falsification. 
