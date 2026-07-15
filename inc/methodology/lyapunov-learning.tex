@@ -45,9 +45,9 @@ This is achieved by minimizing the relative difference between the Lyapunov cand
 For this purpose, the per-sample Lyapunov decrease term is defined as
 \begin{equation}
     \label{eq:lyapunov-decrease}
-    e_V = V(x_{k+1}) - (1 -  \kappa) \cdot V(x_k) + \epsilon_m,
+    e_V = V(x_{k+1}) - (1 -  \kappa) \cdot V(x_k),
 \end{equation}
-where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease, and $\epsilon_m \ge 0$ is a safety margin. 
+where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease. 
 To balance the optimization scale across different magnitudes of $V$, we normalize this violation to obtain the relative decrease loss:
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
