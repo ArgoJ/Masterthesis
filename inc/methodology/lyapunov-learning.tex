@@ -1,10 +1,11 @@
 \section{Lyapunov Learning for Stability Certification}
 \label{sec:lyapunov-learning}
-
 To achieve formal stability with learned controllers, 
 a Lyapunov candidate is trained to certify stability. 
 A falsification-guided framework is used to find stability violations and 
 therefore make the Lyapunov candidate a valid certificate for stability.
+
+
 
 \subsection{Lyapunov Network Architecture}
 \label{subsec:lyapunov-network-architecture}
@@ -31,7 +32,6 @@ positive definite by construction for any $\epsilon > 0$.
 
 \subsection{Loss Formulation}
 \label{subsec:lyapunov-formulation}
-
 To ensure that the Lyapunov candidate described in \cref{eq:lyapunov-candidate} can be certified for stability, 
 the loss function must comprise multiple components. 
 It utilizes the ReLU function $[\cdot]_+$ for specific penalties, 
@@ -205,9 +205,9 @@ where $\omega_{\text{cond}}, \omega_{\text{ROA}}, \omega_{\text{L}}, \omega_V, \
 that balance the relative importance of the individual loss components.
 
 
+
 \subsection{Falsification-Guided Training}
 \label{subsec:fals-guided-training}
-
 Relying solely on uniform state sampling is not sufficient to reliably detect violations of the Lyapunov condition, 
 especially in higher-dimensional state spaces. To overcome this problem, falsification-guided training 
 actively searches for adversarial counterexamples and incorporates them into the training distribution.
@@ -274,3 +274,5 @@ recent violations while allowing the network to gracefully discard resolved edge
 
 
 \subsection{$\rho$-Sublevel Estimation}
+\label{subsec:rho-sublevel-estim}
+In order to compute the loss, the $\rho$-sublevel set value needs to be estimated. 
