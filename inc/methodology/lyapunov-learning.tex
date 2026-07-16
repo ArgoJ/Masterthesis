@@ -52,7 +52,7 @@ To balance the optimization scale across different magnitudes of $V$, we normali
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
     \mathcal{L}_{\text{dec}} = \left[
-        \frac{e_V}{|V(x_k)| + \epsilon_{\text{rel}}}
+        \frac{e_V}{\max(|V(x_k)|, \epsilon_{\text{rel}})}
     \right]_+,
 \end{equation}
 where $\epsilon_{\text{rel}} > 0$ prevents division by zero. However, the normalization of the decrease can also be omitted, 
@@ -121,7 +121,7 @@ signed Lyapunov decrease $-e_V$ for each of these regions.
 After evaluation, the LIRPA-condition violation for each region is computed as
 \begin{equation}
     \label{eq:relative-lirpa-condition}
-    \mathcal{M}_{\text{L}} = \frac{\log_e([-e_{V,\text{lower}}]_+ + 1)}{V(x_{\text{center}}) + \epsilon_{\text{rel}}}.
+    \mathcal{M}_{\text{L}} = \frac{\log_e([-e_{V,\text{lower}}]_+ + 1)}{\max(V(x_{\text{center}}), \epsilon_{\text{rel}})}.
 \end{equation}
 The final LIRPA-condition loss is then computed as the weighted mean over all evaluated regions, 
 where the weight is defined using an exponential function of the squared Euclidean distance between 
@@ -231,7 +231,7 @@ the sign of their local gradient with a constant step size $\alpha$,
 followed by a projection back onto the training bounds $\mathcal{B}$. 
 To retain the strongest violations mitigate the effects of overshooting, the state yielding the 
 minimum objective value across all $K$ iterations is preserved for each candidate. 
-Ultimately, only states strictly within the current $\rho$-sublevel set that exceed the violation tolerance 
+Ultimately, only states strictly within the current $\rho$-sublevel set ($V(x) \le \rho$) that exceed the violation tolerance 
 and lie outside the origin exclusion region are retained as counterexamples.
 
 
@@ -249,7 +249,7 @@ assigning high weights to states inside the estimated region of attraction and e
     \caption{Probabilistic Explorative State Pool Resampling}
     \label{alg:state-pool-resample}
     \SetAlgoLined
-    \KwIn{Lyapunov function $V_\theta$, current ROA estimate $\rho$, margin $m$, sharpness $\beta$, target size $N_x$}
+    \KwIn{Lyapunov function $V_\theta$, current ROA estimate $\rho$, margin $m$, sharpness $s$, target size $N_x$}
     \KwOut{Updated state pool $\mathcal{S}$ of size $N_x$}
 
     \BlankLine
@@ -257,7 +257,7 @@ assigning high weights to states inside the estimated region of attraction and e
 
     \BlankLine
     For all $x \in \mathcal{X}$, assign weight $w(x) \leftarrow \sigma \left(
-        \beta \, \frac{m \cdot \rho - V_\theta(x)}{\max(\rho, 10^{-9})}
+        s \, \frac{m \cdot \rho - V_\theta(x)}{\max(\rho, 10^{-9})}
     \right) + \epsilon$\;
 
     \BlankLine
@@ -270,3 +270,7 @@ a time-to-live mechanism is implemented. Each injected counterexample is assigne
 which is incremented upon every subsequent falsification phase. Once a counterexample reaches the maximum age $\tau_{\max}$, 
 it is removed from the buffer. This guarantees that the condition loss continuously penalizes 
 recent violations while allowing the network to gracefully discard resolved edge cases as the Lyapunov candidate evolves.
+
+
+
+\subsection{$\rho$-Sublevel Estimation}
