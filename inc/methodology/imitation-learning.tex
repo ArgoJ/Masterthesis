@@ -9,8 +9,46 @@
 
 \begin{equation}
     \label{eq:policy-arch}
-    \pi_{\theta}(x) = \operatorname{clamp} \left( 
-        f_{\theta}(x) - f_{\theta}(x) + u^*, 
-        u_{\min}, u_{\max}
+    \pi_{\theta}(x) = \min \left( 
+        \max \left(
+            f_{\theta}(x) - f_{\theta}(x^*) + u^*, 
+            u_{\min} 
+        \right), u_{\max}
     \right)
+\end{equation}
+
+
+\paragraph{Policy Network Loss}
+
+$S_x = \operatorname{diag}(x_{\text{scale}})$
+$S_u = \operatorname{diag}(a_{\text{scale}})$
+
+\begin{equation}
+    \label{eq:state-distance}
+    d(x) = \frac{1}{n_x} \left\| S_x^{-1}(x - x^*) \right\|_1.
+\end{equation}
+
+\begin{equation}
+    \label{eq:state-weight}
+    w_x(x) = w_{\text{min}} + (1 - w_{\text{min}}) \left( \frac{1}{1 + d(x)} \right)^\alpha,
+\end{equation}
+
+
+\begin{equation}
+    \label{eq:state-weighted-loss}
+    \mathcal{L}_x = \frac{1}{M n_u} \sum_{x \in \mathcal{X}_\pi} w_x(x) \left\| S_u^{-1} \big( \pi_V(x) - \pi_0(x) \big) \right\|_2^2.
+\end{equation}
+
+\begin{equation}
+    \label{eq:dynamics-aware-loss}
+    \mathcal{L}_f = \frac{1}{M n_x} \sum_{x \in \mathcal{X}_\pi} \left( 
+        \left\| \big[ x_{k+1} - \bar{x} \big]_+ \right\|_1 + \left\| \big[ \underline{x} - x_{k+1} \big]_+ \right\|_1 
+    \right).
+\end{equation}
+
+\begin{equation}
+    \label{eq:combined-policy-loss}
+    \mathcal{L}_\pi = 
+        \omega_x \mathcal{L}_x + 
+        \omega_f \mathcal{L}_f,
 \end{equation}
