@@ -82,7 +82,7 @@ where $\omega_{\text{inv}}$ is a hyperparameter balancing the relative importanc
 However, to apply the $\rho$-gate appropriately, $\mathcal{L}_{\text{cond}}$ is weighted for each sample using the soft sublevel weight
 \begin{equation}
     \label{eq:rho-gate}
-    w_{\rho} = \operatorname{sigmoid} \left(
+    w_{\rho} = \sigma \left(
         s \cdot \frac{\rho - V(x_k)}{\max (\rho, \epsilon_{\text{rel}})}
     \right),
 \end{equation}
@@ -98,15 +98,17 @@ results in the final loss formulation:
 For this loss, samples are drawn from a counterexample and states mixed replay buffer, described in \cref{subsec:fals-guided-training}.
 
 
-\paragraph{ROA Enlargment Loss} tries to enlarge the region of attraction by creating samples within an ellipsoidal 
-boundary layer inscribed in the training space $\mathcal{B}$. The boundary candidates $x_{\text{ROA}}^{(i)}$ 
-are generated using uniformly distributed directions scaled by a radius $r \in [0.6, 1]$, mapped to the dimensions of $\mathcal{B}$.
-A batch of $M$ candidates is then evaluated using the following formulation:
+\paragraph{ROA Loss} tries to enlarge the region of attraction by uniformly drawing a batch of 
+$M$ samples $\mathcal{X}_{\text{ROA}} \subseteq \mathcal{B} \setminus \xi \mathcal{B}$
+from the shell of the training space. The loss is then evaluated over these candidates 
+using the following formulation:
 \begin{equation}
     \label{eq:roa-loss}
-    \mathcal{L}_{\text{ROA}} = \frac{1}{M} \sum_{i=1}^{M} \left[
-        \frac{V(x_{\text{ROA}}^{(i)})}{\rho} - 1
-    \right]_+.
+    \mathcal{L}_{\text{ROA}} = \frac{1}{M} \sum_{x \in \mathcal{X}_{\text{ROA}}} \ln \left(
+        \left[
+            \frac{V(x)}{\rho} - 1
+        \right]_+ + 1
+    \right).
 \end{equation}
 
 
@@ -121,14 +123,14 @@ signed Lyapunov decrease $-e_V$ for each of these regions.
 After evaluation, the LIRPA-condition violation for each region is computed as
 \begin{equation}
     \label{eq:relative-lirpa-condition}
-    \mathcal{M}_{\text{L}} = \frac{\log_e([-e_{V,\text{lower}}]_+ + 1)}{\max(V(x_{\text{center}}), \epsilon_{\text{rel}})}.
+    \mathcal{M}_{\text{L}} = \frac{\ln ([-e_{V,\text{lower}}]_+ + 1)}{\max(V(x_{\text{center}}), \epsilon_{\text{rel}})}.
 \end{equation}
 The final LIRPA-condition loss is then computed as the weighted mean over all evaluated regions, 
 where the weight is defined using an exponential function of the squared Euclidean distance between 
 the region center $x_{\text{center}}$ and the equilibrium $x^*$:
 \begin{equation}
     \label{eq:lirpa-weight}
-    w_{L} = \operatorname{exp} \left(
+    w_{L} = \exp \left(
         - \alpha_{\text{L}} \cdot \lVert x_{\text{center}} - x^* \rVert^2_2
     \right),
 \end{equation}
@@ -144,42 +146,38 @@ Finally, the LIRPA-condition loss over $N_{\text{L}}$ regions is computed as
 \end{equation}
 
 
-\paragraph{Lyapunov Scaling Loss} is introduced to ensure that the Lyapunov candidate does not collapse towards $0$. 
-This is achieved by drawing a batch of $M$ quasi-Monte Carlo samples $x_V^{(i)} \in \mathcal{B}$ 
-and specifying a target value $\ell_V$ for the logarithm of the average Lyapunov value 
-$\ell_V = \log \left(\frac{1}{M} \sum_{i=1}^{M} V(x_{V}^{(i)})\right)$.  The scaling loss is then defined as
+\paragraph{Lyapunov Scaling Loss} is introduced to ensure that the Lyapunov candidate does not collapse to $0$.
+This is achieved by drawing a batch of $M$ samples $\mathcal{X}_V \subseteq \mathcal{B}$,
+using a quasi-Monte-Carlo sequence. The logarithm of the mean Lyapunov value over this batch is then defined as:
+$\ell_V = \ln \left(\frac{1}{M} \sum_{x \in \mathcal{X}_V} V(x) \right)$, leading to the scaling loss formulation
 \begin{equation}
-    \label{eq:scaling-loss}
-    \mathcal{L}_V = \left( \ell_{V,0} - \ell_V \right)^2.
+\label{eq:scaling-loss}
+\mathcal{L}_V = \left( \ell_{V,0} - \ell_V \right)^2.
 \end{equation}
-Note that $\ell_{V,0}$ is automatically set based on $\ell_V$ computed 
-using the initial Lyapunov candidate. Also, the batch of samples $x_V^{(i)}$ is 
-newly drawn after specified number of calls to prevent the Lyapunov candidate from overfitting 
-to a fixed set of samples. 
+Note that the reference value $\ell_{V,0}$ is determined by computing $\ell_V$ 
+using the initial Lyapunov candidate. Furthermore, to prevent the Lyapunov candidate 
+from overfitting to a fixed set of points, a new batch of samples $\mathcal{X}_V$ 
+is drawn with a specified probability at each optimization step.
 
 
-\paragraph{Policy Scaling Loss} keeps the learned policy within a reasonable range 
-to the output of the original imitaion controller $\pi_0$ based on the MPC teacher. 
-For the generation of the $M$ sized sampled batch $x_{\pi}^{(i)} \in \mathcal{B}$, 
-the quasi-Monte Carlo samling is used and also redrawn after a specified number of calls. 
-These samples are then evaluated with the learned policy $\pi_V$ and 
-the original imitaion controller $\pi_0$ by using the normed squared difference. 
-The loss is then formulated as
+\paragraph{Policy Scaling Loss} encourages the learned policy $\pi_V$ to remain close 
+to the output of the original imitation controller $\pi_0$, which is based on the MPC teacher. 
+A batch of $M$ samples $\mathcal{X}_\pi \subseteq \mathcal{B}$ is generated using a 
+quasi-Monte-Carlo sequence. To prevent overfitting, this batch is redrawn after a 
+specified number of optimization steps. 
+The deviation between the learned policy and the imitation controller is evaluated 
+using a normalized squared difference. The loss is then formulated as
 \begin{equation}
     \label{eq:policy-scaling-loss}
-    \mathcal{L}_{\text{\pi}} = \frac{
-        \frac{1}{M} \sum_{i=1}^{M} \left(
-            \pi_V(x_{\pi}^{(i)}) - \pi_0(x_{\pi}^{(i)}) 
-        \right)^2
+    \mathcal{L}_\pi = \frac{
+        \sum_{x \in \mathcal{X}_\pi} \lVert \pi_V(x) - \pi_0(x) \rVert_2^2
     }{
-        \sum_{i=1}^{M} \left(
-            \pi_0(x_{\pi}^{(i)}) 
-        \right)^2
+        \sum_{x \in \mathcal{X}_\pi} \lVert \pi_0(x) \rVert_2^2
     }
 \end{equation}
 
 
-\paragraph{$R$-Matrix Loss} tries to prevent the collaps of the $R$ matrix in 
+\paragraph{$R$-Matrix Loss} tries to prevent the collapse of the $R$ matrix in 
 \cref{eq:lyapunov-candidate} towards a norm of $0$ during training. 
 To achieve this, the Frobenius norm of the $R$ matrix is computed and compared to a target value $\ell_{R,0}$
 \begin{equation}
@@ -189,20 +187,19 @@ To achieve this, the Frobenius norm of the $R$ matrix is computed and compared t
 Note that $\ell_{R,0} = \lVert R \rVert_F$ is automatically set based on the initial $R$ matrix.
 
 
-\paragraph{Combined Loss} is the final loss function that combines all the previously defined weighted loss components. 
-It is formulated as
+\paragraph{Finale Lyapunov Loss} represents the combined objective function, 
+summing all previously defined weighted components, given by 
 \begin{equation}
     \label{eq:combined-loss}
     \mathcal{L}_{\text{total}} =
-        \omega_{\text{cond}} \cdot \mathcal{L}_{\rho\text{-gated}} +
-        \omega_{\text{ROA}} \cdot \mathcal{L}_{\text{ROA}} +
-        \omega_{\text{L}} \cdot \mathcal{L}_{\text{L}} +
-        \omega_V \cdot \mathcal{L}_V +
-        \omega_{\pi} \cdot \mathcal{L}_{\pi} +
-        \omega_R \cdot \mathcal{L}_R,
+        \omega_{\text{cond}} \mathcal{L}_{\rho\text{-gated}} +
+        \omega_{\text{ROA}} \mathcal{L}_{\text{ROA}} +
+        \omega_{\text{L}} \mathcal{L}_{\text{L}} +
+        \omega_V \mathcal{L}_V +
+        \omega_\pi \mathcal{L}_\pi +
+        \omega_R \mathcal{L}_R,
 \end{equation}
-where $\omega_{\text{cond}}, \omega_{\text{ROA}}, \omega_{\text{L}}, \omega_V, \omega_{\pi}, \omega_R$ are hyperparameters 
-that balance the relative importance of the individual loss components.
+where the weights $\omega$ are hyperparameters that balance the relative importance of the individual loss components.
 
 
 \subsection{Falsification-Guided Training}
@@ -216,7 +213,7 @@ estimated attractor region with the targeted exploitation of known error modes.
 
 \paragraph{PGD Falsification} is utilized to identify counterexamples that violate the Lyapunov 
 conditions and iteratively inject them into the counterexample pool $\mathcal{C}$. 
-Specifically, a $L_\infty$-Projected Gradient Descent (PGD) is employed 
+Specifically, an $L_\infty$-Projected Gradient Descent (PGD) is employed 
 to find adversarial states $x_{\text{adv}} \in \mathcal{B}$ 
 that maximize the condition violation defined in \cref{eq:combined-condition-violation} 
 and \cref{eq:rho-gate}. The per-sample PGD objective is defined as
@@ -274,3 +271,6 @@ recent violations while allowing the network to gracefully discard resolved edge
 
 
 \subsection{$\rho$-Sublevel Estimation}
+\label{subsec:rho-sublevel-estim}
+In order to use the loss defined earlier, the $\rho$-sublevel must be estimated w.r.t. the current 
+Lyapunov candidate.
