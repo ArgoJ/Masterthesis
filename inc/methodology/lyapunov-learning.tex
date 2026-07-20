@@ -70,14 +70,14 @@ where $\epsilon_{\text{rel}} > 0$ prevents division by zero. However, the normal
 depending on the settings. 
 
 
-\paragraph{Relative State Invariance Loss} penalizes trajectories that escape the training state space 
-$\mathcal{B} = \{x \in \mathbb{R}^n \mid \underline{x} \le x \le \bar{x}\}$. 
-Therefore, the relative one-step state-constraint violation loss for the next state $x_{k+1}$ 
-across all dimensions $j = 1, \dots, n$ is formulated per sample as
+\paragraph{Relative State Invariance Loss} penalizes trajectories that escape the training 
+state space $\mathcal{B} = \{x \in \mathbb{R}^n \mid \underline{x} \le x \le \bar{x}\}$. 
+To evaluate the relative one-step state-constraint violation, the scaling matrix 
+$S_{\text{range}} = \diag(\bar{x} - \underline{x})$ is utilized.
+The loss per sample for the next state $x_{k+1}$ is computed as
 \begin{equation}
     \label{eq:rel-invariance}
-    \mathcal{L}_{\text{inv}} = \sum_{j=1}^{n} 
-    \frac{\left[x_{k+1,j} - \bar{x}_j\right]_+ + \left[\underline{x}_j - x_{k+1,j}\right]_+}{\bar{x}_j - \underline{x}_j}.
+    \mathcal{L}_{\text{inv}} = \left\| S_{\text{range}}^{-1} \big[ x_{k+1} - \bar{x} \big]_+ \right\|_1 + \left\| S_{\text{range}}^{-1} \big[ \underline{x} - x_{k+1} \big]_+ \right\|_1.
 \end{equation}
 
 
