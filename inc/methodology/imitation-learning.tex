@@ -1,54 +1,116 @@
 \section{Neural Policy Approximation and Imitation Learning}
 \label{sec:imitation-learning}
+This section specifies the data generation process, 
+the neural policy architecture, and the training objective used to approximate the 
+model predictive control (MPC) expert. Specifically, the MPC controller 
+introduced in \cref{subsec:mpc-problem} serves as the expert policy 
+generating the required state-input pairs. The neural policy is subsequently trained to 
+reproduce the expert control actions over the considered state domain.
+
 
 \subsection{Data Generation and MPC Expert}
 \label{subsec:mpc-datagen}
+The MPC controller introduced in \cref{subsec:mpc-problem} is used as the
+expert policy and is denoted by $\pi_0$. For a given state $x$, it returns the
+first input of the optimal MPC solution,
+\begin{equation}
+    \label{eq:mpc-expert-policy}
+    \pi_0(x) = u_0^*(x).
+\end{equation}
+
+The MPC expert is evaluated along closed-loop trajectories initialized from
+states sampled within the admissible state space $\mathcal{X}$. At each time
+step $k$, the current state $x_k$ and the first control action $u_0^*(x_k)$
+returned by the MPC solver are stored as one training pair. If the MPC problem
+becomes infeasible at any time during one trajectory, all training pairs
+associated with that trajectory are discarded.
+
+To reduce the overrepresentations of regions with high sampling rates, near-duplicate
+state-action pairs are removed during preprocessing. The concatenated
+state-action vectors are normalized and mapped onto an adaptive voxel grid.
+For each occupied voxel, at most one representative pair is retained.
+
+
 
 \subsection{Policy Network Architecture and Imitation Objective}
 \label{subsec:imitation-architecture}
-
+The policy architecture follows the structure proposed in \ref{}, 
+as it enforces true control inputs at the equilibrium $\pi_\theta(x^*) = u^*$ and 
+satisfies the control input constraints $u_{\min} \leq \pi_\theta(x) \leq u_{\max}$ 
+by construction. The neural policy $\pi_\theta$ is forumlated as 
 \begin{equation}
     \label{eq:policy-arch}
-    \pi_{\theta}(x) = \min \left( 
-        \max \left(
-            f_{\theta}(x) - f_{\theta}(x^*) + u^*, 
-            u_{\min} 
-        \right), u_{\max}
-    \right)
+    \pi_\theta(x) = \clamp \left( 
+            f_\theta(x) - f_\theta(x^*) + u^*, 
+            u_{\min},
+            u_{\max}
+    \right).
+\end{equation}
+where $\clamp(\cdot,u_{\min},u_{\max})$ is applied element-wise.
+
+
+\paragraph{Imitation Objective} consists of a state-weighted behavioral cloning loss 
+and a dynamics-aware penalty. 
+To obtain dimensionless and
+comparably scaled loss terms, the diagonal scaling matrices
+\begin{equation}
+    S_x = \diag(x_{\mathrm{scale}})
+    \quad \text{and} \quad
+    S_u = \diag(u_{\mathrm{scale}})
+\end{equation}
+are introduced, where all scaling factors are strictly positive. In addition,
+the element-wise rectified linear unit (ReLU) is defined as
+\begin{equation}
+    [z]_+ = \max(z,0).
 \end{equation}
 
-
-\paragraph{Policy Network Loss}
-
-$S_x = \diag(x_{\text{scale}})$
-$S_u = \diag(a_{\text{scale}})$
-
+The normalized distance of the equilibrium is evaluated using the scaled $L_1$-norm: 
 \begin{equation}
     \label{eq:state-distance}
     d(x) = \frac{1}{n_x} \left\| S_x^{-1}(x - x^*) \right\|_1.
 \end{equation}
 
+To assign appropriate priority during behavioral cloning, a state-dependent weight is defined as
 \begin{equation}
     \label{eq:state-weight}
-    w_x(x) = w_{\text{min}} + (1 - w_{\text{min}}) \left( \frac{1}{1 + d(x)} \right)^\alpha,
+    w_x(x) = w_{\min} + (1 - w_{\min}) \left( \frac{1}{1 + d(x)} \right)^\alpha,
 \end{equation}
+where $w_{\min} \in (0, 1]$ is the baseline weight for states far from the
+equilibrium and $\alpha \geq 0$ controls the decay rate.
 
-
+\paragraph{State-Weighted Behavioral Cloning Loss} penalizes the normalized Euclidean distance 
+between the neural network policy and the expert targets utilizing the state-dependent weightning. 
+For a batch $\mathcal{X}_{\pi}$ containing $M$ samples, the behavioral cloning loss is
+defined as
 \begin{equation}
     \label{eq:state-weighted-loss}
-    \mathcal{L}_x = \frac{1}{M n_u} \sum_{x \in \mathcal{X}_\pi} w_x(x) \left\| S_u^{-1} \big( \pi_V(x) - \pi_0(x) \big) \right\|_2^2.
+    \mathcal{L}_{\mathrm{BC}} = \frac{1}{M n_u} 
+    \sum_{x \in \mathcal{X}_\pi} w_x(x) \left\| 
+        S_u^{-1} \big( \pi_\theta(x) - \pi_0(x) \big) 
+    \right\|_2^2.
 \end{equation}
 
+
+\paragraph{Dynamics-Aware Constraint Loss} applies one-step penalties for successor states 
+that leave the admissible training set $\mathcal{B}_\pi \subseteq \mathcal{X}$. 
+For each state $x \in \mathcal{X}_{\pi}$, the next state is evaluated under 
+the neural policy as $x_{k+1} = f(x,\pi_\theta(x))$. The loss is defined as
 \begin{equation}
     \label{eq:dynamics-aware-loss}
     \mathcal{L}_f = \frac{1}{M n_x} \sum_{x \in \mathcal{X}_\pi} \left( 
-        \left\| \big[ x_{k+1} - \bar{x} \big]_+ \right\|_1 + \left\| \big[ \underline{x} - x_{k+1} \big]_+ \right\|_1 
+        \left\| 
+            \big[ x_{k+1} - \bar{x}_\pi \big]_+ 
+        \right\|_1 + \left\| 
+            \big[ \underline{x}_\pi - x_{k+1} \big]_+ 
+        \right\|_1 
     \right).
 \end{equation}
 
+
+\paragraph{Final Imitation Loss}
 \begin{equation}
     \label{eq:combined-policy-loss}
     \mathcal{L}_\pi = 
-        \omega_x \mathcal{L}_x + 
+        \omega_{\mathrm{BC}} \mathcal{L}_{\mathrm{BC}} + 
         \omega_f \mathcal{L}_f,
 \end{equation}
