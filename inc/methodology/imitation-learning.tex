@@ -79,7 +79,7 @@ where $w_{\min} \in (0, 1]$ is the baseline weight for states far from the
 equilibrium and $\alpha \geq 0$ controls the decay rate.
 
 \paragraph{State-Weighted Behavioral Cloning Loss} penalizes the normalized Euclidean distance 
-between the neural network policy and the expert targets utilizing the state-dependent weightning. 
+between the neural network policy and the expert targets utilizing the state-dependent weighting. 
 For a batch $\mathcal{X}_{\pi}$ containing $M$ samples, the behavioral cloning loss is
 defined as
 \begin{equation}
@@ -107,10 +107,13 @@ the neural policy as $x_{k+1} = f(x,\pi_\theta(x))$. The loss is defined as
 \end{equation}
 
 
-\paragraph{Final Imitation Loss}
+\paragraph{Total Imitation Loss} is the combination of the state-weighted behavioral cloning 
+and dynamics-aware constraint losses into a single scalar objective. 
+Scaling each term by its respective weight, $\omega_{\mathrm{BC}}$ and $\omega_f$, 
+yields the overall policy loss:
 \begin{equation}
     \label{eq:combined-policy-loss}
     \mathcal{L}_\pi = 
         \omega_{\mathrm{BC}} \mathcal{L}_{\mathrm{BC}} + 
-        \omega_f \mathcal{L}_f,
+        \omega_f \mathcal{L}_f.
 \end{equation}
