@@ -1,25 +1,33 @@
 {
   "latex-workshop.latex.recipes": [
     {
-      "name": "latexmk 🔃 (lualatex)",
+      "name": "LuaLaTeX ➔ Biber ➔ LuaLaTeX x2",
       "tools": [
-        "lualatexmk"
+        "lualatex",
+        "biber",
+        "lualatex",
+        "lualatex"
       ]
     }
   ],
   "latex-workshop.latex.tools": [
     {
-      "name": "lualatexmk",
-      "command": "latexmk",
+      "name": "lualatex",
+      "command": "lualatex",
       "args": [
         "-synctex=1",
         "-interaction=nonstopmode",
         "-file-line-error",
-        "-lualatex",
-        "-bibtex",
-        "-outdir=%OUTDIR%",
         "%DOC%"
       ]
+    },
+    {
+      "name": "biber",
+      "command": "biber",
+      "args": [
+        "%DOCFILE%"
+      ]
     }
-  ]
+  ],
+  "latex-workshop.latex.rootFile.useSubFile": false
 }

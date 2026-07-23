@@ -12,7 +12,7 @@ therefore make the Lyapunov candidate a valid certificate for stability.
 
 Ensuring that the learned Lyapunov candidate is positive definite is crucial for stability certification.
 To achieve this, a neural network architecture is designed to guarantee positive definiteness by construction, 
-following the approach in \cite{lyapunov-stable-nn}. The architecture combines the flexibility of neural networks 
+following the approach in \cite{yangLyapunovstableNeuralControl2024}. The architecture combines the flexibility of neural networks 
 while ensuring the mathematical properties required for Lyapunov functions. 
 Consequently, the Lyapunov candidate is formulated as:
 \begin{equation}
@@ -132,7 +132,7 @@ using the following formulation:
 
 \paragraph{LIRPA-Condition Loss} makes the Lyapunov function more verifier-friendly 
 by including formal violations of the Lyapunov decrease condition as defined in \cref{eq:lyapunov-decrease}, 
-which are identified using the LIRPA framework \cite{lirpabook}. 
+which are identified using the LIRPA framework \cite{xuFastCompleteEnabling2021}.
 In order to compute these violations efficiently, only a filtered subset of regions is evaluated. 
 This subset contains regions for which either the center $x_{\text{center}}$, lower bound $x_{\text{lower}}$ or 
 upper bound $x_{\text{upper}}$ lies within $\mathcal{V}_\rho$. 
@@ -296,7 +296,7 @@ Since the goal is to find the largest level set of the Lyapunov candidate $V_\th
 within the defined training bounds $\mathcal{B}_V$, a level set can only escape the safe region by intersecting its 
 boundary $\partial \mathcal{B}_V$. Therefore, the maximum certifiable $\rho$ is mathematically strictly determined
 by the minimum value of the Lyapunov candidate at its boundary.
-According to the formulation proposed by \cite{yang2024lyapunov}, it is sufficient to evaluate $V_\theta(x)$ 
+According to the formulation proposed by \cite{yangLyapunovstableNeuralControl2024}, it is sufficient to evaluate $V_\theta(x)$
 exclusively on the boundary $\partial \mathcal{B}_V$ rather than inefficiently sampling the entire state space, in order to estimate 
 the bounds of the ROA. However, since the boundary is a high-dimensional surface and the neural network parameterized in $V_\theta(x)$ 
 forms a highly non-convex landscape, simple uniform sampling on the boundary is insufficient to find the true minimum. 
@@ -304,7 +304,7 @@ Therefore, a Projected Gradient Descent (PGD) approach is employed to actively s
 Starting from uniformly sampled points $x_{\partial} \sim \mathcal{U} (\partial \mathcal{B}_V)$, PGD iteratively minimizes $V_\theta(x_{\partial})$ 
 by taking steps along the negative gradient and projecting the updated states strictly back onto the boundary surfaces.
 To actively encourage the region of attraction to expand over the course of the co-training process, 
-the formally certifiable limit is intentionally overestimated, as suggested in \cite{yang2024lyapunov}. 
+the formally certifiable limit is intentionally overestimated, as suggested in \cite{yangLyapunovstableNeuralControl2024}.
 Specifically, a target $\rho$ is computed by applying a growth factor $\gamma > 1$ to the identified boundary minimum identified by the PGD:
 \begin{equation}
     \label{eq:rho-estimation}
