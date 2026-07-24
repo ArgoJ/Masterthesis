@@ -1,4 +1,94 @@
 \section{Formal Verification Methodology}
 \label{sec:formal-verification}
 
-This section uses the same strategy proposed in \cite{yangLyapunovstableNeuralControl2024}
+This section uses a slightly changed search for the maximal sublevel set $\mathcal{V}_\rho$ as 
+proposed in \cite{yangLyapunovstableNeuralControl2024}. For saving compute during 
+non-certificable lyapunov candidates, the algorithm includes limits for scaling and bisection. 
+This leads to the following algorithm:
+
+\begin{algorithm}[htpb]
+    \caption{Certified Value Search via Scaling and Bisection}
+    \label{alg:search-and-bisect}
+    \SetAlgoLined
+    \KwIn{$\rho_0, \rho_{\min}$, evaluator $f$, scale $s > 1$, tol $\varepsilon$, limits $N_{\text{scale}}, N_{\text{bisect}}$}
+    \KwOut{Max certified value $\rho^*$}
+
+    \BlankLine
+    $\rho \leftarrow \max(\rho_0, \rho_{\min})$\;
+
+    \BlankLine
+    \tcp{Phase 1: Scaling}
+    \eIf{$f(\rho)$}{
+        \For{$k \leftarrow 1$ \KwTo $N_{\text{scale}}$}{
+            \If{$\neg f(\rho)$}{\textbf{break}\;}
+            $\rho_{\text{lo}} \leftarrow \rho;\quad \rho \leftarrow \rho \cdot s$\;
+        }
+        $\rho_{\text{up}} \leftarrow \rho$\;
+    }{
+        \For{$k \leftarrow 1$ \KwTo $N_{\text{scale}}$}{
+            \If{$f(\rho) \lor \rho = \rho_{\min}$}{\textbf{break}\;}
+            $\rho_{\text{up}} \leftarrow \rho;\quad \rho \leftarrow \max(\rho_{\min}, \rho / s)$\;
+        }
+        \If{$\neg f(\rho)$}{\KwRet $0$\ \tcp*{No valid value $\ge \rho_{\min}$}}
+        $\rho_{\text{lo}} \leftarrow \rho$\;
+    }
+
+    \BlankLine
+    \tcp{Phase 2: Bisection}
+    \For{$k \leftarrow 1$ \KwTo $N_{\text{bisect}}$}{
+        \If{$\rho_{\text{up}} - \rho_{\text{lo}} \le \varepsilon$}{\textbf{break}\;}
+        $\rho_{\text{mid}} \leftarrow \frac{1}{2}(\rho_{\text{lo}} + \rho_{\text{up}})$\;
+        \eIf{$f(\rho_{\text{mid}})$}{
+            $\rho_{\text{lo}} \leftarrow \rho_{\text{mid}}$\;
+        }{
+            $\rho_{\text{up}} \leftarrow \rho_{\text{mid}}$\;
+        }
+    }
+
+    \BlankLine
+    \KwRet $\rho_{\text{lo}}$\;
+\end{algorithm}
+
+Regarding evaluation, the $\alpha\beta$-Crown framework is applied on a certification formulation, 
+described as
+
+\begin{equation}
+    \label{eq:outside-certification}
+    \Phi_{\text{sub}}(x; \rho) \equiv 
+        V_\theta(x) > \rho
+\end{equation}
+
+\begin{equation}
+    \label{eq:positive-certification}
+    \Phi_{\text{pos}}(x) \equiv 
+        V_\theta(x) > 0
+\end{equation}
+
+\begin{equation}
+    \label{eq:decrease-certification}
+    \Phi_{\text{dec}}(x) \equiv 
+        (1 - \kappa) V_\theta(x) - V_\theta(f_d(x, \pi_\theta(x))) > 0
+\end{equation}
+
+\begin{equation}
+    \label{eq:invariance-certification}
+    \Phi_{\text{inv}}(x) \equiv \left(
+        f(x, \pi_\theta(x)) > \underbar{x}_C
+    \right) \land \left(
+        f(x, \pi_\theta(x)) < \bar{x}_C
+    \right)
+\end{equation}
+
+\begin{equation}
+    \label{eq:condition-certification}
+    \Phi_{\text{cond}}(x) \equiv 
+        \Phi_{\text{pos}}(x) 
+        \land \Phi_{\text{dec}}(x) 
+        \land \Phi_{\text{inv}}(x)
+\end{equation}
+
+
+\begin{equation}
+    \label{eq:total-certification-formulation}
+    \Phi(x; \rho) \equiv \Phi_{\text{sub}}(x; \rho) \lor \Phi_{\text{cond}}(x)
+\end{equation}

@@ -18,15 +18,15 @@ Consequently, the Lyapunov candidate is formulated as:
 \begin{equation}
     \label{eq:lyapunov-candidate}
     V_{\theta}(x) = \left| f_{\theta}(x) - f_{\theta}(x^*) \right| 
-        + \left\|  (\epsilon I + R^\top R) (x - x^*)  \right\|_1,
+        + \left\|  (\varepsilon I + R^\top R) (x - x^*)  \right\|_1,
 \end{equation}
 where $f_{\theta} : \mathbb{R}^n \to \mathbb{R}$ is a neural network, $x \in \mathbb{R}^n$ is the current state, 
-$x^* \in \mathbb{R}^n$ is the equilibrium, $\epsilon > 0$ is a small regularization constant, 
+$x^* \in \mathbb{R}^n$ is the equilibrium, $\varepsilon > 0$ is a small regularization constant, 
 and $R \in \mathbb{R}^{n \times n}$ is a learnable matrix. 
 While the first term is only positive semi-definite and may vanish away from the equilibrium, 
 the second term guarantees strict positive definiteness $\forall x \in \mathcal{X} \setminus \{x^*\}$, 
-as the matrix $(\epsilon I + R^\top R)$ is strictly 
-positive definite by construction for any $\epsilon > 0$.
+as the matrix $(\varepsilon I + R^\top R)$ is strictly 
+positive definite by construction for any $\varepsilon > 0$.
 
 
 
@@ -64,10 +64,10 @@ To balance the optimization scale across different magnitudes of $V$, we normali
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
     \mathcal{L}_{\text{dec}} = \left[
-        \frac{e_V}{\max(|V_\theta(x)|, \epsilon_{\text{rel}})}
+        \frac{e_V}{\max(|V_\theta(x)|, \varepsilon_{\text{rel}})}
     \right]_+,
 \end{equation}
-where $\epsilon_{\text{rel}} > 0$ prevents division by zero. 
+where $\varepsilon_{\text{rel}} > 0$ prevents division by zero. 
 Note that the decrease normalization can be omitted depending on the training configuration.
 
 
@@ -99,7 +99,7 @@ However, to apply the $\rho$-gate appropriately, $\mathcal{L}_{\text{cond}}$ is 
 \begin{equation}
     \label{eq:rho-gate}
     w_{\rho} = \sigma \left(
-        s \cdot \frac{\rho - V_\theta(x)}{\max (\rho, \epsilon_{\text{rel}})}
+        s \cdot \frac{\rho - V_\theta(x)}{\max (\rho, \varepsilon_{\text{rel}})}
     \right),
 \end{equation}
 where $s > 0$ denotes the gate sharpness. This smooth formulation ensures that the weights 
@@ -141,7 +141,7 @@ signed Lyapunov decrease $-e_V$ for each of these regions.
 After evaluation, the LIRPA-condition violation for each region is computed as
 \begin{equation}
     \label{eq:relative-lirpa-condition}
-    \mathcal{M}_{\text{L}} = \frac{\ln ([-e_{V,\text{lower}}]_+ + 1)}{\max(V_\theta(x_{\text{center}}), \epsilon_{\text{rel}})}.
+    \mathcal{M}_{\text{L}} = \frac{\ln ([-e_{V,\text{lower}}]_+ + 1)}{\max(V_\theta(x_{\text{center}}), \varepsilon_{\text{rel}})}.
 \end{equation}
 The final LIRPA-condition loss is then computed as the weighted mean over all evaluated regions, 
 where the weight is defined using an exponential function of the squared Euclidean distance between 
@@ -273,7 +273,7 @@ assigning high weights to states inside the estimated region of attraction and e
     \BlankLine
     For all $x \in \mathcal{X}_{\mathrm{ROA}}$, assign weight $w(x) \leftarrow \sigma \left(
         s \, \frac{m \cdot \rho - V_\theta(x)}{\max(\rho, 10^{-9})}
-    \right) + \epsilon$\;
+    \right) + \varepsilon$\;
 
     \BlankLine
     $\mathcal{S} \leftarrow$ Sample $N_x$ states from $\mathcal{X}_{\mathrm{ROA}}$ with probability $P(x) \propto w(x)$\;
