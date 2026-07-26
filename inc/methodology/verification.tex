@@ -1,16 +1,17 @@
 \section{Formal Verification Methodology}
 \label{sec:formal-verification}
 
-This section uses a slightly changed search for the maximal sublevel set $\mathcal{V}_\rho$ as 
-proposed in \cite{yangLyapunovstableNeuralControl2024}. For saving compute during 
-non-certificable lyapunov candidates, the algorithm includes limits for scaling and bisection. 
-This leads to the following algorithm:
+This section adapts the search algorithm for the maximal certifiable sublevel set $\mathcal{V}_\rho$ 
+proposed in \cite{yangLyapunovstableNeuralControl2024}. 
+To reduce computational overhead when evaluating non-certifiable Lyapunov candidates, 
+iteration limits for scaling and bisection are integrated into the search loop, 
+as detailed in \cref{alg:search-and-bisect}.
 
 \begin{algorithm}[htpb]
     \caption{Certified Value Search via Scaling and Bisection}
     \label{alg:search-and-bisect}
     \SetAlgoLined
-    \KwIn{$\rho_0, \rho_{\min}$, evaluator $f$, scale $s > 1$, tol $\varepsilon$, limits $N_{\text{scale}}, N_{\text{bisect}}$}
+    \KwIn{$\rho_0, \rho_{\min}$, evaluator $\Phi$, scale $s > 1$, tol $\varepsilon$, limits $N_{\text{scale}}, N_{\text{bisect}}$}
     \KwOut{Max certified value $\rho^*$}
 
     \BlankLine
@@ -18,18 +19,18 @@ This leads to the following algorithm:
 
     \BlankLine
     \tcp{Phase 1: Scaling}
-    \eIf{$f(\rho)$}{
+    \eIf{$\Phi(\rho)$}{
         \For{$k \leftarrow 1$ \KwTo $N_{\text{scale}}$}{
-            \If{$\neg f(\rho)$}{\textbf{break}\;}
+            \If{$\neg \Phi(\rho)$}{\textbf{break}\;}
             $\rho_{\text{lo}} \leftarrow \rho;\quad \rho \leftarrow \rho \cdot s$\;
         }
         $\rho_{\text{up}} \leftarrow \rho$\;
     }{
         \For{$k \leftarrow 1$ \KwTo $N_{\text{scale}}$}{
-            \If{$f(\rho) \lor \rho = \rho_{\min}$}{\textbf{break}\;}
+            \If{$\Phi(\rho) \lor \rho = \rho_{\min}$}{\textbf{break}\;}
             $\rho_{\text{up}} \leftarrow \rho;\quad \rho \leftarrow \max(\rho_{\min}, \rho / s)$\;
         }
-        \If{$\neg f(\rho)$}{\KwRet $0$\ \tcp*{No valid value $\ge \rho_{\min}$}}
+        \If{$\neg \Phi(\rho)$}{\KwRet $0$\ \tcp*{No valid value $\ge \rho_{\min}$}}
         $\rho_{\text{lo}} \leftarrow \rho$\;
     }
 
@@ -38,7 +39,7 @@ This leads to the following algorithm:
     \For{$k \leftarrow 1$ \KwTo $N_{\text{bisect}}$}{
         \If{$\rho_{\text{up}} - \rho_{\text{lo}} \le \varepsilon$}{\textbf{break}\;}
         $\rho_{\text{mid}} \leftarrow \frac{1}{2}(\rho_{\text{lo}} + \rho_{\text{up}})$\;
-        \eIf{$f(\rho_{\text{mid}})$}{
+        \eIf{$\Phi(\rho_{\text{mid}})$}{
             $\rho_{\text{lo}} \leftarrow \rho_{\text{mid}}$\;
         }{
             $\rho_{\text{up}} \leftarrow \rho_{\text{mid}}$\;
@@ -49,46 +50,51 @@ This leads to the following algorithm:
     \KwRet $\rho_{\text{lo}}$\;
 \end{algorithm}
 
-Regarding evaluation, the $\alpha\beta$-Crown framework is applied on a certification formulation, 
-described as
+To formally certify the Lyapunov candidate, the $\alpha\beta$-CROWN verifier evaluates a 
+logical formulation $\Phi(x; \rho)$ over a bounded certification domain 
+$\mathcal{B}_C = \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \bar{x}_C \} \subseteq \mathcal{B}_V$. 
+The goal is to verify that all states in $\mathcal{V}_\rho \cap \mathcal{B}_C$ satisfy the required stability conditions.
+This implication is rewritten into a disjunctive form that is directly supported by the verifier: 
+a state must either lie outside $\mathcal{V}_\rho$ or satisfy all stability conditions.
 
-\begin{equation}
-    \label{eq:outside-certification}
-    \Phi_{\text{sub}}(x; \rho) \equiv 
-        V_\theta(x) > \rho
-\end{equation}
+The individual logical terms from which this specification is composed are defined as follows:
+\begin{subequations}\label{eq:certification-specification}
+    \begin{align}
+        \Phi_{\mathrm{sub}}
+            &\equiv V_\theta(x) > \rho,
+            \label{eq:outside-certification}\\
+        \Phi_{\mathrm{pos}}
+            &\equiv V_\theta(x) > 0,
+            \label{eq:positive-certification}\\
+        \Phi_{\mathrm{inv}}
+            &\equiv \underline{x}_C \le x^+ \le \bar{x}_C,
+            \label{eq:invariance-certification}\\
+        \Phi_{\mathrm{dec}}
+            &\equiv (1 - \kappa) V_\theta(x) - V_\theta(x^+) > 0,
+            \label{eq:decrease-certification}
+    \end{align}
+\end{subequations}
+where $x^+ = f(x, \pi_\theta(x))$ denotes the discrete one-step state transition. Here, \cref{eq:outside-certification} 
+determines whether $x$ lies outside the target sublevel set $\mathcal{V}_\rho$. For states within $\mathcal{V}_\rho$, 
+\cref{eq:positive-certification} enforces strict positive definiteness away from $x^*$, \cref{eq:invariance-certification} 
+guarantees forward invariance within $\mathcal{B}_C$, and \cref{eq:decrease-certification} ensures the strict Lyapunov decrease property.
 
-\begin{equation}
-    \label{eq:positive-certification}
-    \Phi_{\text{pos}}(x) \equiv 
-        V_\theta(x) > 0
-\end{equation}
-
-\begin{equation}
-    \label{eq:decrease-certification}
-    \Phi_{\text{dec}}(x) \equiv 
-        (1 - \kappa) V_\theta(x) - V_\theta(f_d(x, \pi_\theta(x))) > 0
-\end{equation}
-
-\begin{equation}
-    \label{eq:invariance-certification}
-    \Phi_{\text{inv}}(x) \equiv \left(
-        f(x, \pi_\theta(x)) > \underbar{x}_C
-    \right) \land \left(
-        f(x, \pi_\theta(x)) < \bar{x}_C
-    \right)
-\end{equation}
-
-\begin{equation}
-    \label{eq:condition-certification}
-    \Phi_{\text{cond}}(x) \equiv 
-        \Phi_{\text{pos}}(x) 
-        \land \Phi_{\text{dec}}(x) 
-        \land \Phi_{\text{inv}}(x)
-\end{equation}
-
-
+Finally, combining the sublevel exclusion with the joint stability conditions yields the total specification evaluated by the verifier:
 \begin{equation}
     \label{eq:total-certification-formulation}
-    \Phi(x; \rho) \equiv \Phi_{\text{sub}}(x; \rho) \lor \Phi_{\text{cond}}(x)
+    \Phi(x; \rho) \equiv \Phi_{\mathrm{sub}} \lor \left( 
+        \Phi_{\mathrm{pos}} 
+        \land \Phi_{\mathrm{inv}} 
+        \land \Phi_{\mathrm{dec}} 
+    \right).
 \end{equation}
+
+
+The equilibrium $x^*$ must be excluded from the verification domain. 
+By construction, $V_\theta(x^*) = 0$ and $x^+ = x^*$ hold at the equilibrium, 
+causing the strict positivity ($\Phi_{\mathrm{pos}}$) and strict decrease ($\Phi_{\mathrm{dec}}$) 
+conditions to evaluate to false at $x^*$. Since these conditions hold only for $x \neq x^*$ 
+and positive definiteness is enforced by construction, formal verification is performed over 
+the punctured domain $\mathcal{B}C \setminus \mathcal{B}{\mathrm{hole}}$, where $\mathcal{B}_{\mathrm{hole}}$ 
+denotes a small hyper-rectangular region centered at $x^*$, as shown in \cref{fig:hole-exclusion}.
+

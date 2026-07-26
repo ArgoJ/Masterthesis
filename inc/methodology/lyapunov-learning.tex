@@ -57,13 +57,13 @@ This is achieved by minimizing the relative difference between the Lyapunov cand
 For this purpose, the per-sample Lyapunov decrease term is defined as
 \begin{equation}
     \label{eq:lyapunov-decrease}
-    e_V = V_\theta(x^+) - (1 -  \kappa) \cdot V_\theta(x),
+    e_V = (1 - \kappa) V_\theta(x) - V_\theta(x^+),
 \end{equation}
 where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease. 
 To balance the optimization scale across different magnitudes of $V$, we normalize this violation to obtain the relative decrease loss:
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
-    \mathcal{L}_{\text{dec}} = \left[
+    \loss_{\text{dec}} = \left[
         \frac{e_V}{\max(|V_\theta(x)|, \varepsilon_{\text{rel}})}
     \right]_+,
 \end{equation}
@@ -78,7 +78,7 @@ $S_{\text{range}} = \diag(\bar{x}_V - \underline{x}_V)$ is utilized.
 The loss per sample for the next state $x^+$ is computed as
 \begin{equation}
     \label{eq:rel-invariance}
-    \mathcal{L}_{\text{inv}} = \left\| 
+    \loss_{\text{inv}} = \left\| 
         S_{\text{range}}^{-1} \big[ x^+ - \bar{x}_V \big]_+ 
     \right\|_1 + \left\| 
         S_{\text{range}}^{-1} \big[ \underline{x}_V - x^+ \big]_+ 
@@ -90,12 +90,12 @@ The loss per sample for the next state $x^+$ is computed as
 the relative Lyapunov decrease loss from \cref{eq:rel-lyapunov-decrease} and the relative state invariance loss from \cref{eq:rel-invariance},
 \begin{equation}
     \label{eq:combined-condition-violation}
-    \mathcal{L}_{\text{cond}} = 
-        \mathcal{L}_{\text{dec}} + 
-        \omega_{\text{inv}} \cdot \mathcal{L}_{\text{inv}},
+    \loss_{\text{cond}} = 
+        \loss_{\text{dec}} + 
+        \omega_{\text{inv}} \cdot \loss_{\text{inv}},
 \end{equation}
 where $\omega_{\text{inv}}$ is a hyperparameter balancing the relative importance of the two loss components.
-However, to apply the $\rho$-gate appropriately, $\mathcal{L}_{\text{cond}}$ is weighted for each sample using the soft sublevel weight
+However, to apply the $\rho$-gate appropriately, $\loss_{\text{cond}}$ is weighted for each sample using the soft sublevel weight
 \begin{equation}
     \label{eq:rho-gate}
     w_{\rho} = \sigma \left(
@@ -108,8 +108,8 @@ Evaluating these terms for each sample $x \in \mathcal{X}_{\rho}$, the weighted 
 condition loss and the $\rho$-gating weight results in the final loss formulation:
 \begin{equation}
     \label{eq:rho-gated-condition-loss}
-    \mathcal{L}_{\rho\text{-gated}} = \frac{
-        \sum_{x \in \mathcal{X}_{\rho}} w_{\rho} \mathcal{L}_{\text{cond}}
+    \loss_{\rho\text{-gated}} = \frac{
+        \sum_{x \in \mathcal{X}_{\rho}} w_{\rho} \loss_{\text{cond}}
     }{
         \sum_{x \in \mathcal{X}_{\rho}} w_{\rho}
     }.
@@ -122,7 +122,7 @@ from the shell of the training space. The loss is then evaluated over these cand
 using the following formulation:
 \begin{equation}
     \label{eq:roa-loss}
-    \mathcal{L}_{\text{ROA}} = \frac{1}{M} \sum_{x \in \mathcal{X}_{\text{ROA}}} \ln \left(
+    \loss_{\text{ROA}} = \frac{1}{M} \sum_{x \in \mathcal{X}_{\text{ROA}}} \ln \left(
         \left[
             \frac{V_\theta(x)}{\rho} - 1
         \right]_+ + 1
@@ -156,7 +156,7 @@ where $\alpha_{\text{L}} > 0$ is a hyperparameter controlling the decay rate of 
 Finally, the LIRPA-condition loss over $N_{\text{L}}$ regions is computed as
 \begin{equation}
     \label{eq:relative-lirpa-condition-loss}
-    \mathcal{L}_{\text{L}} = \frac{
+    \loss_{\text{L}} = \frac{
         \sum_{i=1}^{N_{\text{L}}} w_{L}^{(i)} \cdot \mathcal{M}_{\text{L}}^{(i)}
     }{
         \sum_{i=1}^{N_{\text{L}}} w_{L}^{(i)}
@@ -170,7 +170,7 @@ using a quasi-Monte-Carlo sequence. The logarithm of the mean Lyapunov value ove
 $\ell_V = \ln \left(\frac{1}{M} \sum_{x \in \mathcal{X}_V} V_\theta(x) \right)$, leading to the scaling loss formulation
 \begin{equation}
 \label{eq:scaling-loss}
-\mathcal{L}_V = \left( \ell_{V,0} - \ell_V \right)^2.
+\loss_V = \left( \ell_{V,0} - \ell_V \right)^2.
 \end{equation}
 Note that the reference value $\ell_{V,0}$ is determined by computing $\ell_V$ 
 using the initial Lyapunov candidate. Furthermore, to prevent the Lyapunov candidate 
@@ -187,7 +187,7 @@ The deviation between the learned policy and the imitation controller is evaluat
 using a normalized squared difference. The loss is then formulated as
 \begin{equation}
     \label{eq:policy-scaling-loss}
-    \mathcal{L}_\pi = \frac{
+    \loss_\pi = \frac{
         \sum_{x \in \mathcal{X}_\pi} \lVert \pi_V(x) - \pi_0(x) \rVert_2^2
     }{
         \sum_{x \in \mathcal{X}_\pi} \lVert \pi_0(x) \rVert_2^2
@@ -200,7 +200,7 @@ using a normalized squared difference. The loss is then formulated as
 To achieve this, the Frobenius norm of the $R$ matrix is computed and compared to a target value $\ell_{R,0}$
 \begin{equation}
     \label{eq:r-matrix-loss}
-    \mathcal{L}_R = \left( \ell_{R,0} - \lVert R \rVert_F \right)^2.
+    \loss_R = \left( \ell_{R,0} - \lVert R \rVert_F \right)^2.
 \end{equation}
 Note that $\ell_{R,0} = \lVert R \rVert_F$ is automatically set based on the initial $R$ matrix.
 
@@ -209,13 +209,13 @@ Note that $\ell_{R,0} = \lVert R \rVert_F$ is automatically set based on the ini
 summing all previously defined weighted components, given by 
 \begin{equation}
     \label{eq:combined-loss}
-    \mathcal{L}_{\text{total}} =
-        \omega_{\text{cond}} \mathcal{L}_{\rho\text{-gated}} +
-        \omega_{\text{ROA}} \mathcal{L}_{\text{ROA}} +
-        \omega_{\text{L}} \mathcal{L}_{\text{L}} +
-        \omega_V \mathcal{L}_V +
-        \omega_\pi \mathcal{L}_\pi +
-        \omega_R \mathcal{L}_R,
+    \loss_{\text{total}} =
+        \omega_{\text{cond}} \loss_{\rho\text{-gated}} +
+        \omega_{\text{ROA}} \loss_{\text{ROA}} +
+        \omega_{\text{L}} \loss_{\text{L}} +
+        \omega_V \loss_V +
+        \omega_\pi \loss_\pi +
+        \omega_R \loss_R,
 \end{equation}
 where the weights $\omega$ are hyperparameters that balance the relative importance of the individual loss components.
 
@@ -237,7 +237,7 @@ that maximize the condition violation defined in \cref{eq:combined-condition-vio
 and \cref{eq:rho-gate}. The per-sample PGD objective is defined as
 \begin{equation}
     \label{eq:pgd-objective}
-    J_{\text{PGD}} = -w_{\rho} \mathcal{L}_{\text{cond}}.
+    J_{\text{PGD}} = -w_{\rho} \loss_{\text{cond}}.
 \end{equation}
 The adversarial search is initialized using the explorative pool $\mathcal{S}$, 
 with up to $25\%$ of the batch supplemented by existing counterexamples to encourage local refinement.
@@ -250,7 +250,7 @@ Ultimately, only states strictly within $\mathcal{V}_\rho$ that exceed the viola
 and lie outside the origin exclusion region are retained as counterexamples.
 
 
-\paragraph{Adversarial Replay Buffer} manages the sample distribution for the $\rho$-gated condition loss $\mathcal{L}_{\rho\text{-gated}}$. 
+\paragraph{Adversarial Replay Buffer} manages the sample distribution for the $\rho$-gated condition loss $\loss_{\rho\text{-gated}}$. 
 It maintains two distinct state pools: an explorative pool $\mathcal{S}$ and a counterexample pool $\mathcal{C}$. 
 
 To focus the optimization on relevant regions, the explorative pool $\mathcal{S}$ is periodically repopulated. 
@@ -288,7 +288,7 @@ recent violations while allowing the network to gracefully discard resolved edge
 
 
 
-\subsection{$\rho$-Sublevel Estimation}
+\subsection{\texorpdfstring{$\rho$}{ρ}-Sublevel Estimation}
 \label{subsec:rho-sublevel-estim}
 To compute the loss, particularly the $\rho$-gated condition loss in \cref{eq:rho-gated-condition-loss}, 
 the target level $\rho$, which bounds the sublevel set $\mathcal{V}_\rho$, must be continuously estimated during training. 
