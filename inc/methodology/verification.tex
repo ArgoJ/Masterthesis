@@ -3,9 +3,9 @@
 
 This section adapts the search algorithm for the maximal certifiable sublevel set $\mathcal{V}_\rho$ 
 proposed in \cite{yangLyapunovstableNeuralControl2024}. 
-To reduce computational overhead when evaluating non-certifiable Lyapunov candidates, 
-iteration limits for scaling and bisection are integrated into the search loop, 
-as detailed in \cref{alg:search-and-bisect}.
+However, iteration limits for scaling and bisection are integrated into \cref{alg:search-and-bisect} 
+to reduce computational overhead during evaluation.
+
 
 \begin{algorithm}[htpb]
     \caption{Certified Value Search via Scaling and Bisection}
@@ -95,12 +95,13 @@ By construction, $V_\theta(x^*) = 0$ and $x^+ = x^*$ hold at the equilibrium,
 causing the strict positivity ($\Phi_{\mathrm{pos}}$) and strict decrease ($\Phi_{\mathrm{dec}}$) 
 conditions to evaluate to false at $x^*$. Since these conditions hold only for $x \neq x^*$ 
 and positive definiteness is enforced by construction, formal verification is performed over 
-the punctured domain $\mathcal{B}C \setminus \mathcal{B}{\mathrm{hole}}$, where $\mathcal{B}_{\mathrm{hole}}$ 
-denotes a small hyper-rectangular region centered at $x^*$, as shown in \cref{fig:hole-exclusion}.
+the punctured domain $\mathcal{B}_C \setminus \mathcal{B}_{\mathrm{hole}}$, 
+where $\mathcal{B}_{\mathrm{hole}}$ denotes a small hyper-rectangular region 
+centered at $x^*$, as shown in \cref{fig:hole-exclusion}.
 
 \begin{figure}[htbp]
-    \label{fig:hole-exclusion}
     \centering
     \input{tikz/hole_exclusion.tex}
     \caption{Hole exclusion.}
+    \label{fig:hole-exclusion}
 \end{figure}

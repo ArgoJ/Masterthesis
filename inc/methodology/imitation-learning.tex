@@ -51,14 +51,13 @@ where $\clamp(\cdot,u_{\min},u_{\max})$ is applied element-wise.
 
 \paragraph{Imitation Objective} consists of a state-weighted behavioral cloning loss 
 and a dynamics-aware penalty. 
-To obtain dimensionless and
-comparably scaled loss terms, the diagonal scaling matrices
+The loss terms are normalized using the diagonal scaling matrices
 \begin{equation}
     S_x = \diag(x_{\mathrm{scale}})
     \quad \text{and} \quad
-    S_u = \diag(u_{\mathrm{scale}})
+    S_u = \diag(u_{\mathrm{scale}}), 
 \end{equation}
-are introduced, where all scaling factors are strictly positive. In addition,
+where all scaling factors are strictly positive. In addition,
 the element-wise rectified linear unit (ReLU) is defined as
 \begin{equation}
     [z]_+ = \max(z,0).

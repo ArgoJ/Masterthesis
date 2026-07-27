@@ -10,11 +10,8 @@ therefore make the Lyapunov candidate a valid certificate for stability.
 \subsection{Lyapunov Network Architecture}
 \label{subsec:lyapunov-network-architecture}
 
-Ensuring that the learned Lyapunov candidate is positive definite is crucial for stability certification.
-To achieve this, a neural network architecture is designed to guarantee positive definiteness by construction, 
-following the approach in \cite{yangLyapunovstableNeuralControl2024}. The architecture combines the flexibility of neural networks 
-while ensuring the mathematical properties required for Lyapunov functions. 
-Consequently, the Lyapunov candidate is formulated as:
+Following \cite{yangLyapunovstableNeuralControl2024}, 
+the Lyapunov candidate $V_\theta(x)$ is parameterized to be positive definite by construction:
 \begin{equation}
     \label{eq:lyapunov-candidate}
     V_{\theta}(x) = \left| f_{\theta}(x) - f_{\theta}(x^*) \right| 
@@ -52,9 +49,8 @@ using the system dynamics and the policy $u_k = \pi_V(x)$, which may be actively
 during the co-training process.
 
 
-\paragraph{Relative Lyapunov Decrease Loss} is intended to ensure that the Lyapunov candidate decreases along the system trajectories.
-This is achieved by minimizing the relative difference between the Lyapunov candidate evaluated at the current state and the next state. 
-For this purpose, the per-sample Lyapunov decrease term is defined as
+\paragraph{Relative Lyapunov Decrease Loss} penalizes trajectories along which the Lyapunov candidate fails to decay. 
+For each sample, the decrease violation is defined as
 \begin{equation}
     \label{eq:lyapunov-decrease}
     e_V = (1 - \kappa) V_\theta(x) - V_\theta(x^+),
@@ -164,10 +160,12 @@ Finally, the LIRPA-condition loss over $N_{\text{L}}$ regions is computed as
 \end{equation}
 
 
-\paragraph{Lyapunov Scaling Loss} is introduced to ensure that the Lyapunov candidate does not collapse to $0$.
-This is achieved by drawing a batch of $M$ samples $\mathcal{X}_V \subseteq \mathcal{B}_V$,
-using a quasi-Monte-Carlo sequence. The logarithm of the mean Lyapunov value over this batch is then defined as:
-$\ell_V = \ln \left(\frac{1}{M} \sum_{x \in \mathcal{X}_V} V_\theta(x) \right)$, leading to the scaling loss formulation
+\paragraph{Lyapunov Scaling Loss} prevents numerical collapses to $0$, 
+by penalizing deviations from the initial average magnitude over a 
+quasi-Monte-Carlo batch $\mathcal{X}_V \subseteq \mathcal{B}_V$ of $M$ samples. 
+The logarithm of the mean Lyapunov value over this batch is then defined as:
+$\ell_V = \ln \left(\frac{1}{M} \sum_{x \in \mathcal{X}_V} V_\theta(x) \right)$, 
+leading to the scaling loss formulation
 \begin{equation}
 \label{eq:scaling-loss}
 \loss_V = \left( \ell_{V,0} - \ell_V \right)^2.
@@ -195,9 +193,8 @@ using a normalized squared difference. The loss is then formulated as
 \end{equation}
 
 
-\paragraph{$R$-Matrix Loss} tries to prevent the collapse of the $R$ matrix in 
-\cref{eq:lyapunov-candidate} towards a norm of $0$ during training. 
-To achieve this, the Frobenius norm of the $R$ matrix is computed and compared to a target value $\ell_{R,0}$
+\paragraph{$R$-Matrix Loss} regularizes the learnable matrix $R$ by penalizing deviations 
+of its Frobenius norm from its initial value $\ell_{R,0}$:
 \begin{equation}
     \label{eq:r-matrix-loss}
     \loss_R = \left( \ell_{R,0} - \lVert R \rVert_F \right)^2.
@@ -253,7 +250,7 @@ and lie outside the origin exclusion region are retained as counterexamples.
 \paragraph{Adversarial Replay Buffer} manages the sample distribution for the $\rho$-gated condition loss $\loss_{\rho\text{-gated}}$. 
 It maintains two distinct state pools: an explorative pool $\mathcal{S}$ and a counterexample pool $\mathcal{C}$. 
 
-To focus the optimization on relevant regions, the explorative pool $\mathcal{S}$ is periodically repopulated. 
+The explorative pool $\mathcal{S}$ is periodically repopulated every outer epoch to balance exploration and local refinement.  
 Every outer epoch, candidate states are oversampled uniformly from the training domain $\mathcal{B}$. 
 The final pool is then constructed using a probabilistic sampling strategy that 
 prioritizes states within an expanded sublevel boundary $m \cdot \rho$, controlled by a scalar margin $m > 1$. 
@@ -305,7 +302,7 @@ Starting from uniformly sampled points $x_{\partial} \sim \mathcal{U} (\partial 
 by taking steps along the negative gradient and projecting the updated states strictly back onto the boundary surfaces.
 To actively encourage the region of attraction to expand over the course of the co-training process, 
 the formally certifiable limit is intentionally overestimated, as suggested in \cite{yangLyapunovstableNeuralControl2024}.
-Specifically, a target $\rho$ is computed by applying a growth factor $\gamma > 1$ to the identified boundary minimum identified by the PGD:
+Specifically, a target $\rho$ is computed by applying a growth factor $\gamma > 1$ to the boundary minimum found via PGD:
 \begin{equation}
     \label{eq:rho-estimation}
     \tilde{\rho} = \max \left( 
