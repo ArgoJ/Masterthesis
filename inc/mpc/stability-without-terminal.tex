@@ -1,22 +1,36 @@
 \section{Stability without Terminal Constraints}
 \label{sec:stability-without-terminal}
 
-only for no terminal constraints -> not asymptotically stable, but can be shown to be practically stable
+Although terminal constraints simplify stability analysis, they restrict the feasible set $\mathcal{X}_N$ of 
+the optimization problem and introduce additional complexity in finding suitable terminal ingredients \citeSec{6.1}{gruneNonlinearModelPredictive2017}. 
+Alternatively, closed-loop stability can be demonstrated even without any stabilizing terminal conditions. 
 
-\begin{equation}
-    \label{eq:without-terminal-alpha}
-    \alpha_N = 1 - \frac{(\gamma - 1)^N}{\gamma^{N-1} - (\gamma - 1)^N}
-\end{equation}
-
-if $\alpha_N > 0$ then  
-\begin{equation}
-    \label{eq:without-terminal-N}
-    N < 2 + \frac{\ln(\gamma - 1)}{\ln(\gamma) - \ln(\gamma - 1)},
-\end{equation}
-
-then holds
-
+In this setting, nominal asymptotic stability requires bounding $V_N(x_k)$ relative to the minimum stage cost
+$\ell^*(x_k) := \inf_{u \in \mathcal{U}} \ell(x_k, u)$ \citeSec{6.2}{gruneNonlinearModelPredictive2017}:
 \begin{equation}
     \label{eq:general-stability-condition}
-    V_N(x_k) \leq \gamma \ell^*(x_k)
+    V_N(x_k) \leq \gamma \ell^*(x_k),
 \end{equation}
+where $\gamma \geq 1$ quantifies the system controllability. 
+Assuming a constant bound $\gamma$ across optimization horizons, 
+this relation yields an explicit expression for the decrease factor $\alpha_N$ in 
+\cref{eq:relaxed-mpc-stability} \citeRem{6.22}{gruneNonlinearModelPredictive2017}:
+\begin{equation}
+    \label{eq:without-terminal-alpha}
+    \alpha_N = 1 - \frac{(\gamma - 1)^N}{\gamma^{N-1} - (\gamma - 1)^{N-1}}.
+\end{equation}
+
+To guarantee a strict Lyapunov decrease ($\alpha_N > 0$), the prediction horizon $N$ must be chosen sufficiently large to satisfy 
+\cite[Remark 6.22]{gruneNonlinearModelPredictive2017}:
+\begin{equation}
+    \label{eq:without-terminal-N}
+    N > 2 + \frac{\ln(\gamma - 1)}{\ln \gamma - \ln(\gamma - 1)}.
+\end{equation}
+Satisfying this lower bound guarantees global asymptotic stability for the nominal NMPC scheme
+\citeSec{6.5}{gruneNonlinearModelPredictive2017}.
+
+However, if the linear bound in \cref{eq:general-stability-condition} cannot be satisfied globally and 
+is replaced by a general, nonlinear bound, exact asymptotic stability may be lost. Under these relaxed conditions, 
+the MPC closed-loop system can still be shown to be semiglobally \textit{practically} asymptotically stable, 
+meaning the system trajectories are guaranteed to converge to a sufficiently small neighborhood of the origin 
+\citeThm{6.37}{gruneNonlinearModelPredictive2017}.

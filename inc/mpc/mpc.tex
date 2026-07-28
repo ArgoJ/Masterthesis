@@ -9,7 +9,7 @@ the conditions required to guarantee closed-loop stability in finite-horizon opt
 \label{subsec:mpc-problem}
 
 For the nominal MPC setup considered in this work, the following finite-horizon optimal control problem  
-is solved at each time step $k$ given the current system state $x_k$ \citeSec{2.2}{rawlingsModelPredictiveControl2020}:
+is solved at each time step $k$ given the current system state $x_k$ \citeSec{2.2,3.3}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}:
 \begin{equation}
     \label{eq:mpc-problem}
     \begin{aligned}
@@ -23,7 +23,7 @@ is solved at each time step $k$ given the current system state $x_k$ \citeSec{2.
 \end{equation}
 Here, $N$ denotes the prediction horizon, $\ell(x_i, u_i)$ is the stage cost function, and $V_f(x_N)$ represents the terminal cost function. 
 The system dynamics are represented by the discrete-time function $f_d(x_i, u_i)$, 
-while $\mathcal{X}$ and $\mathcal{U}$ denote the state and input constraint sets, respectively. 
+while $\mathcal{X}$ and $\mathcal{U}$ denote the state and input constraint sets, respectively \citeSec{3.2}{gruneNonlinearModelPredictive2017}. 
 
 A quadratic cost function is used for the stage cost, defined as 
 \begin{equation}
@@ -32,19 +32,19 @@ A quadratic cost function is used for the stage cost, defined as
 \end{equation}
 where $Q \succ 0$ and $R \succ 0$ are the state and input weighting matrices, respectively \citeSec{1.3}{rawlingsModelPredictiveControl2020}. 
 Following the receding horizon principle, only the first control input $u_0^*$ from the optimal sequence is applied to the system, 
-and the optimization is repeated at the next sampling instance \citeSec{2.2}{rawlingsModelPredictiveControl2020}.
+and the optimization is repeated at the next sampling instance \citeSec{2.2,3.1}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}.
 
 
 \subsection{Terminal Ingredients for Stability}
 \label{subsec:terminal-set-cost} 
 
 To guarantee closed-loop stability in nominal MPC, the optimal control problem \cref{eq:mpc-problem} is augmented 
-with a terminal constraint $x_N \in \mathcal{X}_f$, where $\mathcal{X}_f \subseteq \mathcal{X}$ denotes the terminal set, 
-and a terminal cost function $V_f(x_N)$ \citeAsm{2.14}{rawlingsModelPredictiveControl2020}:
+with a terminal cost function $V_f(x_N)$ and the terminal constraint \citeAsm{2.14,5.9}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}:
 \begin{equation}
     \label{eq:terminal-constraint}
-    x_N \in \mathcal{X}_f.
+    x_N \in \mathcal{X}_f,
 \end{equation}  
+where $\mathcal{X}_f \subseteq \mathcal{X}$ denotes the invariant terminal set.
 
 A set $\mathcal{X}_f$ is positively invariant under a local control law $u = \pi(x_k)$ if any trajectory originating in $\mathcal{X}_f$ 
 remains inside the set for all future time steps \citeDef{2.9}{rawlingsModelPredictiveControl2020}:
@@ -68,7 +68,8 @@ $(x, u) = (\mathbf{0}, \mathbf{0})$, yielding the linear discrete-time model:
     \label{eq:linearized-system}
     x_{k+1} = A x_k + B u_k.
 \end{equation}
-A widely used choice for these terminal ingredients is then derived from the Linear-Quadratic Regulator (LQR) \citeEq{1.18}{rawlingsModelPredictiveControl2020}. 
+A widely used choice for these terminal ingredients is then derived from the Linear-Quadratic Regulator (LQR) 
+\citeEq{1.18,5.24}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}. 
 Here, the local control law $\pi(x_k)$ is chosen as a linear state-feedback policy $\pi(x_k) = -K x_k$, where the optimal LQR gain $K$ is given by
 \begin{equation}
     \label{eq:lqr-feedback}
@@ -77,7 +78,7 @@ Here, the local control law $\pi(x_k)$ is chosen as a linear state-feedback poli
 
 Under the standard stabilizability and detectability assumptions, the matrix
 $P \succ 0$ is obtained as the unique stabilizing solution to the discrete-time
-Algebraic Riccati Equation (DARE) \citeEq{1.18}{rawlingsModelPredictiveControl2020}:
+Algebraic Riccati Equation (DARE) \citeEq{1.18,5.23}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}:
 \begin{equation}
     \label{eq:riccati-equation}
     P = A^\top P A - A^\top P B \left(R + B^\top P B\right)^{-1} B^\top P A + Q.
@@ -112,15 +113,18 @@ over the feasible set $\mathcal{X}_N \subseteq \mathcal{X}$ \citeSec{2.4.2}{rawl
 Using the terminal ingredients from \cref{subsec:terminal-set-cost}, the recursive
 feasibility at time step $k+1$ is determined by using the remaining inputs of the optimal sequence 
 computed at time step $k$ and appending the terminal control action $\pi(x_N^*)$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
-Consequently, $V_N^*$ satisfies a decrease condition along closed-loop trajectories, 
-expressed with the relaxed Lyapunov decrease formulation:
+
+Consequently, $V_N^*$ satisfies a decrease condition along closed-loop trajectories $x_{k+1} = f_d(x_k, \pi_{\mathrm{MPC}}(x_k))$. 
+Relaxing the standard stability conditions, this can be expressed with the relaxed Lyapunov decrease formulation 
+\citeThm{4.11}{gruneNonlinearModelPredictive2017}:
 \begin{equation}
     \label{eq:relaxed-mpc-stability}
-    V_N^*(f_d(x_k, \pi_{\mathrm{MPC}}(x_k))) \leq V_N^*(x_k) - \alpha_N \cdot \ell(x_k, \pi_{\mathrm{MPC}}(x_k)), \qquad \forall x_k \in \mathcal{X}_N,
+    V_N^*(x_{k+1}) \leq V_N^*(x_k) - \alpha_N \ell(x_k, \pi_{\mathrm{MPC}}(x_k)), \qquad \forall x_k \in \mathcal{X}_N,
 \end{equation}
-where $\alpha_N \in (0, 1]$ denotes the relaxed decre factor \citeAsm{2.14}{rawlingsModelPredictiveControl2020}. 
+where $\alpha_N \in (0, 1]$ denotes the relaxed decrease factor \citeThm{4.11}{gruneNonlinearModelPredictive2017}. 
 Setting $\alpha_N = 1$ yields the standard nominal Lyapunov decrease
 \begin{equation}
     V_N^*(x_{k+1}) - V_N^*(x_k) \leq -\ell(x_k, \pi_{\mathrm{MPC}}(x_k)),
 \end{equation}
-guaranteeing asymptotic stability of the origin $\mathbf{0}$ for all initial states $x_0 \in \mathcal{X}_N$ \citeThm{2.19}{rawlingsModelPredictiveControl2020}.
+guaranteeing asymptotic stability of the origin $\mathbf{0}$ for all initial states $x_0 \in \mathcal{X}_N$ 
+\citeAsm{2.14}{rawlingsModelPredictiveControl2020}.
