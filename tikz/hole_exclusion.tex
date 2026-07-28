@@ -1,12 +1,24 @@
+\definecolor{shapeColor1}{RGB}{255,127,14}
+
 \begin{tikzpicture}
 \begin{axis}[
-    title={RegionBuilder build\_regions output},
-    xlabel={x0},
-    ylabel={x1}
+    xlabel={$x_0$},
+    ylabel={$x_1$},
+    xmin=-1,
+    xmax=1,
+    ymin=-1,
+    ymax=1,
+    width=0.55\textwidth,
+    axis equal image
 ]
-    \draw[fill={rgb,255:red,255;green,127;blue,14}, fill opacity=0.25, draw={rgb,255:red,255;green,127;blue,14}, draw opacity=0.25, line width=2pt] (axis cs:-1, -1) rectangle (axis cs:-0.25, 1);
-    \draw[fill={rgb,255:red,255;green,127;blue,14}, fill opacity=0.25, draw={rgb,255:red,255;green,127;blue,14}, draw opacity=0.25, line width=2pt] (axis cs:0.25, -1) rectangle (axis cs:1, 1);
-    \draw[fill={rgb,255:red,255;green,127;blue,14}, fill opacity=0.25, draw={rgb,255:red,255;green,127;blue,14}, draw opacity=0.25, line width=2pt] (axis cs:-0.25, -1) rectangle (axis cs:0.25, -0.25);
-    \draw[fill={rgb,255:red,255;green,127;blue,14}, fill opacity=0.25, draw={rgb,255:red,255;green,127;blue,14}, draw opacity=0.25, line width=2pt] (axis cs:-0.25, 0.25) rectangle (axis cs:0.25, 1);
+    \draw[fill=shapeColor1, fill opacity=0.25, draw=shapeColor1, draw opacity=1.0, line width=2pt] (-1, -1) rectangle (-0.25, 1);
+    \draw[fill=shapeColor1, fill opacity=0.25, draw=shapeColor1, draw opacity=1.0, line width=2pt] (0.25, -1) rectangle (1, 1);
+    \draw[fill=shapeColor1, fill opacity=0.25, draw=shapeColor1, draw opacity=1.0, line width=2pt] (-0.25, -1) rectangle (0.25, -0.25);
+    \draw[fill=shapeColor1, fill opacity=0.25, draw=shapeColor1, draw opacity=1.0, line width=2pt] (-0.25, 0.25) rectangle (0.25, 1);
+    \node at (0,0) {$\mathcal{B}_{\mathrm{hole}}$};
+    \node at (-0.625, 0) {$\mathcal{B}_{C,1}$};
+    \node at (0.625, 0)  {$\mathcal{B}_{C,2}$};
+    \node at (0, -0.625) {$\mathcal{B}_{C,3}$};
+    \node at (0, 0.625)  {$\mathcal{B}_{C,4}$};
 \end{axis}
 \end{tikzpicture}

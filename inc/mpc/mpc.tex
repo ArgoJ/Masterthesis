@@ -1,16 +1,15 @@
 \section{Model Predictive Control and Stability}
 \label{sec:mpc-stability}
 
-This section provides a brief overview of the Model Predictive Control (\textit{MPC}) framework and its stability properties. 
-First, the general MPC problem is formulated, followed by a discussion on the terminal set and terminal cost constraints. 
-Afterwards, the closed-loop stability of the MPC scheme is analyzed.
+This section summarizes the Model Predictive Control (MPC) framework and 
+the conditions required to guarantee closed-loop stability in finite-horizon optimal control setups.
 
 
 \subsection{Problem Formulation}
 \label{subsec:mpc-problem}
 
 For the nominal MPC setup considered in this work, the following finite-horizon optimal control problem  
-is solved at each time step $k$ given the current system state $x_k$:
+is solved at each time step $k$ given the current system state $x_k$ \citeSec{2.2}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:mpc-problem}
     \begin{aligned}
@@ -31,85 +30,97 @@ A quadratic cost function is used for the stage cost, defined as
     \label{eq:stage-cost}
     \ell(x_i, u_i) = x_i^\top Q x_i + u_i^\top R u_i,
 \end{equation}
-where $Q \succeq 0$ and $R \succ 0$ are the state and input weighting matrices, respectively. 
+where $Q \succ 0$ and $R \succ 0$ are the state and input weighting matrices, respectively \citeSec{1.3}{rawlingsModelPredictiveControl2020}. 
 Following the receding horizon principle, only the first control input $u_0^*$ from the optimal sequence is applied to the system, 
-and the optimization is repeated at the next sampling instance.
+and the optimization is repeated at the next sampling instance \citeSec{2.2}{rawlingsModelPredictiveControl2020}.
 
 
 \subsection{Terminal Ingredients for Stability}
 \label{subsec:terminal-set-cost} 
 
-To ensure stability of a closed-loop system of a nominal MPC, a terminal set $\mathcal{X}_f \subseteq \mathcal{X}$ 
-and a terminal cost function $V_f(x_N)$ are introduced. 
-The terminal set $\mathcal{X}_f$ is a positively invariant set for the system under a local control law $u = \mu(x_k)$, 
-and the terminal cost $V_f(x_N)$ is a Lyapunov function for the system within this set. 
-However, to include these terminal ingredients, \cref{eq:mpc-problem} must be augmented with the following terminal constraint:
+To guarantee closed-loop stability in nominal MPC, the optimal control problem \cref{eq:mpc-problem} is augmented 
+with a terminal constraint $x_N \in \mathcal{X}_f$, where $\mathcal{X}_f \subseteq \mathcal{X}$ denotes the terminal set, 
+and a terminal cost function $V_f(x_N)$ \citeAsm{2.14}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:terminal-constraint}
     x_N \in \mathcal{X}_f.
 \end{equation}  
 
-The property of a positive invariant set $\mathcal{X}_f$ is defined as a set of states where a state $x_k \in \mathcal{X}_f$ remains in $\mathcal{X}_f$ 
-for all future time steps under the local control law $\mu(x_k)$, 
+A set $\mathcal{X}_f$ is positively invariant under a local control law $u = \pi(x_k)$ if any trajectory originating in $\mathcal{X}_f$ 
+remains inside the set for all future time steps \citeDef{2.9}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:positive-invariance}
-    f_d(x, \mu(x)) \in \mathcal{X}_f \quad \forall x \in \mathcal{X}_f.
+    f_d(x, \pi(x)) \in \mathcal{X}_f
+    \quad \text{and} \quad
+    \pi(x) \in \mathcal{U},
+    \qquad \forall x \in \mathcal{X}_f.
 \end{equation}
 
-This predictive mechanism is visualized in \cref{fig:terminal-set-comparison}. 
-While the initial state $x_0$ and the intermediate predicted states $x_1, x_2$ are only restricted to the safe state space $\mathcal{X}$, 
-the terminal constraint \cref{eq:terminal-constraint} forces the final predicted state $x_N$ to terminate strictly inside the invariant terminal set $\mathcal{X}_f$. 
-Together with the terminal cost $V_f(x_N)$, which acts as a local Lyapunov function inside $\mathcal{X}_f$, 
-these ingredients establish a mathematical bridge. 
+The predictive mechanism is illustrated in \cref{fig:terminal-set-comparison}. 
+While the intermediate states $x_0, \dots, x_{N-1}$ are merely constrained to the safe state space $\mathcal{X}$, 
+the terminal constraint \cref{eq:terminal-constraint} enforces $x_N \in \mathcal{X}_f$. 
+Together with the terminal cost $V_f(x_N)$ acting as a local Lyapunov function, 
+these ingredients guarantee closed-loop asymptotic stability over an infinite horizon \citeThm{2.19}{rawlingsModelPredictiveControl2020}.
 
 For nonlinear systems, the terminal set $\mathcal{X}_f$ is typically computed using linearized system dynamics around the equilibrium point 
-$(x, u) = (\mathbf{0}, \mathbf{0})$, yielding the linear discrete-time state-space model:
+$(x, u) = (\mathbf{0}, \mathbf{0})$, yielding the linear discrete-time model:
 \begin{equation}
     \label{eq:linearized-system}
     x_{k+1} = A x_k + B u_k.
 \end{equation}
-A widely used choice for these terminal ingredients is then derived from the Linear-Quadratic Regulator (\textit{LQR}). 
-Here, the local control law $\mu(x_k)$ is chosen as a linear state-feedback policy $\mu(x_k) = -K x_k$, where the optimal LQR gain $K$ is given by
+A widely used choice for these terminal ingredients is then derived from the Linear-Quadratic Regulator (LQR) \citeEq{1.18}{rawlingsModelPredictiveControl2020}. 
+Here, the local control law $\pi(x_k)$ is chosen as a linear state-feedback policy $\pi(x_k) = -K x_k$, where the optimal LQR gain $K$ is given by
 \begin{equation}
     \label{eq:lqr-feedback}
     K = \left(R + B^\top P B\right)^{-1} B^\top P A.
 \end{equation}
 
-The matrix $P \succ 0$ is obtained as the unique positive definite solution to the discrete-time Algebraic Riccati Equation (\textit{DARE}):
+Under the standard stabilizability and detectability assumptions, the matrix
+$P \succ 0$ is obtained as the unique stabilizing solution to the discrete-time
+Algebraic Riccati Equation (DARE) \citeEq{1.18}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:riccati-equation}
     P = A^\top P A - A^\top P B \left(R + B^\top P B\right)^{-1} B^\top P A + Q.
 \end{equation}
 
 This matrix parameterizes the quadratic terminal cost function $V_f(x_N) = x_N^\top P x_N$. 
-Accordingly, the terminal set $\mathcal{X}_f$ is defined as an ellipsoidal sub-level set of this cost function:
+Accordingly, the terminal set $\mathcal{X}_f$ is defined as an ellipsoidal sub-level set of 
+this cost function \citeSec{2.5.5}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:terminal-ellipse}
-    \mathcal{X}_f = \left\{ x \in \mathbb{R}^n \ \middle|\ x^\top P x \leq \alpha \right\}.
+    \mathcal{X}_f := \left\{ x \in \mathbb{R}^n \ \middle|\ x^\top P x \leq \alpha \right\}.
 \end{equation}
-To satisfy the positive invariance condition \cref{eq:positive-invariance} for the original nonlinear system, 
-the scaling parameter $\alpha > 0$ must be chosen sufficiently small. This ensures not only that all states within $\mathcal{X}_f$ 
-satisfy the state constraints $\mathcal{X}$ and input constraints $\mathcal{U}$, but also that the local quadratic 
-Lyapunov descent condition dominates the higher-order linearization errors of the nonlinear dynamics.
-
-\newcommand{\boundellipse}[3]% center, xdim, ydim
-{(#1) ellipse (#2 and #3)
-}
+Choosing the scaling parameter $\alpha > 0$ sufficiently small guarantees that $\mathcal{X}_f$ 
+satisfies both the state and input constraints $\mathcal{X}$ and $\mathcal{U}$ 
+while ensuring that the quadratic Lyapunov decrease dominates higher-order 
+linearization errors of the nonlinear dynamics.
 
 \begin{figure}[htbp]
-    \label{fig:terminal-set-comparison}
     \centering
     \input{tikz/sets}
     \caption{Comparison of the terminal set $\mathcal{X}_f$ (red) with the entire state space $\mathcal{X}$ (blue).}
+    \label{fig:terminal-set-comparison}
 \end{figure}
 
 
 \subsection{Closed-Loop Stability}
 \label{subsec:closed-loop-stability}
 
-TODO: ADD FORMULATION FOR RELAXED MPC STABILITY CONDITION
-
+Under the MPC policy $\pi_{\mathrm{MPC}}(x_k) := u_0^*(x_k)$, 
+the optimal value function $V_N^*(x_k)$ of \cref{eq:mpc-problem} serves as a Lyapunov candidate 
+over the feasible set $\mathcal{X}_N \subseteq \mathcal{X}$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}. 
+Using the terminal ingredients from \cref{subsec:terminal-set-cost}, the recursive
+feasibility at time step $k+1$ is determined by using the remaining inputs of the optimal sequence 
+computed at time step $k$ and appending the terminal control action $\pi(x_N^*)$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
+Consequently, $V_N^*$ satisfies a decrease condition along closed-loop trajectories, 
+expressed with the relaxed Lyapunov decrease formulation:
 \begin{equation}
     \label{eq:relaxed-mpc-stability}
-    V_N(f_d(x_k, \mu(x_k))) \leq  V_N(x_k) - \alpha_N \cdot \ell(x_k, \mu(x_k)), \quad \forall x_k \in \mathcal{X}_f
+    V_N^*(f_d(x_k, \pi_{\mathrm{MPC}}(x_k))) \leq V_N^*(x_k) - \alpha_N \cdot \ell(x_k, \pi_{\mathrm{MPC}}(x_k)), \qquad \forall x_k \in \mathcal{X}_N,
 \end{equation}
+where $\alpha_N \in (0, 1]$ denotes the relaxed decre factor \citeAsm{2.14}{rawlingsModelPredictiveControl2020}. 
+Setting $\alpha_N = 1$ yields the standard nominal Lyapunov decrease
+\begin{equation}
+    V_N^*(x_{k+1}) - V_N^*(x_k) \leq -\ell(x_k, \pi_{\mathrm{MPC}}(x_k)),
+\end{equation}
+guaranteeing asymptotic stability of the origin $\mathbf{0}$ for all initial states $x_0 \in \mathcal{X}_N$ \citeThm{2.19}{rawlingsModelPredictiveControl2020}.

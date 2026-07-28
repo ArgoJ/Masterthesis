@@ -13,32 +13,30 @@ In this work, the corresponding discrete-time system
     x_{k+1} = f_d(x_k, u_k)
 \end{equation}
 is obtained by approximating the continuous dynamics using a numerical integration scheme with a constant sampling time $T_s$, 
-such as the forward Euler or a fourth-order Runge-Kutta (\textit{RK4}) method \cite{something}.
+such as the forward Euler or a fourth-order Runge-Kutta (RK4) method \cite{butcherNumericalMethodsOrdinary2016}.
+
 
 \subsection{Lyapunov Stability}
 \label{subsec:lyapunov-stability}
 
-Let the origin $(x, u) = (\mathbf{0}, \mathbf{0})$ be an equilibrium point of the system 
-such that $f_d(\mathbf{0}, \mathbf{0}) = \mathbf{0}$.
-Suppose the system is controlled by a state-feedback control policy $u_k = \kappa(x_k)$.
-The closed-loop system is said to be \textit{Lyapunov stable} if there exists a 
-positive definite Lyapunov function $V(x_k)$ such that:
+Consider the discrete-time closed-loop system under a state-feedback control policy 
+$u = \pi(x)$ with equilibrium $(\mathbf{0}, \mathbf{0})$ such that $f_d(\mathbf{0}, \pi(\mathbf{0})) = \mathbf{0}$. 
+The origin is \textit{locally Lyapunov stable} if there exists a positive definite function 
+$V: \mathcal{X} \to \mathbb{R}_{\ge 0}$ satisfying \citeThm{2.13}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:lyapunov-stability}
     \begin{aligned}
-        V(\mathbf{0}) &= 0 \quad \quad && \\
-        V(x_k) &> 0 \quad \quad && \forall x_k \in \mathcal{X} \setminus \{\mathbf{0}\} \\
-        V(f_d(x_k, \kappa(x_k))) - V(x_k) &\leq 0 \quad \quad && \forall x_k \in \mathcal{X} \setminus \{\mathbf{0}\}.
+        V(\mathbf{0}) &= 0 \qquad && \\
+        V(x) &> 0 \qquad && \forall x \in \mathcal{X} \setminus \{\mathbf{0}\} \\
+        V(f_d(x, \pi(x))) - V(x) &\leq 0 \qquad && \forall x \in \mathcal{X} \setminus \{\mathbf{0}\}.
     \end{aligned}
 \end{equation}
 
-Furthermore, the equilibrium point is \textit{locally asymptotically stable} 
-if the Lyapunov function additionally satisfies a strictly negative definite decrease condition 
-along the closed-loop trajectories:
+If the decrease condition holds strictly along closed-loop trajectories,
 \begin{equation}
     \label{eq:asymptotic-lyapunov-stability}
-    V(f_d(x_k, \kappa(x_k))) - V(x_k) < 0 \quad \quad \forall x_k \in \mathcal{X} \setminus \{\mathbf{0}\}.
+    V(f_d(x, \pi(x))) - V(x) < 0 \qquad \forall x \in \mathcal{X} \setminus \{\mathbf{0}\},
 \end{equation}
-
-Asymptotic stability is typically the desired property for control systems, 
-as it ensures that the system will converge to the equilibrium point over time.
+the origin is \textit{locally asymptotically stable}, guaranteeing trajectory
+convergence to the origin for all initial states $x_0$ in a sufficiently small
+neighborhood of the origin \citeThm{2.13}{rawlingsModelPredictiveControl2020}.

@@ -52,7 +52,7 @@ to reduce computational overhead during evaluation.
 
 To formally certify the Lyapunov candidate, the $\alpha\beta$-CROWN verifier evaluates a 
 logical formulation $\Phi(x; \rho)$ over a bounded certification domain 
-$\mathcal{B}_C = \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \bar{x}_C \} \subseteq \mathcal{B}_V$. 
+$\mathcal{B}_C := \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \bar{x}_C \} \subseteq \mathcal{B}_V$. 
 The goal is to verify that all states in $\mathcal{V}_\rho \cap \mathcal{B}_C$ satisfy the required stability conditions.
 This implication is rewritten into a disjunctive form that is directly supported by the verifier: 
 a state must either lie outside $\mathcal{V}_\rho$ or satisfy all stability conditions.
@@ -90,18 +90,18 @@ Finally, combining the sublevel exclusion with the joint stability conditions yi
 \end{equation}
 
 
-The equilibrium $x^*$ must be excluded from the verification domain. 
+The equilibrium $x^*$ must be excluded from the certification domain $\mathcal{B}_C$. 
 By construction, $V_\theta(x^*) = 0$ and $x^+ = x^*$ hold at the equilibrium, 
 causing the strict positivity ($\Phi_{\mathrm{pos}}$) and strict decrease ($\Phi_{\mathrm{dec}}$) 
 conditions to evaluate to false at $x^*$. Since these conditions hold only for $x \neq x^*$ 
 and positive definiteness is enforced by construction, formal verification is performed over 
-the punctured domain $\mathcal{B}_C \setminus \mathcal{B}_{\mathrm{hole}}$, 
-where $\mathcal{B}_{\mathrm{hole}}$ denotes a small hyper-rectangular region 
-centered at $x^*$, as shown in \cref{fig:hole-exclusion}.
+the punctured domain $\mathcal{B}_C \setminus \mathcal{B}_{\mathrm{hole}}$. 
+Here, $\mathcal{B}_{\mathrm{hole}}$ denotes a small hyper-rectangular region centered at $x^*$. 
+The punctured certification domain is thus split into multiple subregions, as shown in \cref{fig:hole-exclusion}.
 
 \begin{figure}[htbp]
     \centering
     \input{tikz/hole_exclusion.tex}
-    \caption{Hole exclusion.}
+    \caption{2D Hole exclusion example with $\mathcal{B}_{\mathrm{hole}} := \left\{ x \in \mathbb{R}^2 \;\middle\vert{}\; \lVert x \rVert_\infty < 0.25 \right\}$.}
     \label{fig:hole-exclusion}
 \end{figure}
