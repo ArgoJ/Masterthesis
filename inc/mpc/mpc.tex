@@ -107,24 +107,24 @@ linearization errors of the nonlinear dynamics.
 \subsection{Closed-Loop Stability}
 \label{subsec:closed-loop-stability}
 
-Under the MPC policy $\pi_{\mathrm{MPC}}(x_k) := u_0^*(x_k)$, 
+Under the MPC policy $\pi_0(x_k) := u_0^*(x_k)$, 
 the optimal value function $V_N^*(x_k)$ of \cref{eq:mpc-problem} serves as a Lyapunov candidate 
 over the feasible set $\mathcal{X}_N \subseteq \mathcal{X}$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}. 
 Using the terminal ingredients from \cref{subsec:terminal-set-cost}, the recursive
 feasibility at time step $k+1$ is determined by using the remaining inputs of the optimal sequence 
 computed at time step $k$ and appending the terminal control action $\pi(x_N^*)$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
 
-Consequently, $V_N^*$ satisfies a decrease condition along closed-loop trajectories $x_{k+1} = f_d(x_k, \pi_{\mathrm{MPC}}(x_k))$. 
+Consequently, $V_N^*$ satisfies a decrease condition along closed-loop trajectories $x_{k+1} = f_d(x_k, \pi_0(x_k))$. 
 Relaxing the standard stability conditions, this can be expressed with the relaxed Lyapunov decrease formulation 
 \citeThm{4.11}{gruneNonlinearModelPredictive2017}:
 \begin{equation}
     \label{eq:relaxed-mpc-stability}
-    V_N^*(x_{k+1}) \leq V_N^*(x_k) - \alpha_N \ell(x_k, \pi_{\mathrm{MPC}}(x_k)), \qquad \forall x_k \in \mathcal{X}_N,
+    V_N^*(x_{k+1}) \leq V_N^*(x_k) - \alpha_N \ell(x_k, \pi_0(x_k)), \qquad \forall x_k \in \mathcal{X}_N,
 \end{equation}
 where $\alpha_N \in (0, 1]$ denotes the relaxed decrease factor \citeThm{4.11}{gruneNonlinearModelPredictive2017}. 
 Setting $\alpha_N = 1$ yields the standard nominal Lyapunov decrease
 \begin{equation}
-    V_N^*(x_{k+1}) - V_N^*(x_k) \leq -\ell(x_k, \pi_{\mathrm{MPC}}(x_k)),
+    V_N^*(x_{k+1}) - V_N^*(x_k) \leq -\ell(x_k, \pi_0(x_k)),
 \end{equation}
 guaranteeing asymptotic stability of the origin $\mathbf{0}$ for all initial states $x_0 \in \mathcal{X}_N$ 
 \citeAsm{2.14}{rawlingsModelPredictiveControl2020}.
