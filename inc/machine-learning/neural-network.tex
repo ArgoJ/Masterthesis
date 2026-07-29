@@ -1,8 +1,61 @@
 \section{Artificial Neural Networks}
 \label{cha:ann}
 
+In imitation learning, Artificial Neural Networks (ANNs) approximate complex control laws offline 
+to bypass the computational overhead of online Model Predictive Control (MPC) evaluations.
+
 \subsection{Multi-Layer Perceptrons}
 \label{subsec:mlp}
+
+Multi-Layer Perceptrons (MLPs) are fully connected feed-forward networks that map an input 
+through $L-1$ hidden layers to an output layer \citeSec{1.4,3.1}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
+
+For a state input $x \in \mathbb{R}^{n_x}$, forward propagation to the network prediction $\hat{y}$ is defined recursively for layers $l = 1, \dots, L$:
+\begin{equation}
+    \label{eq:nn-forward}
+    a^{(l)} = \sigma^{(l)}\left( W^{(l)} a^{(l-1)} + b^{(l)} \right), \qquad \forall l = 1, \dots, L,
+\end{equation}
+where $a^{(0)} := x$ is the input, and $a^{(L)} := \hat{y}$ is the network's prediction. 
+The matrix $W^{(l)}$ and vector $b^{(l)}$ denote the weights and biases of layer $l$, respectively, 
+while $\sigma^{(l)}(z)$ represents a non-linear activation function applied element-wise to 
+the pre-activation values \citeSec{3.2}{kollmannsbergerDeepLearningComputational2021}. 
+Without these non-linearities, the layers would simply be reduced to a single linear transformation, 
+drastically limiting the model's ability to capture complexity \citeSec{1.5}{aggarwalNeuralNetworksDeep2023}. 
+Common activation functions in neural control include the hyperbolic tangent, 
+the Rectified Linear Unit (ReLU), and Leaky ReLU, defined respectively as
+\citeSec{3.5}{kollmannsbergerDeepLearningComputational2021}.
+\begin{subequations}
+    \label{eq:act-funs}
+    \begin{align}
+        \tanh z &= \frac{\mathrm{e}^{2z} - 1}{\mathrm{e}^{2z} + 1} \label{eq:tanh} \\
+        {[z]_+} &= \max(0, z) \label{eq:relu} \\
+        {[z]}_{\alpha} &= \max(\alpha z, z), \quad \alpha \in (0, 1) \label{eq:leaky-relu}
+    \end{align}
+\end{subequations}
+Their qualitative profiles are illustrated in \cref{fig:activation-funs}.
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/acts.tex}
+    \caption[Activation functions]{Standard activation functions for neural control policies.}
+    \label{fig:activation-funs}
+\end{figure}
+
+Based on the universal approximation theorem, an MLP with at least one sufficiently sized hidden layer and non-linear activations 
+can approximate any continuous multidimensional function on compact sets to arbitrary accuracy \citeSec{3.1}{kollmannsbergerDeepLearningComputational2021}. 
+The trainable parameters are represented by $\theta = \{W^{(l)}, b^{(l)}\}_{l=1}^L$. \Cref{fig:mlp-architecture} illustrates a representative architecture.
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/ann.tex}
+    \caption[MLP]{
+        Architecture of an exemplary Multi-Layer Perceptron with three inputs, two outputs and two hidden layers with four neurons each. 
+        Illustration adapted from \citeFig{3.1}{kollmannsbergerDeepLearningComputational2021}
+    }
+    \label{fig:mlp-architecture}
+\end{figure}
+
+
 
 \subsection{Optimization and Training}
 \label{subsec:opt-training}

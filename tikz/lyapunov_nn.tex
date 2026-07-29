@@ -1,0 +1,82 @@
+\begin{tikzpicture}[
+    >=stealth, thick,
+    % Styles für Blöcke und Knoten
+    blockNN/.style={
+        rectangle, draw=teal!90!black, fill=teal!12,
+        minimum height=0.75cm, minimum width=1.1cm,
+        rounded corners=3pt, font=\small\bfseries, text=black
+    },
+    blockOp/.style={
+        rectangle, draw=amber!90!black, fill=amber!12,
+        minimum height=0.75cm, minimum width=1.8cm,
+        rounded corners=3pt, font=\small, text=black, align=center
+    },
+    sum/.style={
+        circle, draw=navy, fill=white,
+        inner sep=0pt, minimum size=18pt, font=\small\bfseries, text=black
+    },
+    val/.style={font=\normalsize, text=black},
+    point/.style={circle, fill=dark, inner sep=0pt, minimum size=3pt}
+]
+
+    % --- KNOTEN & POSITIONIERUNG (3 Etagen) ---
+    
+    % Inputs (Links)
+    \node[val] (x) at (0, 1.0) {$x$};
+    \node[val] (xstar) at (0, -0.6) {$x^*$};
+
+    % Verzweigungspunkte
+    \node[point] (fork_x) at (0.6, 1.0) {};
+    \node[point] (fork_xstar) at (0.9, -0.6) {};
+
+    % Term 1: Neuronale Netze (Etage 1 & 2)
+    \node[blockNN] (f1) at (2.0, 1.0) {$f_\theta$};
+    \node[blockNN] (f2) at (2.0, -0.6) {$f_\theta$};
+    
+    % Term 1 Operationen (Etage 1)
+    \node[sum] (sum_f) at (3.8, 1.0) {$\Sigma$};
+    \node[blockOp] (abs) at (5.6, 1.0) {$|\cdot|$};
+
+    % Term 2 Operationen (Etage 3 - Ganz unten)
+    \node[sum] (sum_x) at (3.8, -2.2) {$\Sigma$};
+    \node[blockOp] (norm_weighted) at (6.2, -2.2) {
+        $\|(\varepsilon I + R^\top R) \cdot \|_1$\\[-2pt]
+        {\tiny\itshape\color{navy!70}(learnable $R$)}
+    };
+
+    % Finale Zusammenführung (Rechts)
+    \node[sum] (sum_final) at (8.4, 1.0) {$\Sigma$};
+    \node[val] (V) at (9.8, 1.0) {$V_{\theta}(x)$};
+
+
+    % --- VERBINDUNGEN & ROUTING ---
+
+    % Shared weights Indikator
+    \draw[dashed, navy!70, thin] (f1.south) -- node[right, font=\tiny, text=navy] {shared $\theta$} (f2.north);
+
+    % Input x Pfade
+    \draw[-] (x) -- (fork_x);
+    \draw[->] (fork_x) -- (f1);
+    % x speist VON LINKS in sum_x ein
+    \draw[->] (fork_x) |- node[pos=0.92, above=1pt, font=\tiny\bfseries, text=navy] {$+$} (sum_x.west);
+
+    % Input x* Pfade
+    \draw[-] (xstar) -- (fork_xstar);
+    \draw[->] (fork_xstar) -- (f2);
+    % x* führt UNTEN HERUM und speist VON UNTEN in sum_x ein
+    \draw[->] (fork_xstar) |- (3.8, -3.0) -- node[pos=0.7, left=1pt, font=\tiny\bfseries, text=navy] {$-$} (sum_x.south);
+
+    % Term 1 Verbindungen (Oben)
+    \draw[->] (f1) -- node[pos=0.8, above=1pt, font=\tiny\bfseries, text=navy] {$+$} (sum_f);
+    \draw[->] (f2) -| node[pos=0.85, left=1pt, font=\tiny\bfseries, text=navy] {$-$} (sum_f);
+    \draw[->] (sum_f) -- (abs);
+    \draw[->] (abs) -- node[pos=0.8, above=1pt, font=\tiny\bfseries, text=navy] {$+$} (sum_final);
+
+    % Term 2 Verbindungen (Unten)
+    \draw[->] (sum_x) -- (norm_weighted);
+    \draw[->] (norm_weighted) -| node[pos=0.85, left=1pt, font=\tiny\bfseries, text=navy] {$+$} (sum_final);
+
+    % Ausgang
+    \draw[->] (sum_final) -- (V);
+
+\end{tikzpicture}

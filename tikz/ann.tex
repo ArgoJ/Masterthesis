@@ -1,0 +1,52 @@
+\begin{tikzpicture}[
+    shorten >=1pt,->,draw=black!70, node distance=2.5cm,
+    neuron/.style={circle,draw,minimum size=25pt,inner sep=0pt, thick},
+    input neuron/.style={neuron, fill=amber!20},
+    hidden neuron/.style={neuron, fill=dark!15},
+    output neuron/.style={neuron, fill=teal!20},
+    annot/.style={text width=4em, text centered}
+]
+    % Define network size
+    \def\inputnum{3}
+    \def\hiddennum{4}
+    \def\hiddennumtwo{4}
+    \def\outputnum{2}
+
+    % Input Layer
+    \foreach \name / \y in {1,...,\inputnum}
+        \node[input neuron] (I-\name) at (0,-\y) {$x_\name$};
+
+    % First Hidden Layer
+    \foreach \name / \y in {1,...,\hiddennum}
+        \path[yshift=0.5cm] node[hidden neuron] (H1-\name) at (2.5 cm,-\y) {$\sigma$};
+
+    % Second Hidden Layer
+    \foreach \name / \y in {1,...,\hiddennumtwo}
+        \path[yshift=0.5cm] node[hidden neuron] (H2-\name) at (5 cm,-\y) {$\sigma$};
+
+    % Output Layer
+    \node[output neuron] (O-1) at (7.5 cm, -1.5) {$\hat{y}_1$};
+    \node[output neuron] (O-2) at (7.5 cm, -2.5) {$\hat{y}_2$};
+    \node[output neuron] (O-2) at (7.5 cm, -2.5) {$\hat{y}_2$};
+
+    % Connect Input to Hidden 1
+    \foreach \source in {1,...,\inputnum}
+        \foreach \dest in {1,...,\hiddennum}
+            \draw (I-\source) -- (H1-\dest);
+
+    % Connect Hidden 1 to Hidden 2
+    \foreach \source in {1,...,\hiddennum}
+        \foreach \dest in {1,...,\hiddennumtwo}
+            \draw (H1-\source) -- (H2-\dest);
+
+    % Connect Hidden 2 to Output
+    \foreach \source in {1,...,\hiddennumtwo}
+        \foreach \dest in {1,...,\outputnum}
+            \draw (H2-\source) -- (O-\dest);
+
+    % Annotations
+    \node[annot,above of=I-1, node distance=1cm] {Input Layer};
+    \node[annot,above of=H1-1, node distance=1cm] {Hidden Layer 1};
+    \node[annot,above of=H2-1, node distance=1cm] {Hidden Layer 2};
+    \node[annot,above of=O-1, node distance=1cm] {Output Layer};
+\end{tikzpicture}

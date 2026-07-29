@@ -37,7 +37,7 @@ For each occupied voxel, at most one representative pair is retained.
 The policy architecture follows the structure proposed in \cite{yangLyapunovstableNeuralControl2024}, 
 as it enforces true control inputs at the equilibrium $\pi_\theta(x^*) = u^*$ and 
 satisfies the control input constraints $u_{\min} \leq \pi_\theta(x) \leq u_{\max}$ 
-by construction. The neural policy $\pi_\theta$ is forumlated as 
+by construction. The neural policy $\pi_\theta$ is visualized in \cref{fig:imitation-policy} and forumlated as 
 \begin{equation}
     \label{eq:policy-arch}
     \pi_\theta(x) = \clamp \left( 
@@ -46,7 +46,14 @@ by construction. The neural policy $\pi_\theta$ is forumlated as
             u_{\max}
     \right).
 \end{equation}
-where $\clamp(\cdot,u_{\min},u_{\max})$ is applied element-wise.
+where $\clamp(\cdot,u_{\min},u_{\max})$ is applied element-wise. 
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/policy_nn.tex}
+    \caption[Imitation Policy]{The imitation learning policy.}
+    \label{fig:imitation-policy}
+\end{figure}
 
 
 \paragraph{Imitation Objective} consists of a state-weighted behavioral cloning loss 

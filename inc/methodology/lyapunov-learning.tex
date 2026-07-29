@@ -24,6 +24,14 @@ While the first term is only positive semi-definite and may vanish away from the
 the second term guarantees strict positive definiteness $\forall x \in \mathcal{X} \setminus \{x^*\}$, 
 as the matrix $(\varepsilon I + R^\top R)$ is strictly 
 positive definite by construction for any $\varepsilon > 0$.
+The complete architectural layout of $V_\theta(x)$ is illustrated in \cref{fig:neural-lyapunov}.
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/lyapunov_nn.tex}
+    \caption[Neural Lyapunov Architecture]{The neural Lyapunov architecture.}
+    \label{fig:neural-lyapunov}
+\end{figure}
 
 
 
@@ -277,11 +285,10 @@ assigning high weights to states inside the estimated region of attraction and e
 \end{algorithm}
 
 The counterexample pool $\mathcal{C}$ stores the critical violations identified during the PGD falsification step. 
-To maintain the relevance of the adversarial states and prevent overfitting to outdated violations, 
-a time-to-live mechanism is implemented. Each injected counterexample is assigned an initial age counter $\tau = 0$, 
-which is incremented upon every subsequent falsification phase. Once a counterexample reaches the maximum age $\tau_{\max}$, 
-it is removed from the buffer. This guarantees that the condition loss continuously penalizes 
-recent violations while allowing the network to gracefully discard resolved edge cases as the Lyapunov candidate evolves.
+A age-tracking mechanism limits sample lifespan, preventing overfitting outdated violations.
+Each injected counterexample is assigned an initial age $\tau = 0$, which is incremented after every subsequent falsification phase. 
+Once a counterexample reaches the maximum age $\tau_{\max}$, it is removed from the pool. 
+Consequently, the condition loss continuously penalizes recent violations while discarding resolved edge cases as the Lyapunov candidate evolves.
 
 
 
