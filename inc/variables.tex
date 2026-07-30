@@ -1,0 +1,152 @@
+\chapter*{List of Variables and Symbols}
+
+\begin{longtable}{@{} p{0.2\textwidth} p{0.75\textwidth} @{}}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+\endhead
+
+\bottomrule
+\endfoot
+
+% --- System Dynamics & Control ---
+\multicolumn{2}{@{}l}{\textit{System Dynamics \& Control}} \\
+\midrule
+$n_x$ & State space dimension \\
+$n_u$ & Control input space dimension \\
+$\mathcal{X}$ & Admissible state set \\
+$\mathcal{U}$ & Admissible input set \\
+$T_s$ & Sampling time \\
+$k$ & Discrete time step index \\
+$x(t)$ & Continuous-time state vector \\
+$x_k$ & Discrete-time state vector \\
+$u(t)$ & Continuous-time control input vector \\
+$u_k$ & Discrete-time control input vector \\
+$x^*$ & System equilibrium point \\
+$x_{k+1}$ & Discrete-time successor state \\
+$x^+$ & One-step successor state \\
+$\pi(x)$ & State-feedback policy \\
+$f(x, u)$ & Continuous-time system dynamics \\
+$f_d(x_k, u_k)$ & Discrete-time system dynamics \\
+\midrule
+
+% --- Optimal Control & Model Predictive Control ---
+\multicolumn{2}{@{}l}{\textit{Optimal Control \& Model Predictive Control (MPC)}} \\
+\midrule
+$N$ & Prediction horizon \\
+$\ell(x, u)$ & Stage cost function \\
+$V_f(x)$ & Terminal cost function \\
+$\mathcal{X}_f$ & Terminal constraint set \\
+$Q$ & State weighting matrix \\
+$R$ & Input weighting matrix \\
+$u_0^*$ & Optimal control input \\
+$V_N^*(x)$ & Optimal value function \\
+$A$ & Linearized system state matrix \\
+$B$ & Linearized system input matrix \\
+$K$ & LQR feedback gain matrix \\
+$P$ & DARE solution matrix \\
+$\alpha_N$ & Relaxed Lyapunov decrease factor \\
+$\mathcal{X}_N$ & Feasible initial state set \\
+\midrule
+
+% --- Neural Networks & Imitation Learning ---
+\multicolumn{2}{@{}l}{\textit{Neural Networks \& Imitation Learning}} \\
+\midrule
+$L$ & Total layer count \\
+$l$ & Layer index \\
+$a^{(l)}$ & Layer activation vector \\
+$z^{(l)}$ & Layer pre-activation vector \\
+$W^{(l)}$ & Layer weight matrix \\
+$b^{(l)}$ & Layer bias vector \\
+$\sigma^{(l)}(\cdot)$ & Non-linear activation function \\
+$\theta$ & Trainable network parameters \\
+$\mathcal{D}_\pi$ & Imitation learning dataset \\
+$N_{\mathcal{D}}$ & Dataset sample count \\
+$\pi_0(x)$ & Expert MPC policy \\
+$\pi_\theta(x)$ & Learned imitation policy \\
+$\clamp(\cdot)$ & Control input clamping function \\
+$u_{\min}$ & Lower control input bound \\
+$u_{\max}$ & Upper control input bound \\
+$S_x$ & State scaling matrix \\
+$S_u$ & Input scaling matrix \\
+$d(x)$ & Scaled equilibrium distance \\
+$w_x(x)$ & Behavioral cloning loss weight \\
+$w_{\min}$ & Baseline loss weight \\
+$\mathcal{B}_\pi$ & Training mini-batch \\
+$M_\pi$ & Mini-batch size \\
+$\mathcal{L}_{\mathrm{BC}}$ & Behavioral cloning loss \\
+$\mathcal{L}_f$ & Dynamics-aware constraint loss \\
+$\underline{x}_\pi$ & Admissible state lower bound \\
+$\overline{x}_\pi$ & Admissible state upper bound \\
+$\omega_{\mathrm{BC}}$ & Behavioral cloning loss weight \\
+$\omega_f$ & Dynamics-aware constraint loss weight \\
+$\mathcal{L}_\pi$ & Total imitation policy loss \\
+\midrule
+
+% --- Neural Lyapunov Learning & Falsification ---
+\multicolumn{2}{@{}l}{\textit{Neural Lyapunov Learning \& Falsification}} \\
+\midrule
+$V_\theta(x)$ & Neural Lyapunov candidate \\
+$\varepsilon$ & Regularization constant \\
+$R$ & Learnable transformation matrix \\
+$\rho$ & Target Lyapunov sublevel value \\
+$\mathcal{V}_\rho$ & Certified sublevel set \\
+$\mathcal{B}_V$ & Lyapunov training domain \\
+$\rho_{\min}$ & Minimum sublevel target bound \\
+$\pi_V(x)$ & Co-trained policy \\
+$e_V$ & Lyapunov decrease violation \\
+$\kappa$ & Target decrease rate \\
+$\varepsilon_{\text{rel}}$ & Numerical stabilization constant \\
+$\loss_{\text{dec}}$ & Relative Lyapunov decrease loss \\
+$S_{\text{range}}$ & Domain range scaling matrix \\
+$\loss_{\text{inv}}$ & Relative state-invariance loss \\
+$\loss_{\text{cond}}$ & Combined condition violation loss \\
+$w_\rho$ & Soft sublevel gating weight \\
+$s$ & Gate sharpness parameter \\
+$\loss_{\rho\text{-gated}}$ & Soft-gated condition loss \\
+$\mathcal{X}_{\text{ROA}}$ & Shell sample set \\
+$\xi$ & Inner boundary shell factor \\
+$\loss_{\text{ROA}}$ & Region of Attraction expansion loss \\
+$e_{V,\text{lower}}$ & Signed Lyapunov decrease lower bound \\
+$\mathcal{M}_{\text{L}}$ & Region LIRPA condition violation \\
+$w_{\text{L}}$ & LIRPA region weight \\
+$\alpha_{\text{L}}$ & LIRPA weight decay rate \\
+$N_{\text{L}}$ & Region count \\
+$\loss_{\text{L}}$ & LIRPA loss \\
+$\ell_V$ & Mean Lyapunov log-value \\
+$\ell_{V,0}$ & Initial mean Lyapunov log-value \\
+$\loss_V$ & Lyapunov magnitude scaling loss \\
+$\loss_\pi$ & Policy scaling loss \\
+$\ell_{R,0}$ & Initial matrix $R$ Frobenius norm \\
+$\loss_R$ & Matrix $R$ regularization loss \\
+$\loss_{\text{total}}$ & Total combined Lyapunov loss \\
+$\omega_{\text{cond}}$ & Soft-gated condition loss weight \\
+$\omega_{\text{ROA}}$ & Region of Attraction expansion loss weight \\
+$\omega_{\text{L}}$ & LIRPA loss weight \\
+$\omega_V$ & Lyapunov magnitude scaling loss weight \\
+$\omega_\pi$ & Policy scaling loss weight \\
+$\omega_R$ & Matrix $R$ regularization loss weight \\
+$\mathcal{C}$ & Counterexample pool \\
+$\mathcal{S}$ & Explorative pool \\
+$x_{\text{adv}}$ & Counterexample state \\
+$J_{\text{PGD}}$ & PGD objective \\
+$\tau$ & Counterexample age \\
+$\tau_{\max}$ & Maximum lifespan \\
+$m$ & Sublevel margin \\
+$\gamma$ & Overestimation factor \\
+$\tilde{\rho}$ & Estimated ROA boundary minimum \\
+$\beta$ & EMA decay rate \\
+\midrule
+
+% --- Formal Verification ---
+\multicolumn{2}{@{}l}{\textit{Formal Verification \& Certification}} \\
+\midrule
+$\mathcal{B}_C$ & Formal verification domain \\
+$\Phi(x; \rho)$ & Verification specification formula \\
+$\Phi_{\mathrm{sub}}$ & Sublevel set exclusion predicate \\
+$\Phi_{\mathrm{pos}}$ & Positive definiteness predicate \\
+$\Phi_{\mathrm{inv}}$ & Forward invariance predicate \\
+$\Phi_{\mathrm{dec}}$ & Strict Lyapunov decrease predicate \\
+$\mathcal{B}_{\mathrm{hole}}$ & Equilibrium exclusion region \\
+$\rho^*$ & Maximal verified sublevel value \\
+\end{longtable}

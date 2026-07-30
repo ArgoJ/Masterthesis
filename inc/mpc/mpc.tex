@@ -41,7 +41,7 @@ and the optimization is repeated at the next sampling instance \citeSec{2.2,3.1}
 \subsection{Terminal Ingredients for Stability}
 \label{subsec:terminal-set-cost} 
 
-To guarantee closed-loop stability of a nominal MPC, the optimal control problem \cref{eq:mpc-problem} 
+To guarantee closed-loop stability of a nominal MPC, the optimal control problem \eqref{eq:mpc-problem} 
 incorporates specific terminal ingredients: 
 the terminal cost function $V_f(x_N)$ and the terminal set $\mathcal{X}_f$ 
 \citeAsm{2.14,5.9}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}.
@@ -57,7 +57,7 @@ time steps while respecting input constraints \citeDef{2.9}{rawlingsModelPredict
 The predictive mechanism is illustrated in \cref{fig:terminal-set-comparison}. 
 While the intermediate states $x_0, \dots, x_{N-1}$ are merely constrained to the 
 safe state space $\mathcal{X}$, the terminal constraint enforces $x_N \in \mathcal{X}_f$.
-Let $V_N^*(x)$ denote the optimal value function of \cref{eq:mpc-problem} for a state $x$. 
+Let $V_N^*(x)$ denote the optimal value function of \eqref{eq:mpc-problem} for a state $x$. 
 Combined with the terminal cost $V_f(x_N)$ acting as a local Lyapunov function in $\mathcal{X}_f$, 
 these ingredients ensure that the optimal value function $V_N^*(x)$ 
 serves as a Lyapunov function for the closed-loop system, guaranteeing asymptotic stability 
@@ -110,7 +110,7 @@ linearization errors of the nonlinear dynamics.
 \label{subsec:closed-loop-stability}
 
 Under the MPC policy $\pi_0(x_k) := u_0^*(x_k)$, 
-the optimal value function $V_N^*(x_k)$ of \cref{eq:mpc-problem} serves as a Lyapunov candidate 
+the optimal value function $V_N^*(x_k)$ of \eqref{eq:mpc-problem} serves as a Lyapunov candidate 
 over the feasible set $\mathcal{X}_N \subseteq \mathcal{X}$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}. 
 Using the terminal ingredients from \cref{subsec:terminal-set-cost}, the recursive
 feasibility at time step $k+1$ is determined by using the remaining inputs of the optimal sequence 

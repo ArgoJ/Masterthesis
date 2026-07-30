@@ -25,8 +25,8 @@ explicit Euler method with a sampling time of $\Delta t = 0.1$, leads to the dis
 where $x_k = \begin{bmatrix}p_k & v_k\end{bmatrix}^\top$ is the state vector containing the position and velocity of the system, 
 respectively, and $u_k$ denotes acceleration.
 
-The \textit{MPC setup} is formulated according to the problem in \cref{eq:mpc-problem} 
-subject to the double-integrator dynamics in \cref{eq:double-integrator}. 
+The \textit{MPC setup} is formulated according to the problem in \eqref{eq:mpc-problem} 
+subject to the double-integrator dynamics in \eqref{eq:double-integrator}. 
 A prediction horizon of $N = 20$ steps is chosen, and the states and inputs are penalized using 
 the weighting matrices $Q = \operatorname{diag}(15, 1)$ and $R = 0.1$.
 
@@ -63,6 +63,6 @@ leads to the discrete-time state-space equation:
 \end{equation}
 
 For the nonlinear benchmark, a prediction horizon of $N = 40$ stages is chosen. 
-The system states and control inputs are penalized within the optimization framework of \cref{eq:mpc-problem} 
+The system states and control inputs are penalized within the optimization framework of \eqref{eq:mpc-problem} 
 using the weighting matrices $Q = \operatorname{diag}(10,\, 1,\, 10,\, 0.01)$ and $R = 0.5$, respectively, 
-subject to the dynamics defined in \cref{eq:cartpole}.
+subject to the dynamics defined in \eqref{eq:cartpole}.

@@ -9,6 +9,13 @@
     width=0.55\textwidth,
     axis equal image
 ]
-    \addplot+[only marks, mark=*, mark size=2pt, draw=dark, mark options={solid}] table [x=x, y=y, col sep=tab] {tikz/methods/box_shell.tsv};
+    \addplot+[
+        only marks,
+        mark=*,
+        mark size=2pt,
+        draw=dark,
+        fill=dark,
+        mark options={solid}
+    ] table [x=x, y=y, col sep=tab] {tikz/methods/box_shell.tsv};
 \end{axis}
 \end{tikzpicture}

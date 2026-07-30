@@ -74,10 +74,10 @@ The individual logical terms from which this specification is composed are defin
             \label{eq:decrease-certification}
     \end{align}
 \end{subequations}
-where $x^+ = f(x, \pi_\theta(x))$ denotes the discrete one-step state transition. Here, \cref{eq:outside-certification} 
+where $x^+ = f(x, \pi_\theta(x))$ denotes the discrete one-step state transition. Here, \eqref{eq:outside-certification} 
 determines whether $x$ lies outside the target sublevel set $\mathcal{V}_\rho$. For states within $\mathcal{V}_\rho$, 
-\cref{eq:positive-certification} enforces strict positive definiteness away from $x^*$, \cref{eq:invariance-certification} 
-guarantees forward invariance within $\mathcal{B}_C$, and \cref{eq:decrease-certification} ensures the strict Lyapunov decrease property.
+\eqref{eq:positive-certification} enforces strict positive definiteness away from $x^*$, \eqref{eq:invariance-certification} 
+guarantees forward invariance within $\mathcal{B}_C$, and \eqref{eq:decrease-certification} ensures the strict Lyapunov decrease property.
 
 Finally, combining the sublevel exclusion with the joint stability conditions yields the total specification evaluated by the verifier:
 \begin{equation}
