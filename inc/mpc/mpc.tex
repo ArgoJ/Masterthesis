@@ -16,14 +16,17 @@ is solved at each time step $k$ given the current system state $x_k$ \citeSec{2.
         \min_{\{x_i\}_{i=0}^N, \{u_i\}_{i=0}^{N-1}} \quad &
         \sum_{i=0}^{N-1} \ell(x_i, u_i) + V_f(x_N) \\
         \text{s.t.} \quad & x_{i+1} = f_d(x_i, u_i), && i = 0, \dots, N-1, \\
-        & x_i \in \mathcal{X}, && i = 0, \dots, N, \\
+        & x_i \in \mathcal{X}, && i = 0, \dots, N-1, \\
         & u_i \in \mathcal{U}, && i = 0, \dots, N-1, \\
+        & x_N \in \mathcal{X}_f \\
         & x_0 = x_k.
     \end{aligned}
 \end{equation}
-Here, $N$ denotes the prediction horizon, $\ell(x_i, u_i)$ is the stage cost function, and $V_f(x_N)$ represents the terminal cost function. 
-The system dynamics are represented by the discrete-time function $f_d(x_i, u_i)$, 
-while $\mathcal{X}$ and $\mathcal{U}$ denote the state and input constraint sets, respectively \citeSec{3.2}{gruneNonlinearModelPredictive2017}. 
+Here, $N \in \mathbb{N}$ denotes the prediction horizon, $\ell: \mathcal{X} \times \mathcal{U} \to \mathbb{R}_{\ge 0}$ is the stage cost function, 
+and $V_f: \mathcal{X}_f \to \mathbb{R}_{\ge 0}$ represents the terminal cost function defined over the terminal constraint set 
+$\mathcal{X}_f \subseteq \mathcal{X}$. The state and input sequences $\{x_i\}_{i=0}^N$ and $\{u_i\}_{i=0}^{N-1}$ 
+denote the predicted state and input vectors over the horizon, constrained by the sets $\mathcal{X}$ and $\mathcal{U}$ 
+\citeSec{3.2}{gruneNonlinearModelPredictive2017}.
 
 A quadratic cost function is used for the stage cost, defined as 
 \begin{equation}
@@ -38,29 +41,27 @@ and the optimization is repeated at the next sampling instance \citeSec{2.2,3.1}
 \subsection{Terminal Ingredients for Stability}
 \label{subsec:terminal-set-cost} 
 
-To guarantee closed-loop stability in nominal MPC, the optimal control problem \cref{eq:mpc-problem} is augmented 
-with a terminal cost function $V_f(x_N)$ and the terminal constraint \citeAsm{2.14,5.9}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}:
-\begin{equation}
-    \label{eq:terminal-constraint}
-    x_N \in \mathcal{X}_f,
-\end{equation}  
-where $\mathcal{X}_f \subseteq \mathcal{X}$ denotes the invariant terminal set.
+To guarantee closed-loop stability of a nominal MPC, the optimal control problem \cref{eq:mpc-problem} 
+incorporates specific terminal ingredients: 
+the terminal cost function $V_f(x_N)$ and the terminal set $\mathcal{X}_f$ 
+\citeAsm{2.14,5.9}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}.
 
-A set $\mathcal{X}_f$ is positively invariant under a local control law $u = \pi(x_k)$ if any trajectory originating in $\mathcal{X}_f$ 
-remains inside the set for all future time steps \citeDef{2.9}{rawlingsModelPredictiveControl2020}:
+The terminal set $\mathcal{X}_f$ is required to be positively invariant under a local control law $u = \pi(x)$, 
+meaning that any trajectory originating in $\mathcal{X}_f$ remains inside the set for all future 
+time steps while respecting input constraints \citeDef{2.9}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:positive-invariance}
-    f_d(x, \pi(x)) \in \mathcal{X}_f
-    \quad \text{and} \quad
-    \pi(x) \in \mathcal{U},
-    \qquad \forall x \in \mathcal{X}_f.
+    f_d(x, \pi(x)) \in \mathcal{X}_f \quad \text{and} \quad \pi(x) \in \mathcal{U}, \qquad \forall x \in \mathcal{X}_f.
 \end{equation}
 
 The predictive mechanism is illustrated in \cref{fig:terminal-set-comparison}. 
-While the intermediate states $x_0, \dots, x_{N-1}$ are merely constrained to the safe state space $\mathcal{X}$, 
-the terminal constraint \cref{eq:terminal-constraint} enforces $x_N \in \mathcal{X}_f$. 
-Together with the terminal cost $V_f(x_N)$ acting as a local Lyapunov function, 
-these ingredients guarantee closed-loop asymptotic stability over an infinite horizon \citeThm{2.19}{rawlingsModelPredictiveControl2020}.
+While the intermediate states $x_0, \dots, x_{N-1}$ are merely constrained to the 
+safe state space $\mathcal{X}$, the terminal constraint enforces $x_N \in \mathcal{X}_f$.
+Let $V_N^*(x)$ denote the optimal value function of \cref{eq:mpc-problem} for a state $x$. 
+Combined with the terminal cost $V_f(x_N)$ acting as a local Lyapunov function in $\mathcal{X}_f$, 
+these ingredients ensure that the optimal value function $V_N^*(x)$ 
+serves as a Lyapunov function for the closed-loop system, guaranteeing asymptotic stability 
+\citeThm{2.19}{rawlingsModelPredictiveControl2020}.
 
 For nonlinear systems, the terminal set $\mathcal{X}_f$ is typically computed using linearized system dynamics around the equilibrium point 
 $(x, u) = (\mathbf{0}, \mathbf{0})$, yielding the linear discrete-time model:
@@ -85,11 +86,12 @@ Algebraic Riccati Equation (DARE) \citeEq{1.18,5.23}{rawlingsModelPredictiveCont
 \end{equation}
 
 This matrix parameterizes the quadratic terminal cost function $V_f(x_N) = x_N^\top P x_N$. 
-Accordingly, the terminal set $\mathcal{X}_f$ is defined as an ellipsoidal sub-level set of 
-this cost function \citeSec{2.5.5}{rawlingsModelPredictiveControl2020}:
+Accordingly, the terminal set $\mathcal{X}_f$ is defined in this specific case 
+as an ellipsoidal sub-level set of this cost function 
+\citeSec{2.5.5}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:terminal-ellipse}
-    \mathcal{X}_f := \left\{ x \in \mathbb{R}^n \ \middle|\ x^\top P x \leq \alpha \right\}.
+    \mathcal{X}_f := \left\{ x \in \mathbb{R}^{n_x} \ \middle|\ x^\top P x \leq \alpha \right\}.
 \end{equation}
 Choosing the scaling parameter $\alpha > 0$ sufficiently small guarantees that $\mathcal{X}_f$ 
 satisfies both the state and input constraints $\mathcal{X}$ and $\mathcal{U}$ 
@@ -98,7 +100,7 @@ linearization errors of the nonlinear dynamics.
 
 \begin{figure}[htbp]
     \centering
-    \input{tikz/sets}
+    \input{tikz/basics/sets.tex}
     \caption{Comparison of the terminal set $\mathcal{X}_f$ (red) with the entire state space $\mathcal{X}$ (blue).}
     \label{fig:terminal-set-comparison}
 \end{figure}

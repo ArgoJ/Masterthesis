@@ -1,27 +1,20 @@
 \section{Neural Policy Approximation and Imitation Learning}
 \label{sec:imitation-learning}
-This section specifies the data generation process, 
-the neural policy architecture, and the training objective used to approximate the 
-model predictive control (MPC) expert. Specifically, the MPC controller 
-introduced in \cref{subsec:mpc-problem} serves as the expert policy 
-generating the required state-input pairs. The neural policy is subsequently trained to 
-reproduce the expert control actions over the considered state domain.
 
 
-\subsection{Data Generation and MPC Expert}
-\label{subsec:mpc-datagen}
-The MPC controller introduced in \cref{subsec:mpc-problem} is used as the
-expert policy and is denoted by $\pi_0$. For a given state $x$, it returns the
-first input of the optimal MPC solution,
+\paragraph{Data Generation} uses the MPC expert policy $\pi_0$ defined in \cref{subsec:closed-loop-stability}.
+Closed-loop trajectories $x_{k+1} = f_d(x_k, \pi_0(x_k))$ are initialized from states sampled across 
+the training set $\mathcal{X}_\pi \subseteq \mathcal{X}$. 
+Storing the visited states and their corresponding optimal control actions yields the dataset
 \begin{equation}
-    \label{eq:mpc-expert-policy}
-    \pi_0(x) = u_0^*(x).
+    \label{eq:dataset-definition}
+    \mathcal{D}_\pi = \left\{ (x^{(i)}, u^{(i)}) \right\}_{i=1}^{N_{\mathcal{D}}},
 \end{equation}
+where $x^{(i)} \in \mathcal{X}_\pi$ and $u^{(i)} = \pi_0(x^{(i)})$.
 
-The MPC expert is evaluated along closed-loop trajectories initialized from
-states sampled within the admissible state space $\mathcal{X}$. At each time
-step $k$, the current state $x_k$ and the first control action $u_0^*(x_k)$
-returned by the MPC solver are stored as one training pair. If the MPC problem
+
+\todo[inline]{move to 7}
+If the MPC problem
 becomes infeasible at any time during one trajectory, all training pairs
 associated with that trajectory are discarded.
 
@@ -30,27 +23,24 @@ state-action pairs are removed during preprocessing. The concatenated
 state-action vectors are normalized and mapped onto an adaptive voxel grid.
 For each occupied voxel, at most one representative pair is retained.
 
-
-
-\subsection{Policy Network Architecture and Imitation Objective}
-\label{subsec:imitation-architecture}
-The policy architecture follows the structure proposed in \cite{yangLyapunovstableNeuralControl2024}, 
+\paragraph{Imitation Policy} follows the structure proposed in \cite{yangLyapunovstableNeuralControl2024}, 
 as it enforces true control inputs at the equilibrium $\pi_\theta(x^*) = u^*$ and 
 satisfies the control input constraints $u_{\min} \leq \pi_\theta(x) \leq u_{\max}$ 
-by construction. The neural policy $\pi_\theta$ is visualized in \cref{fig:imitation-policy} and forumlated as 
+by construction. The neural policy $\pi_\theta$ is visualized in \cref{fig:imitation-policy} and 
+formulated as 
 \begin{equation}
     \label{eq:policy-arch}
-    \pi_\theta(x) = \clamp \left( 
+    \pi_\theta(x) = \clamp(
             f_\theta(x) - f_\theta(x^*) + u^*, 
             u_{\min},
             u_{\max}
-    \right).
+    ).
 \end{equation}
 where $\clamp(\cdot,u_{\min},u_{\max})$ is applied element-wise. 
 
 \begin{figure}[htbp]
     \centering
-    \input{tikz/policy_nn.tex}
+    \input{tikz/methods/policy_nn.tex}
     \caption[Imitation Policy]{The imitation learning policy.}
     \label{fig:imitation-policy}
 \end{figure}
@@ -65,12 +55,8 @@ The loss terms are normalized using the diagonal scaling matrices
     S_u = \diag(u_{\mathrm{scale}}), 
 \end{equation}
 where all scaling factors are strictly positive. In addition,
-the element-wise rectified linear unit (ReLU) is defined as
-\begin{equation}
-    [z]_+ = \max(z,0).
-\end{equation}
-
-The normalized distance of the equilibrium is evaluated using the scaled $L_1$-norm: 
+the element-wise rectified linear unit defined in \cref{eq:relu} is utilized. 
+The normalizing the distance of the equilibrium is evaluated using the scaled $L_1$-norm: 
 \begin{equation}
     \label{eq:state-distance}
     d(x) = \frac{1}{n_x} \left\| S_x^{-1}(x - x^*) \right\|_1.
@@ -85,32 +71,36 @@ where $w_{\min} \in (0, 1]$ is the baseline weight for states far from the
 equilibrium and $\alpha \geq 0$ controls the decay rate.
 
 \paragraph{State-Weighted Behavioral Cloning Loss} penalizes the normalized Euclidean distance 
-between the neural network policy and the expert targets utilizing the state-dependent weighting. 
-For a batch $\mathcal{X}_{\pi}$ containing $M$ samples, the behavioral cloning loss is
-defined as
+between the neural network policy and the expert targets. 
+For a mini-batch $\mathcal{B}_\pi \subset \mathcal{D}_\pi$ of size 
+$M_\pi = |\mathcal{B}_\pi|$, the behavioral cloning loss is defined as
 \begin{equation}
     \label{eq:state-weighted-loss}
-    \mathcal{L}_{\mathrm{BC}} = \frac{1}{M n_u} 
-    \sum_{x \in \mathcal{X}_\pi} w_x(x) \left\| 
-        S_u^{-1} \big( \pi_\theta(x) - \pi_0(x) \big) 
+    \mathcal{L}_{\mathrm{BC}} = \frac{1}{M_\pi n_u} 
+    \sum_{(x, u) \in \mathcal{B}_\pi} w_x(x) \left\| 
+        S_u^{-1} \big( \pi_\theta(x) - u \big) 
     \right\|_2^2.
 \end{equation}
+Here, the state-dependent weight $w_x(x)$ prioritizes approximation accuracy near the equilibrium.
 
 
-\paragraph{Dynamics-Aware Constraint Loss} applies one-step penalties for successor states 
-that leave the admissible training set $\mathcal{B}_\pi \subseteq \mathcal{X}$. 
-For each state $x \in \mathcal{X}_{\pi}$, the next state is evaluated under 
-the neural policy as $x_{k+1} = f(x,\pi_\theta(x))$. The loss is defined as
+\paragraph{Dynamics-Aware Constraint Loss} applies a one-step penalty for successor states 
+that leave the admissible state set $\mathcal{X}_\pi$, defined by lower and upper bounds 
+$\underline{x}_\pi$ and $\overline{x}_\pi$. 
+For each state $x \in \mathcal{B}_\pi$, the next state is evaluated under 
+the neural policy as $x^+ = f_d(x,\pi_\theta(x))$. The loss is defined as
 \begin{equation}
     \label{eq:dynamics-aware-loss}
-    \mathcal{L}_f = \frac{1}{M n_x} \sum_{x \in \mathcal{X}_\pi} \left( 
+    \mathcal{L}_f = \frac{1}{M_\pi n_x} \sum_{x \in \mathcal{B}_\pi} \left( 
         \left\| 
-            \big[ x_{k+1} - \bar{x}_\pi \big]_+ 
+            \big[ x^+ - \overline{x}_\pi \big]_+ 
         \right\|_1 + \left\| 
-            \big[ \underline{x}_\pi - x_{k+1} \big]_+ 
+            \big[ \underline{x}_\pi - x^+ \big]_+ 
         \right\|_1 
     \right).
 \end{equation}
+Here, a one-step evaluation outside the admissible set results in a penalty for the current state, 
+forcing the learned policy to stay inside the admissible set.
 
 
 \paragraph{Total Imitation Loss} is the combination of the state-weighted behavioral cloning 

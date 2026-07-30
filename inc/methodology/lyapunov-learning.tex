@@ -28,7 +28,7 @@ The complete architectural layout of $V_\theta(x)$ is illustrated in \cref{fig:n
 
 \begin{figure}[htbp]
     \centering
-    \input{tikz/lyapunov_nn.tex}
+    \input{tikz/methods/lyapunov_nn.tex}
     \caption[Neural Lyapunov Architecture]{The neural Lyapunov architecture.}
     \label{fig:neural-lyapunov}
 \end{figure}
@@ -43,7 +43,8 @@ It utilizes the previously introduced ReLU function $[\cdot]_+$ for one-sided pe
 alongside a weighted mean to aggregate the sample losses.
 Central to the following loss terms is the estimation of the region of attraction (ROA). 
 Throughout the training process, a target level $\rho$ is considered, leading to
-the corresponding $\rho$-sublevel set within the training domain $\mathcal{B}_V \subseteq \mathcal{B}_\pi$, 
+the corresponding $\rho$-sublevel set within the training domain 
+$\mathcal{B}_V = \left\{ x \in \mathcal{B}_\pi \mid \underline{x}_V \leq  x \leq \overline{x}_V \right\}$, 
 defined as
 \begin{equation}
     \label{eq:sublevel-set}
@@ -64,7 +65,7 @@ For each sample, the decrease violation is defined as
     e_V = (1 - \kappa) V_\theta(x) - V_\theta(x^+),
 \end{equation}
 where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease. 
-To balance the optimization scale across different magnitudes of $V$, we normalize this violation to obtain the relative decrease loss:
+To balance the optimization scale across different magnitudes of $V_\theta$, we normalize this violation to obtain the relative decrease loss:
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
     \loss_{\text{dec}} = \left[
@@ -121,17 +122,25 @@ condition loss and the $\rho$-gating weight results in the final loss formulatio
 
 
 \paragraph{ROA Loss} tries to enlarge the region of attraction by uniformly drawing a batch of 
-$M$ samples $\mathcal{X}_{\text{ROA}} \subseteq \mathcal{B}_V \setminus \xi \mathcal{B}_V$
-from the shell of the training space. The loss is then evaluated over these candidates 
+$M$ samples $\mathcal{X}_{\text{ROA}} \subseteq \mathcal{B}_V \setminus \xi \mathcal{B}_V$ 
+from the shell of the training space, where $\xi \in [0, 1)$ is a scaling factor defining the 
+inner boundary of the shell. The loss is then evaluated over these candidates 
 using the following formulation:
 \begin{equation}
     \label{eq:roa-loss}
-    \loss_{\text{ROA}} = \frac{1}{M} \sum_{x \in \mathcal{X}_{\text{ROA}}} \ln \left(
+    \loss_{\text{ROA}} = \frac{1}{M} \sum^{\mathcal{X}_{\text{ROA}}} \ln \left(
         \left[
             \frac{V_\theta(x)}{\rho} - 1
         \right]_+ + 1
     \right).
 \end{equation}
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/methods/box_shell_sampling.tex}
+    \caption[Box Shell Sampling]{Example for uniformly drawn samples in the shell $\mathcal{X}_{\text{ROA}}$ with $\xi = 0.6$.}
+    \label{fig:box-shell}
+\end{figure}
 
 
 \paragraph{LIRPA-Condition Loss} makes the Lyapunov function more verifier-friendly 
@@ -182,7 +191,7 @@ Note that the reference value $\ell_{V,0}$ is determined by computing $\ell_V$
 using the initial Lyapunov candidate. Furthermore, to prevent the Lyapunov candidate 
 from overfitting to a fixed set of points, a new batch of samples $\mathcal{X}_V$ 
 is drawn with a specified probability at each optimization step.
-
+\todo[inline]{quasi monte carlo -> sobol generator with quelle}
 
 \paragraph{Policy Scaling Loss} encourages the learned policy $\pi_V$ to remain close 
 to the output of the original imitation controller $\pi_0$, which is based on the MPC teacher. 
@@ -207,7 +216,7 @@ of its Frobenius norm from its initial value $\ell_{R,0}$:
     \label{eq:r-matrix-loss}
     \loss_R = \left( \ell_{R,0} - \lVert R \rVert_F \right)^2.
 \end{equation}
-Note that $\ell_{R,0} = \lVert R \rVert_F$ is automatically set based on the initial $R$ matrix.
+Note that $\ell_{R,0} = \lVert R \rVert_F$ is automatically computed, based on the initial $R$ matrix.
 
 
 \paragraph{Final Lyapunov Loss} represents the combined objective function, 
@@ -294,6 +303,7 @@ Consequently, the condition loss continuously penalizes recent violations while 
 
 \subsection{\texorpdfstring{$\rho$}{ρ}-Sublevel Estimation}
 \label{subsec:rho-sublevel-estim}
+\todo[inline]{explain why exactly we need it}
 To compute the loss, particularly the $\rho$-gated condition loss in \cref{eq:rho-gated-condition-loss}, 
 the target level $\rho$, which bounds the sublevel set $\mathcal{V}_\rho$, must be continuously estimated during training. 
 Since the goal is to find the largest level set of the Lyapunov candidate $V_\theta(x)$ that lies entirely 

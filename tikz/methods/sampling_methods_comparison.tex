@@ -1,0 +1,36 @@
+% Required Preamble:
+% \usepackage{amsmath}
+% \usepackage{tikz}
+% \usepackage{pgfplots}
+% \pgfplotsset{compat=1.18}
+\begin{tikzpicture}
+\begin{axis}[
+    title={Comparison of Lyapunov Sampling Methods (2D Projection)},
+    xlabel={State 0},
+    ylabel={State 1},
+    xmin=-1,
+    xmax=1,
+    ymin=-1,
+    ymax=1,
+    width=16.0cm,
+    height=16.0cm
+]
+    \addplot+[only marks, mark=*, mark size=2pt, mark options={solid}] table [x=x, y=y, col sep=tab] {sampling_methods_comparison_trace_0.tsv};
+    \addlegendentry{Uniform Box (sample\_uniform\_box)}
+
+    \addplot+[only marks, mark=x, mark size=2pt, mark options={solid}] table [x=x, y=y, col sep=tab] {sampling_methods_comparison_trace_1.tsv};
+    \addlegendentry{Box Boundary (sample\_boundary\_points)}
+
+    \addplot+[only marks, mark=*, mark size=2pt, mark options={solid}] table [x=x, y=y, col sep=tab] {sampling_methods_comparison_trace_2.tsv};
+    \addlegendentry{Box Shell (sample\_box\_shell)}
+
+    \addplot+[only marks, mark=*, mark size=2pt, mark options={solid}] table [x=x, y=y, col sep=tab] {sampling_methods_comparison_trace_3.tsv};
+    \addlegendentry{Ellipsoid Boundary (sample\_ellipsoid\_boundary)}
+
+    \addplot+[only marks, mark=diamond*, mark size=2pt, mark options={solid}] table [x=x, y=y, col sep=tab] {sampling_methods_comparison_trace_4.tsv};
+    \addlegendentry{Sobol Box (sample\_sobol\_box)}
+
+    \addplot+[only marks, mark=*, mark size=2pt, mark options={solid}] table [x=x, y=y, col sep=tab] {sampling_methods_comparison_trace_5.tsv};
+    \addlegendentry{Box Rejection (Center weighted)}
+\end{axis}
+\end{tikzpicture}
