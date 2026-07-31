@@ -14,15 +14,15 @@ Following \cite{yangLyapunovstableNeuralControl2024},
 the Lyapunov candidate $V_\theta(x)$ is parameterized to be positive definite by construction:
 \begin{equation}
     \label{eq:lyapunov-candidate}
-    V_{\theta}(x) = \left| f_{\theta}(x) - f_{\theta}(x^*) \right| 
-        + \left\|  (\varepsilon I + R^\top R) (x - x^*)  \right\|_1,
+    V_{\theta}(x) = \left| g_{\theta}(x) - g_{\theta}(x^*) \right| 
+        + \left\|  (\varepsilon I + R_\theta^\top R_\theta) (x - x^*)  \right\|_1,
 \end{equation}
-where $f_{\theta} : \mathbb{R}^n \to \mathbb{R}$ is a neural network, $x \in \mathbb{R}^n$ is the current state, 
+where $g_{\theta} : \mathbb{R}^n \to \mathbb{R}$ is a neural network, $x \in \mathbb{R}^n$ is the current state, 
 $x^* \in \mathbb{R}^n$ is the equilibrium, $\varepsilon > 0$ is a small regularization constant, 
-and $R \in \mathbb{R}^{n \times n}$ is a learnable matrix. 
+and $R_\theta \in \mathbb{R}^{n \times n}$ is a learnable matrix. 
 While the first term is only positive semi-definite and may vanish away from the equilibrium, 
 the second term guarantees strict positive definiteness $\forall x \in \mathcal{X} \setminus \{x^*\}$, 
-as the matrix $(\varepsilon I + R^\top R)$ is strictly 
+as the matrix $(\varepsilon I + R_\theta^\top R_\theta)$ is strictly 
 positive definite by construction for any $\varepsilon > 0$.
 The complete architectural layout of $V_\theta(x)$ is illustrated in \cref{fig:neural-lyapunov}.
 
@@ -44,28 +44,29 @@ alongside a weighted mean to aggregate the sample losses.
 Central to the following loss terms is the estimation of the region of attraction (ROA). 
 Throughout the training process, a target level $\rho$ is considered, leading to
 the corresponding $\rho$-sublevel set within the training domain 
-$\mathcal{B}_V = \left\{ x \in \mathcal{B}_\pi \mid \underline{x}_V \leq  x \leq \overline{x}_V \right\}$, 
+$\mathcal{X}_V := \left\{ x \in \mathcal{X}_\pi \mid \underline{x}_V \leq  x \leq \overline{x}_V \right\}$, 
 defined as
 \begin{equation}
     \label{eq:sublevel-set}
-    \mathcal{V}_\rho := \{ x \in \mathcal{B}_V \mid V_\theta(x) \le \rho \}.
+    \mathcal{V}_\rho := \{ x \in \mathcal{X}_V \mid V_\theta(x) \le \rho \}.
 \end{equation}
 To prevent this certified region from trivially collapsing towards the origin during optimization, 
 and to ensure numerical stability during normalizations, $\rho$ is strictly constrained 
 by a lower bound $\rho_{\text{min}} > 0$.
-Furthermore, the next states $x^+$ needed during loss computation are evaluated on-the-fly
-using the system dynamics and the policy $u_k = \pi_V(x)$, which may be actively learning 
-during the co-training process.
+Furthermore, the successor states $x^+_V = f(x, \pi_V(x))$ needed during loss computation are 
+evaluated on-the-fly using the system dynamics and the policy. The latter may also be trained 
+in the co-training setup and is thus referred to as $\pi_V$ hereafter.
 
 
 \paragraph{Relative Lyapunov Decrease Loss} penalizes trajectories along which the Lyapunov candidate fails to decay. 
 For each sample, the decrease violation is defined as
 \begin{equation}
     \label{eq:lyapunov-decrease}
-    e_V = (1 - \kappa) V_\theta(x) - V_\theta(x^+),
+    e_V = (1 - \kappa) V_\theta(x) - V_\theta(x^+_V),
 \end{equation}
 where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease. 
-To balance the optimization scale across different magnitudes of $V_\theta$, we normalize this violation to obtain the relative decrease loss:
+To balance the optimization scale across different magnitudes of $V_\theta$, 
+we normalize this violation to obtain the relative decrease loss:
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
     \loss_{\text{dec}} = \left[
@@ -77,16 +78,16 @@ Note that the decrease normalization can be omitted depending on the training co
 
 
 \paragraph{Relative State Invariance Loss} penalizes successor states
-leaving the Lyapunov training domain $\mathcal{B}_V $. 
+leaving the Lyapunov training domain $\mathcal{X}_V $. 
 To evaluate the relative one-step state-constraint violation, the scaling matrix 
 $S_{\text{range}} = \diag(\bar{x}_V - \underline{x}_V)$ is utilized.
-The loss per sample for the next state $x^+$ is computed as
+The loss per sample for the next state $x^+_V$ is computed as
 \begin{equation}
     \label{eq:rel-invariance}
     \loss_{\text{inv}} = \left\| 
-        S_{\text{range}}^{-1} \big[ x^+ - \bar{x}_V \big]_+ 
+        S_{\text{range}}^{-1} \big[ x^+_V - \bar{x}_V \big]_+ 
     \right\|_1 + \left\| 
-        S_{\text{range}}^{-1} \big[ \underline{x}_V - x^+ \big]_+ 
+        S_{\text{range}}^{-1} \big[ \underline{x}_V - x^+_V \big]_+ 
     \right\|_1.
 \end{equation}
 
@@ -109,26 +110,27 @@ However, to apply the $\rho$-gate appropriately, $\loss_{\text{cond}}$ is weight
 \end{equation}
 where $s > 0$ denotes the gate sharpness. This smooth formulation ensures that the weights 
 inside $\mathcal{V}_\rho$ are $\approx 1$, whereas the weights for states far outside of $\rho$ approach $0$. 
-Evaluating these terms for each sample $x \in \mathcal{X}_{\rho}$, the weighted mean of the combined 
-condition loss and the $\rho$-gating weight results in the final loss formulation:
+Evaluating these terms on a mini-batch $\mathcal{B}_{\rho}$ drawn from the combined state pools 
+$\mathcal{S} \cup \mathcal{C}$ (details in \cref{subsec:fals-guided-training}), 
+the weighted mean of the combined condition loss results in the final loss formulation:
 \begin{equation}
     \label{eq:rho-gated-condition-loss}
     \loss_{\rho\text{-gated}} = \frac{
-        \sum_{x \in \mathcal{X}_{\rho}} w_{\rho} \loss_{\text{cond}}
+        \sum_{\mathcal{B}_{\rho}} w_{\rho} \loss_{\text{cond}}
     }{
-        \sum_{x \in \mathcal{X}_{\rho}} w_{\rho}
+        \sum_{\mathcal{B}_{\rho}} w_{\rho}
     }.
 \end{equation}
 
 
-\paragraph{ROA Loss} tries to enlarge the region of attraction by uniformly drawing a batch of 
-$M$ samples $\mathcal{X}_{\text{ROA}} \subseteq \mathcal{B}_V \setminus \xi \mathcal{B}_V$ 
-from the shell of the training space, where $\xi \in [0, 1)$ is a scaling factor defining the 
+\paragraph{ROA Loss} tries to enlarge the region of attraction by uniformly drawing a batch 
+$\mathcal{B}_{\text{ROA}}$ from $\mathcal{X}_V \setminus \xi \mathcal{X}_V$, 
+where $\xi \in [0, 1)$ is a scaling factor defining the 
 inner boundary of the shell. The loss is then evaluated over these candidates 
-using the following formulation:
+using 
 \begin{equation}
     \label{eq:roa-loss}
-    \loss_{\text{ROA}} = \frac{1}{M} \sum^{\mathcal{X}_{\text{ROA}}} \ln \left(
+    \loss_{\text{ROA}} = \frac{1}{|\mathcal{B}_{\text{ROA}}|} \sum_{x \in \mathcal{B}_{\text{ROA}}} \ln \left(
         \left[
             \frac{V_\theta(x)}{\rho} - 1
         \right]_+ + 1
@@ -138,7 +140,7 @@ using the following formulation:
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/box_shell_sampling.tex}
-    \caption[Box Shell Sampling]{Example for uniformly drawn samples in the shell $\mathcal{X}_{\text{ROA}}$ with $\xi = 0.6$.}
+    \caption[Box Shell Sampling]{Illustration of uniformly drawn samples in the shell batch $\mathcal{B}_{\text{ROA}}$ with $\xi = 0.6$.}
     \label{fig:box-shell}
 \end{figure}
 
@@ -161,7 +163,7 @@ where the weight is defined using an exponential function of the squared Euclide
 the region center $x_{\text{center}}$ and the equilibrium $x^*$:
 \begin{equation}
     \label{eq:lirpa-weight}
-    w_{L} = \exp \left(
+    w_{\text{L}} = \exp \left(
         - \alpha_{\text{L}} \cdot \lVert x_{\text{center}} - x^* \rVert^2_2
     \right),
 \end{equation}
@@ -177,76 +179,83 @@ Finally, the LIRPA-condition loss over $N_{\text{L}}$ regions is computed as
 \end{equation}
 
 
-\paragraph{Lyapunov Scaling Loss} prevents numerical collapses to $0$, 
+\paragraph{Lyapunov Scaling Loss} prevents numerical collapse to zero 
 by penalizing deviations from the initial average magnitude over a 
-quasi-Monte-Carlo batch $\mathcal{X}_V \subseteq \mathcal{B}_V$ of $M$ samples. 
-The logarithm of the mean Lyapunov value over this batch is then defined as:
-$\ell_V = \ln \left(\frac{1}{M} \sum_{x \in \mathcal{X}_V} V_\theta(x) \right)$, 
+quasi-Monte Carlo batch $\mathcal{B}_V \subset \mathcal{X}_V$, 
+sampled via a low-discrepancy Sobol sequence \cite{sobol}. 
+The logarithm of the mean Lyapunov value over this batch is defined as
+\begin{equation}
+    \label{eq:mean-lyapunov-log}
+    \ell_V = \ln \left( \frac{1}{|\mathcal{B}_V|} \sum_{x \in \mathcal{B}_V} V_\theta(x) \right),
+\end{equation}
 leading to the scaling loss formulation
 \begin{equation}
-\label{eq:scaling-loss}
-\loss_V = \left( \ell_{V,0} - \ell_V \right)^2.
+    \label{eq:scaling-loss}
+    \loss_V = \left( \ell_{V,0} - \ell_V \right)^2.
 \end{equation}
-Note that the reference value $\ell_{V,0}$ is determined by computing $\ell_V$ 
-using the initial Lyapunov candidate. Furthermore, to prevent the Lyapunov candidate 
-from overfitting to a fixed set of points, a new batch of samples $\mathcal{X}_V$ 
-is drawn with a specified probability at each optimization step.
-\todo[inline]{quasi monte carlo -> sobol generator with quelle}
+The reference value $\ell_{V,0}$ is determined once using the initial 
+Lyapunov candidate prior to training. To prevent the Lyapunov candidate from 
+overfitting to a static point cloud, a new batch $\mathcal{B}_V$ is resampled from $\mathcal{X}_V$ 
+with a specified probability at each optimization step.
+
 
 \paragraph{Policy Scaling Loss} encourages the learned policy $\pi_V$ to remain close 
-to the output of the original imitation controller $\pi_0$, which is based on the MPC teacher. 
-A batch of $M$ samples $\mathcal{X}_\pi \subseteq \mathcal{B}_V$ is generated using a 
-quasi-Monte-Carlo sequence. To prevent overfitting, this batch is redrawn after a 
-specified number of optimization steps. 
-The deviation between the learned policy and the imitation controller is evaluated 
-using a normalized squared difference. The loss is then formulated as
+to the output of the original imitation controller $\pi$, which is based on the MPC teacher. 
+A quasi-Monte Carlo batch $\mathcal{B}_{S\pi} \subset \mathcal{X}_V$ is sampled using a 
+low-discrepancy Sobol sequence \cite{sobol}. 
+To prevent overfitting to a static set of states, this batch also is resampled from $\mathcal{X}_V$ 
+after a specified number of optimization steps. 
+The normalized deviation between the learned policy and the imitation controller over this batch is formulated as
 \begin{equation}
     \label{eq:policy-scaling-loss}
-    \loss_\pi = \frac{
-        \sum_{x \in \mathcal{X}_\pi} \lVert \pi_V(x) - \pi_0(x) \rVert_2^2
+    \loss_{S\pi} = \frac{
+        \sum_{x \in \mathcal{B}_{S\pi}} \lVert \pi_V(x) - \pi(x) \rVert_2^2
     }{
-        \sum_{x \in \mathcal{X}_\pi} \lVert \pi_0(x) \rVert_2^2
+        \sum_{x \in \mathcal{B}_{S\pi}} \lVert \pi(x) \rVert_2^2
     }
 \end{equation}
 
 
-\paragraph{$R$-Matrix Loss} regularizes the learnable matrix $R$ by penalizing deviations 
+\paragraph{$R$-Matrix Loss} regularizes the learnable matrix $R_\theta$ by penalizing deviations 
 of its Frobenius norm from its initial value $\ell_{R,0}$:
 \begin{equation}
     \label{eq:r-matrix-loss}
     \loss_R = \left( \ell_{R,0} - \lVert R \rVert_F \right)^2.
 \end{equation}
-Note that $\ell_{R,0} = \lVert R \rVert_F$ is automatically computed, based on the initial $R$ matrix.
+However, $\ell_{R,0} = \lVert R_\theta \rVert_F$ is automatically computed, 
+based on the initial $R_{\theta,0}$ matrix.
 
 
-\paragraph{Final Lyapunov Loss} represents the combined objective function, 
+\paragraph{Overall Lyapunov Loss} represents the combined objective function, 
 summing all previously defined weighted components, given by 
 \begin{equation}
     \label{eq:combined-loss}
     \loss_{\text{total}} =
-        \omega_{\text{cond}} \loss_{\rho\text{-gated}} +
+        \omega_{\rho\text{-gated}} \loss_{\rho\text{-gated}} +
         \omega_{\text{ROA}} \loss_{\text{ROA}} +
         \omega_{\text{L}} \loss_{\text{L}} +
         \omega_V \loss_V +
-        \omega_\pi \loss_\pi +
+        \omega_{S\pi} \loss_{S\pi} +
         \omega_R \loss_R,
 \end{equation}
-where the weights $\omega$ are hyperparameters that balance the relative importance of the individual loss components.
+where the weights $\omega_m > 0$, with $m \in \{ \rho\text{-gated},\;\text{ROA},\;\text{L},\;V,\;S\pi,\;R \}$ are 
+hyperparameters that balance the relative importance of the individual loss components.
 
 
 
 \subsection{Falsification-Guided Training}
 \label{subsec:fals-guided-training}
 Relying solely on uniform state sampling is not sufficient to reliably detect violations of the Lyapunov condition, 
-especially in higher-dimensional state spaces. To overcome this problem, falsification-guided training 
+especially in higher-dimensional state spaces \cite{counterexampleRef}. To overcome this problem, falsification-guided training 
 actively searches for adversarial counterexamples and incorporates them into the training distribution.
 This is made possible by an adversarial replay buffer that reconciles the exploration of the 
 estimated attractor region with the targeted exploitation of known error modes.
 
+
 \paragraph{PGD Falsification} is utilized to identify counterexamples that violate the Lyapunov 
 conditions and iteratively inject them into the counterexample pool $\mathcal{C}$. 
 Specifically, an $L_\infty$-Projected Gradient Descent (PGD) is employed 
-to find adversarial states $x_{\text{adv}} \in \mathcal{B}_V$ 
+to find adversarial states $x_{\text{adv}} \in \mathcal{X}_V$ 
 that maximize the condition violation defined in \eqref{eq:combined-condition-violation} 
 and \eqref{eq:rho-gate}. The per-sample PGD objective is defined as
 \begin{equation}
@@ -257,7 +266,7 @@ The adversarial search is initialized using the explorative pool $\mathcal{S}$,
 with up to $25\%$ of the batch supplemented by existing counterexamples to encourage local refinement.
 The algorithm minimizes $J_{\text{PGD}}$ by iteratively updating the input states along 
 the sign of their local gradient with a constant step size $\alpha$,
-followed by a projection back onto the training bounds $\mathcal{B}_V$. 
+followed by a projection back onto the training bounds $\mathcal{X}_V$. 
 To retain the strongest violations and mitigate the effects of overshooting, the state yielding the 
 minimum objective value across all $K$ iterations is preserved for each candidate. 
 Ultimately, only states strictly within $\mathcal{V}_\rho$ that exceed the violation tolerance 
@@ -268,7 +277,7 @@ and lie outside the origin exclusion region are retained as counterexamples.
 It maintains two distinct state pools: an explorative pool $\mathcal{S}$ and a counterexample pool $\mathcal{C}$. 
 
 The explorative pool $\mathcal{S}$ is periodically repopulated every outer epoch to balance exploration and local refinement.  
-Every outer epoch, candidate states are oversampled uniformly from the training domain $\mathcal{B}$. 
+Every outer epoch, candidate states are oversampled uniformly from the training domain $\mathcal{X}_V$. 
 The final pool is then constructed using a probabilistic sampling strategy that 
 prioritizes states within an expanded sublevel boundary $m \cdot \rho$, controlled by a scalar margin $m > 1$. 
 As outlined in \cref{alg:state-pool-resample}, a continuous sampling probability is computed via a sigmoid function, 
@@ -277,20 +286,20 @@ assigning high weights to states inside the estimated region of attraction and e
 \begin{algorithm}[htpb]
     \caption{Probabilistic Explorative State Pool Resampling}
     \label{alg:state-pool-resample}
-    \SetAlgoLined
+
     \KwIn{Lyapunov function $V_\theta$, current ROA estimate $\rho$, margin $m$, sharpness $s$, target size $N_x$}
     \KwOut{Updated state pool $\mathcal{S}$ of size $N_x$}
 
     \BlankLine
-    Generate $4 N_x$ candidates: $\mathcal{X}_{\mathrm{ROA}} \sim \mathcal{U}(\mathcal{B}_V)$\;
+    Generate $4 N_x$ candidates: $\mathcal{B}_{\text{ROA}} \sim \mathcal{U}(\mathcal{X}_V)$\;
 
     \BlankLine
-    For all $x \in \mathcal{X}_{\mathrm{ROA}}$, assign weight $w(x) \leftarrow \sigma \left(
+    For all $x \in \mathcal{B}_{\text{ROA}}$, assign weight $w(x) \leftarrow \sigma \left(
         s \, \frac{m \cdot \rho - V_\theta(x)}{\max(\rho, 10^{-9})}
     \right) + \varepsilon$\;
 
     \BlankLine
-    $\mathcal{S} \leftarrow$ Sample $N_x$ states from $\mathcal{X}_{\mathrm{ROA}}$ with probability $P(x) \propto w(x)$\;
+    $\mathcal{S} \leftarrow$ Sample $N_x$ states from $\mathcal{B}_{\text{ROA}}$ with probability $P(x) \propto w(x)$\;
 \end{algorithm}
 
 The counterexample pool $\mathcal{C}$ stores the critical violations identified during the PGD falsification step. 
@@ -307,15 +316,15 @@ Consequently, the condition loss continuously penalizes recent violations while 
 To compute the loss, particularly the $\rho$-gated condition loss in \eqref{eq:rho-gated-condition-loss}, 
 the target level $\rho$, which bounds the sublevel set $\mathcal{V}_\rho$, must be continuously estimated during training. 
 Since the goal is to find the largest level set of the Lyapunov candidate $V_\theta(x)$ that lies entirely 
-within the defined training bounds $\mathcal{B}_V$, a level set can only escape the safe region by intersecting its 
-boundary $\partial \mathcal{B}_V$. Therefore, the maximum certifiable $\rho$ is mathematically strictly determined
+within the defined training bounds $\mathcal{X}_V$, a level set can only escape the safe region by intersecting its 
+boundary $\partial \mathcal{X}_V$. Therefore, the maximum certifiable $\rho$ is mathematically strictly determined
 by the minimum value of the Lyapunov candidate at its boundary.
 According to the formulation proposed by \cite{yangLyapunovstableNeuralControl2024}, it is sufficient to evaluate $V_\theta(x)$
-exclusively on the boundary $\partial \mathcal{B}_V$ rather than inefficiently sampling the entire state space, in order to estimate 
+exclusively on the boundary $\partial \mathcal{X}_V$ rather than inefficiently sampling the entire state space, in order to estimate 
 the bounds of the ROA. However, since the boundary is a high-dimensional surface and the neural network parameterized in $V_\theta(x)$ 
 forms a highly non-convex landscape, simple uniform sampling on the boundary is insufficient to find the true minimum. 
 Therefore, a Projected Gradient Descent (PGD) approach is employed to actively search for the worst-case boundary points. 
-Starting from uniformly sampled points $x_{\partial} \sim \mathcal{U} (\partial \mathcal{B}_V)$, PGD iteratively minimizes $V_\theta(x_{\partial})$ 
+Starting from uniformly sampled points $x_{\partial} \sim \mathcal{U} (\partial \mathcal{X}_V)$, PGD iteratively minimizes $V_\theta(x_{\partial})$ 
 by taking steps along the negative gradient and projecting the updated states strictly back onto the boundary surfaces.
 To actively encourage the region of attraction to expand over the course of the co-training process, 
 the formally certifiable limit is intentionally overestimated, as suggested in \cite{yangLyapunovstableNeuralControl2024}.
@@ -323,7 +332,7 @@ Specifically, a target $\rho$ is computed by applying a growth factor $\gamma > 
 \begin{equation}
     \label{eq:rho-estimation}
     \tilde{\rho} = \max \left( 
-        \rho_{\text{min}}, \gamma \cdot \min_{x \in \partial \mathcal{B}_V} V_\theta(x) 
+        \rho_{\text{min}}, \gamma \cdot \min_{x \in \partial \mathcal{X}_V} V_\theta(x) 
     \right).
 \end{equation}
 By targeting a value for $\tilde{\rho}$ that is slightly above the currently safe maximum, the formulation deliberately 

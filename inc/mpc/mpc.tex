@@ -15,7 +15,7 @@ is solved at each time step $k$ given the current system state $x_k$ \citeSec{2.
     \begin{aligned}
         \min_{\{x_i\}_{i=0}^N, \{u_i\}_{i=0}^{N-1}} \quad &
         \sum_{i=0}^{N-1} \ell(x_i, u_i) + V_f(x_N) \\
-        \text{s.t.} \quad & x_{i+1} = f_d(x_i, u_i), && i = 0, \dots, N-1, \\
+        \text{s.t.} \quad & x_{i+1} = f(x_i, u_i), && i = 0, \dots, N-1, \\
         & x_i \in \mathcal{X}, && i = 0, \dots, N-1, \\
         & u_i \in \mathcal{U}, && i = 0, \dots, N-1, \\
         & x_N \in \mathcal{X}_f \\
@@ -51,7 +51,7 @@ meaning that any trajectory originating in $\mathcal{X}_f$ remains inside the se
 time steps while respecting input constraints \citeDef{2.9}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:positive-invariance}
-    f_d(x, \pi(x)) \in \mathcal{X}_f \quad \text{and} \quad \pi(x) \in \mathcal{U}, \qquad \forall x \in \mathcal{X}_f.
+    f(x, \pi(x)) \in \mathcal{X}_f \quad \text{and} \quad \pi(x) \in \mathcal{U}, \qquad \forall x \in \mathcal{X}_f.
 \end{equation}
 
 The predictive mechanism is illustrated in \cref{fig:terminal-set-comparison}. 
@@ -116,7 +116,7 @@ Using the terminal ingredients from \cref{subsec:terminal-set-cost}, the recursi
 feasibility at time step $k+1$ is determined by using the remaining inputs of the optimal sequence 
 computed at time step $k$ and appending the terminal control action $\pi(x_N^*)$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
 
-Consequently, $V_N^*$ satisfies a decrease condition along closed-loop trajectories $x_{k+1} = f_d(x_k, \pi_0(x_k))$. 
+Consequently, $V_N^*$ satisfies a decrease condition along closed-loop trajectories $x_{k+1} = f(x_k, \pi_0(x_k))$. 
 Relaxing the standard stability conditions, this can be expressed with the relaxed Lyapunov decrease formulation 
 \citeThm{4.11}{gruneNonlinearModelPredictive2017}:
 \begin{equation}

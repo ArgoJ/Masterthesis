@@ -16,6 +16,10 @@ $n_x$ & State space dimension \\
 $n_u$ & Control input space dimension \\
 $\mathcal{X}$ & Admissible state set \\
 $\mathcal{U}$ & Admissible input set \\
+$\underline{x}$ & Lower state bound \\
+$\overline{x}$ & Upper state bound \\
+$\underline{u}$ & Lower control input bound \\
+$\overline{u}$ & Upper control input bound \\
 $T_s$ & Sampling time \\
 $k$ & Discrete time step index \\
 $x(t)$ & Continuous-time state vector \\
@@ -23,11 +27,12 @@ $x_k$ & Discrete-time state vector \\
 $u(t)$ & Continuous-time control input vector \\
 $u_k$ & Discrete-time control input vector \\
 $x^*$ & System equilibrium point \\
+$u^*$ & Input reference at $x^*$ \\
 $x_{k+1}$ & Discrete-time successor state \\
 $x^+$ & One-step successor state \\
 $\pi(x)$ & State-feedback policy \\
-$f(x, u)$ & Continuous-time system dynamics \\
-$f_d(x_k, u_k)$ & Discrete-time system dynamics \\
+$f_c(x, u)$ & Continuous-time system dynamics \\
+$f(x_k, u_k)$ & Discrete-time system dynamics \\
 \midrule
 
 % --- Optimal Control & Model Predictive Control ---
@@ -49,8 +54,8 @@ $\alpha_N$ & Relaxed Lyapunov decrease factor \\
 $\mathcal{X}_N$ & Feasible initial state set \\
 \midrule
 
-% --- Neural Networks & Imitation Learning ---
-\multicolumn{2}{@{}l}{\textit{Neural Networks \& Imitation Learning}} \\
+% --- Neural Networks ---
+\multicolumn{2}{@{}l}{\textit{Neural Network}} \\
 \midrule
 $L$ & Total layer count \\
 $l$ & Layer index \\
@@ -60,24 +65,32 @@ $W^{(l)}$ & Layer weight matrix \\
 $b^{(l)}$ & Layer bias vector \\
 $\sigma^{(l)}(\cdot)$ & Non-linear activation function \\
 $\theta$ & Trainable network parameters \\
+\midrule
+
+% --- Imitation Learning ---
+\multicolumn{2}{@{}l}{\textit{Imitation Learning}} \\
+\midrule
+$\mathcal{X}_\pi$ & Imitation learning state space \\
+$\underline{x}_\pi$ & Admissible state lower bound \\
+$\overline{x}_\pi$ & Admissible state upper bound \\
 $\mathcal{D}_\pi$ & Imitation learning dataset \\
 $N_{\mathcal{D}}$ & Dataset sample count \\
+$\mathcal{B}_\pi$ & Training mini-batch \\
+$M_\pi$ & Mini-batch size \\
 $\pi_0(x)$ & Expert MPC policy \\
 $\pi_\theta(x)$ & Learned imitation policy \\
+$h_\theta(x)$ & Unconstrained neural network output \\
 $\clamp(\cdot)$ & Control input clamping function \\
-$u_{\min}$ & Lower control input bound \\
-$u_{\max}$ & Upper control input bound \\
 $S_x$ & State scaling matrix \\
 $S_u$ & Input scaling matrix \\
+$x_{\mathrm{scale}}$ & State scaling vector \\
+$u_{\mathrm{scale}}$ & Input scaling vector \\
 $d(x)$ & Scaled equilibrium distance \\
 $w_x(x)$ & Behavioral cloning loss weight \\
 $w_{\min}$ & Baseline loss weight \\
-$\mathcal{B}_\pi$ & Training mini-batch \\
-$M_\pi$ & Mini-batch size \\
+$\eta$ & Decay rate for state-dependent weight \\
 $\mathcal{L}_{\mathrm{BC}}$ & Behavioral cloning loss \\
 $\mathcal{L}_f$ & Dynamics-aware constraint loss \\
-$\underline{x}_\pi$ & Admissible state lower bound \\
-$\overline{x}_\pi$ & Admissible state upper bound \\
 $\omega_{\mathrm{BC}}$ & Behavioral cloning loss weight \\
 $\omega_f$ & Dynamics-aware constraint loss weight \\
 $\mathcal{L}_\pi$ & Total imitation policy loss \\
@@ -86,12 +99,13 @@ $\mathcal{L}_\pi$ & Total imitation policy loss \\
 % --- Neural Lyapunov Learning & Falsification ---
 \multicolumn{2}{@{}l}{\textit{Neural Lyapunov Learning \& Falsification}} \\
 \midrule
+$\pi_V(x)$ & Co-trained imitation policy \\
 $V_\theta(x)$ & Neural Lyapunov candidate \\
 $\varepsilon$ & Regularization constant \\
-$R$ & Learnable transformation matrix \\
+$R_\theta$ & Learnable transformation matrix \\
 $\rho$ & Target Lyapunov sublevel value \\
 $\mathcal{V}_\rho$ & Certified sublevel set \\
-$\mathcal{B}_V$ & Lyapunov training domain \\
+$\mathcal{X}_V$ & Lyapunov training domain \\
 $\rho_{\min}$ & Minimum sublevel target bound \\
 $\pi_V(x)$ & Co-trained policy \\
 $e_V$ & Lyapunov decrease violation \\
@@ -104,7 +118,7 @@ $\loss_{\text{cond}}$ & Combined condition violation loss \\
 $w_\rho$ & Soft sublevel gating weight \\
 $s$ & Gate sharpness parameter \\
 $\loss_{\rho\text{-gated}}$ & Soft-gated condition loss \\
-$\mathcal{X}_{\text{ROA}}$ & Shell sample set \\
+$\mathcal{B}_{\text{ROA}}$ & Shell sample set \\
 $\xi$ & Inner boundary shell factor \\
 $\loss_{\text{ROA}}$ & Region of Attraction expansion loss \\
 $e_{V,\text{lower}}$ & Signed Lyapunov decrease lower bound \\
@@ -124,7 +138,7 @@ $\omega_{\text{cond}}$ & Soft-gated condition loss weight \\
 $\omega_{\text{ROA}}$ & Region of Attraction expansion loss weight \\
 $\omega_{\text{L}}$ & LIRPA loss weight \\
 $\omega_V$ & Lyapunov magnitude scaling loss weight \\
-$\omega_\pi$ & Policy scaling loss weight \\
+$\omega_{S\pi}$ & Policy scaling loss weight \\
 $\omega_R$ & Matrix $R$ regularization loss weight \\
 $\mathcal{C}$ & Counterexample pool \\
 $\mathcal{S}$ & Explorative pool \\

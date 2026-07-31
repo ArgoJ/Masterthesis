@@ -22,30 +22,28 @@
     % --- KNOTEN DEFINITION ---
     % Hauptpfad (Oben)
     \node[val] (x) {$x$};
-    \node[blockNN, right=0.8cm of x] (f1) {$f_\theta$};
+    \node[blockNN, right=0.8cm of x] (f1) {$h_\theta$};
     \node[sum, right=1.6cm of f1] (sum) {$\Sigma$};
     
     % Sekundärpfad für Gleichgewichtszustand (Unten)
     \node[val, below=1.0cm of x] (xstar) {$x^*$};
-    \node[blockNN, right=0.8cm of xstar] (f2) {$f_\theta$};
+    \node[blockNN, right=0.8cm of xstar] (f2) {$h_\theta$};
 
     % Gleichgewichtseingang (Oben zentriert über Summe)
     \node[val, above=0.8cm of sum] (ustar) {$u^*$};
 
     % Clamp & Ausgang (Rechts)
-    \node[blockClamp, right=1.2cm of sum] (clamp) {$\text{clamp}(\cdot, u_{\min}, u_{\max})$};
+    \node[blockClamp, right=1.2cm of sum] (clamp) {$\text{clamp}(\cdot, \underline{u}, \overline{u})$};
     \node[val, right=0.8cm of clamp] (out) {$\pi_\theta (x)$};
 
     % --- VERBINDUNGEN & BESCHRIFTUNGEN ---
     % 1. Pfad f_theta(x)
     \draw[->] (x) -- (f1);
-    \draw[->] (f1) -- node[above, font=\scriptsize] {$f_\theta(x)$} 
-                      node[pos=0.88, above=1pt, font=\tiny\bfseries, text=navy] {$+$} (sum);
+    \draw[->] (f1) -- node[pos=0.88, above=1pt, font=\tiny\bfseries, text=navy] {$+$} (sum);
 
     % 2. Pfad f_theta(x*)
     \draw[->] (xstar) -- (f2);
-    \draw[->] (f2) -| node[below, pos=0.25, font=\scriptsize] {$f_\theta(x^*)$} 
-                      node[pos=0.88, right=1pt, font=\tiny\bfseries, text=navy] {$-$} (sum);
+    \draw[->] (f2) -| node[pos=0.88, right=1pt, font=\tiny\bfseries, text=navy] {$-$} (sum);
 
     % 3. Pfad u*
     \draw[->] (ustar) -- node[pos=0.8, left=1pt, font=\tiny\bfseries, text=navy] {$+$} (sum);

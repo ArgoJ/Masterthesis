@@ -3,8 +3,9 @@
 
 
 \paragraph{Data Generation} uses the MPC expert policy $\pi_0$ defined in \cref{subsec:closed-loop-stability}.
-Closed-loop trajectories $x_{k+1} = f_d(x_k, \pi_0(x_k))$ are initialized from states sampled across 
-the training set $\mathcal{X}_\pi \subseteq \mathcal{X}$. 
+Closed-loop trajectories $x_{k+1} = f(x_k, \pi_0(x_k))$ are initialized from states sampled across 
+the training set 
+$\mathcal{X}_\pi : \{ x \in \mathcal{X} \mid \underline{x}_\pi \leq x \leq \overline{x}_\pi \}$. 
 Storing the visited states and their corresponding optimal control actions yields the dataset
 \begin{equation}
     \label{eq:dataset-definition}
@@ -25,18 +26,20 @@ For each occupied voxel, at most one representative pair is retained.
 
 \paragraph{Imitation Policy} follows the structure proposed in \cite{yangLyapunovstableNeuralControl2024}, 
 as it enforces true control inputs at the equilibrium $\pi_\theta(x^*) = u^*$ and 
-satisfies the control input constraints $u_{\min} \leq \pi_\theta(x) \leq u_{\max}$ 
+satisfies the control input constraints $\underline{u} \leq \pi_\theta(x) \leq \overline{u}$ 
 by construction. The neural policy $\pi_\theta$ is visualized in \cref{fig:imitation-policy} and 
 formulated as 
 \begin{equation}
     \label{eq:policy-arch}
     \pi_\theta(x) = \clamp(
-            f_\theta(x) - f_\theta(x^*) + u^*, 
-            u_{\min},
-            u_{\max}
+            h_\theta(x) - h_\theta(x^*) + u^*, 
+            \underline{u},
+            \overline{u}
     ).
 \end{equation}
-where $\clamp(\cdot,u_{\min},u_{\max})$ is applied element-wise. 
+where $h_\theta : \mathbb{R}^{n_x} \to \mathbb{R}^{n_u}$ is an unconstrained neural network, 
+$u^* \in \mathcal{U} $ represents the desired control action at the equilibrium $x^*$, 
+and $\clamp(\cdot, \overline{\cdot}, \underline{\cdot})$ acts element-wise to enforce the input constraints.
 
 \begin{figure}[htbp]
     \centering
@@ -48,15 +51,14 @@ where $\clamp(\cdot,u_{\min},u_{\max})$ is applied element-wise.
 
 \paragraph{Imitation Objective} consists of a state-weighted behavioral cloning loss 
 and a dynamics-aware penalty. 
-The loss terms are normalized using the diagonal scaling matrices
+To account for different physical units and numerical scales across the state and control vectors, 
+the loss terms are normalized using strictly positive diagonal scaling matrices
 \begin{equation}
-    S_x = \diag(x_{\mathrm{scale}})
+    S_x = \diag(x_{\mathrm{scale}}) \in \mathbb{R}^{n_x \times n_x}
     \quad \text{and} \quad
-    S_u = \diag(u_{\mathrm{scale}}), 
+    S_u = \diag(u_{\mathrm{scale}}) \in \mathbb{R}^{n_u \times n_u}.
 \end{equation}
-where all scaling factors are strictly positive. In addition,
-the element-wise rectified linear unit defined in \eqref{eq:relu} is utilized. 
-The normalizing the distance of the equilibrium is evaluated using the scaled $L_1$-norm: 
+Using $S_x$, the normalized distance of a state $x$ from the equilibrium $x^*$ is quantified with the $L_1$-norm as
 \begin{equation}
     \label{eq:state-distance}
     d(x) = \frac{1}{n_x} \left\| S_x^{-1}(x - x^*) \right\|_1.
@@ -65,13 +67,13 @@ The normalizing the distance of the equilibrium is evaluated using the scaled $L
 To assign appropriate priority during behavioral cloning, a state-dependent weight is defined as
 \begin{equation}
     \label{eq:state-weight}
-    w_x(x) = w_{\min} + (1 - w_{\min}) \left( \frac{1}{1 + d(x)} \right)^\alpha,
+    w_x(x) = w_{\min} + (1 - w_{\min}) \left( \frac{1}{1 + d(x)} \right)^\eta,
 \end{equation}
-where $w_{\min} \in (0, 1]$ is the baseline weight for states far from the
-equilibrium and $\alpha \geq 0$ controls the decay rate.
+where $w_{\min} \in (0, 1)$ is the baseline weight for states far from the
+equilibrium and $\eta \geq 0$ controls the decay rate.
 
-\paragraph{State-Weighted Behavioral Cloning Loss} penalizes the normalized Euclidean distance 
-between the neural network policy and the expert targets. 
+\paragraph{State-Weighted Behavioral Cloning Loss} penalizes the squared normalized 
+Euclidean distance between the neural network policy and the expert targets. 
 For a mini-batch $\mathcal{B}_\pi \subset \mathcal{D}_\pi$ of size 
 $M_\pi = |\mathcal{B}_\pi|$, the behavioral cloning loss is defined as
 \begin{equation}
@@ -85,10 +87,10 @@ Here, the state-dependent weight $w_x(x)$ prioritizes approximation accuracy nea
 
 
 \paragraph{Dynamics-Aware Constraint Loss} applies a one-step penalty for successor states 
-that leave the admissible state set $\mathcal{X}_\pi$, defined by lower and upper bounds 
-$\underline{x}_\pi$ and $\overline{x}_\pi$. 
+that leave the admissible state set $\mathcal{X}_\pi$.
 For each state $x \in \mathcal{B}_\pi$, the next state is evaluated under 
-the neural policy as $x^+ = f_d(x,\pi_\theta(x))$. The loss is defined as
+the neural policy as $x^+ = f(x,\pi_\theta(x))$. 
+Using the element-wise ReLU function defined in \eqref{eq:relu}, the loss is defined as
 \begin{equation}
     \label{eq:dynamics-aware-loss}
     \mathcal{L}_f = \frac{1}{M_\pi n_x} \sum_{x \in \mathcal{B}_\pi} \left( 
