@@ -182,7 +182,7 @@ Finally, the LIRPA-condition loss over $N_{\text{L}}$ regions is computed as
 \paragraph{Lyapunov Scaling Loss} prevents numerical collapse to zero 
 by penalizing deviations from the initial average magnitude over a 
 quasi-Monte Carlo batch $\mathcal{B}_V \subset \mathcal{X}_V$, 
-sampled via a low-discrepancy Sobol sequence \cite{sobol}. 
+sampled via a low-discrepancy Sobol sequence \cite{sobol}, as illustrated in \cref{fig:sobol-sampling}.
 The logarithm of the mean Lyapunov value over this batch is defined as
 \begin{equation}
     \label{eq:mean-lyapunov-log}
@@ -197,6 +197,13 @@ The reference value $\ell_{V,0}$ is determined once using the initial
 Lyapunov candidate prior to training. To prevent the Lyapunov candidate from 
 overfitting to a static point cloud, a new batch $\mathcal{B}_V$ is resampled from $\mathcal{X}_V$ 
 with a specified probability at each optimization step.
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/methods/box_sobol_sampling.tex}
+    \caption[Sobol iequence illustration]{Comparisson of Sobol and uniform sampling in two dimensions.}
+    \label{fig:sobol-sampling}
+\end{figure}
 
 
 \paragraph{Policy Scaling Loss} encourages the learned policy $\pi_V$ to remain close 
@@ -239,9 +246,15 @@ summing all previously defined weighted components, given by
         \omega_R \loss_R,
 \end{equation}
 where the weights $\omega_m > 0$, with $m \in \{ \rho\text{-gated},\;\text{ROA},\;\text{L},\;V,\;S\pi,\;R \}$ are 
-hyperparameters that balance the relative importance of the individual loss components.
+hyperparameters that balance the relative importance of the individual loss components. 
+The full loss flow is pictured in \cref{fig:loss-flow}
 
-
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/methods/loss_flow.tex}
+    \caption{Loss flow visualization.}
+    \label{fig:loss-flow}
+\end{figure}
 
 \subsection{Falsification-Guided Training}
 \label{subsec:fals-guided-training}
@@ -276,22 +289,23 @@ and lie outside the origin exclusion region are retained as counterexamples.
 \paragraph{Adversarial Replay Buffer} manages the sample distribution for the $\rho$-gated condition loss $\loss_{\rho\text{-gated}}$. 
 It maintains two distinct state pools: an explorative pool $\mathcal{S}$ and a counterexample pool $\mathcal{C}$. 
 
-The explorative pool $\mathcal{S}$ is periodically repopulated every outer epoch to balance exploration and local refinement.  
-Every outer epoch, candidate states are oversampled uniformly from the training domain $\mathcal{X}_V$. 
-The final pool is then constructed using a probabilistic sampling strategy that 
-prioritizes states within an expanded sublevel boundary $m \cdot \rho$, controlled by a scalar margin $m > 1$. 
-As outlined in \cref{alg:state-pool-resample}, a continuous sampling probability is computed via a sigmoid function, 
-assigning high weights to states inside the estimated region of attraction and exponentially decaying weights to states further outside.
+As outlined in \cref{alg:state-pool-resample}, the explorative state pool $\mathcal{S}$ is repopulated 
+at each outer epoch to balance global exploration with local refinement. 
+First, candidate states $\mathcal{B}_{\text{ROA}}$ are oversampled uniformly from the training domain $\mathcal{X}_V$. 
+From these candidates, $N_{\text{ROA}}$ states are probabilistically sampled based on a sigmoid weighting function 
+centered around an expanded sublevel boundary $m \cdot \rho$ (with margin $m > 1$). 
+This weighting smoothly penalizes states further outside the estimated region of attraction, 
+significantly reducing their likelihood of being selected.
 
 \begin{algorithm}[htpb]
     \caption{Probabilistic Explorative State Pool Resampling}
     \label{alg:state-pool-resample}
 
-    \KwIn{Lyapunov function $V_\theta$, current ROA estimate $\rho$, margin $m$, sharpness $s$, target size $N_x$}
-    \KwOut{Updated state pool $\mathcal{S}$ of size $N_x$}
+    \KwIn{Lyapunov function $V_\theta$, current ROA estimate $\rho$, margin $m$, sharpness $s$, target size $N_{\text{ROA}}$}
+    \KwOut{Updated state pool $\mathcal{S}$ of size $N_{\text{ROA}}$}
 
     \BlankLine
-    Generate $4 N_x$ candidates: $\mathcal{B}_{\text{ROA}} \sim \mathcal{U}(\mathcal{X}_V)$\;
+    Generate $4 N_{\text{ROA}}$ candidates: $\mathcal{B}_{\text{ROA}} \sim \mathcal{U}(\mathcal{X}_V)$\;
 
     \BlankLine
     For all $x \in \mathcal{B}_{\text{ROA}}$, assign weight $w(x) \leftarrow \sigma \left(
@@ -299,7 +313,7 @@ assigning high weights to states inside the estimated region of attraction and e
     \right) + \varepsilon$\;
 
     \BlankLine
-    $\mathcal{S} \leftarrow$ Sample $N_x$ states from $\mathcal{B}_{\text{ROA}}$ with probability $P(x) \propto w(x)$\;
+    $\mathcal{S} \leftarrow$ Sample $N_{\text{ROA}}$ states from $\mathcal{B}_{\text{ROA}}$ with probability $P(x) \propto w(x)$\;
 \end{algorithm}
 
 The counterexample pool $\mathcal{C}$ stores the critical violations identified during the PGD falsification step. 
@@ -314,27 +328,36 @@ Consequently, the condition loss continuously penalizes recent violations while 
 \label{subsec:rho-sublevel-estim}
 \todo[inline]{explain why exactly we need it}
 To compute the loss, particularly the $\rho$-gated condition loss in \eqref{eq:rho-gated-condition-loss}, 
-the target level $\rho$, which bounds the sublevel set $\mathcal{V}_\rho$, must be continuously estimated during training. 
+the target level $\rho$ must be continuously estimated during training. 
 Since the goal is to find the largest level set of the Lyapunov candidate $V_\theta(x)$ that lies entirely 
 within the defined training bounds $\mathcal{X}_V$, a level set can only escape the safe region by intersecting its 
 boundary $\partial \mathcal{X}_V$. Therefore, the maximum certifiable $\rho$ is mathematically strictly determined
 by the minimum value of the Lyapunov candidate at its boundary.
 According to the formulation proposed by \cite{yangLyapunovstableNeuralControl2024}, it is sufficient to evaluate $V_\theta(x)$
-exclusively on the boundary $\partial \mathcal{X}_V$ rather than inefficiently sampling the entire state space, in order to estimate 
-the bounds of the ROA. However, since the boundary is a high-dimensional surface and the neural network parameterized in $V_\theta(x)$ 
+only on the boundary $\partial \mathcal{X}_V$ rather than sampling the entire state space. 
+However, since the boundary is a high-dimensional surface and the neural network parameterized in $V_\theta(x)$ 
 forms a highly non-convex landscape, simple uniform sampling on the boundary is insufficient to find the true minimum. 
 Therefore, a Projected Gradient Descent (PGD) approach is employed to actively search for the worst-case boundary points. 
-Starting from uniformly sampled points $x_{\partial} \sim \mathcal{U} (\partial \mathcal{X}_V)$, PGD iteratively minimizes $V_\theta(x_{\partial})$ 
-by taking steps along the negative gradient and projecting the updated states strictly back onto the boundary surfaces.
+Starting from uniformly sampled points $\mathcal{B}_{\partial} \sim \mathcal{U}(\partial \mathcal{X}_V)$, 
+visualized in \cref{fig:boundary-sampling}, PGD iteratively minimizes $V_\theta(x)$ by taking steps along 
+the negative gradient and projecting the updated states strictly back onto the boundary surfaces.
 To actively encourage the region of attraction to expand over the course of the co-training process, 
 the formally certifiable limit is intentionally overestimated, as suggested in \cite{yangLyapunovstableNeuralControl2024}.
 Specifically, a target $\rho$ is computed by applying a growth factor $\gamma > 1$ to the boundary minimum found via PGD:
 \begin{equation}
     \label{eq:rho-estimation}
     \tilde{\rho} = \max \left( 
-        \rho_{\text{min}}, \gamma \cdot \min_{x \in \partial \mathcal{X}_V} V_\theta(x) 
+        \rho_{\text{min}}, \gamma \cdot \min_{x \in \mathcal{B}_{\partial}} V_\theta(x) 
     \right).
 \end{equation}
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/methods/box_boundary_sampling.tex}
+    \caption[Boundary Sampling]{Visualization for boundary sampling of a 2 dimensional example.}
+    \label{fig:boundary-sampling}
+\end{figure}
+
 By targeting a value for $\tilde{\rho}$ that is slightly above the currently safe maximum, the formulation deliberately 
 leads to small violations near the boundary. These violations are then captured by the aforementioned 
 adversarial replay buffer, effectively forcing the optimization to continuously expand the sublevel set outward.

@@ -1,0 +1,143 @@
+\begin{tikzpicture}[
+    node distance=0.5cm and 0.8cm,
+    font=\small,
+    % --- Stylings mit deinen Farbwerten ---
+    input/.style={
+        draw=navy, 
+        fill=gray, 
+        rounded corners=3pt, 
+        align=center, 
+        font=\footnotesize\bfseries, 
+        text=dark,
+        inner sep=4pt,
+        minimum width=1.8cm
+    },
+    model/.style={
+        draw=navy, 
+        fill=white, 
+        rounded corners=4pt, 
+        thick, 
+        align=center, 
+        font=\small\bfseries, 
+        text=navy,
+        inner sep=5pt,
+        minimum width=1.6cm
+    },
+    loss/.style={
+        draw=teal, 
+        fill=teal!8, 
+        rounded corners=4pt, 
+        thick, 
+        align=center, 
+        font=\small\bfseries, 
+        text=dark,
+        inner sep=5pt,
+        minimum width=2.2cm
+    },
+    weight/.style={
+        draw=amber, 
+        fill=amber!15, 
+        circle, 
+        font=\scriptsize\bfseries, 
+        text=dark,
+        inner sep=2pt, 
+        minimum size=1.8em
+    },
+    sum/.style={
+        draw=navy, 
+        fill=navy!15, 
+        circle, 
+        thick, 
+        font=\bfseries\large, 
+        text=navy,
+        inner sep=2pt
+    },
+    arr/.style={
+        -Latex, 
+        thick, 
+        draw=navy
+    }
+]
+
+    % ==========================================
+    % 1. INPUTS & PARAMETERS (Linke Spalte)
+    % ==========================================
+    \node[input] (in_x) {$\mathcal{B}_\rho$};
+    \node[input, below=0.6cm of in_x] (in_roa) {$\mathcal{B}_{\text{ROA}}$};
+    \node[input, below=0.6cm of in_roa] (in_V) {$\mathcal{B}_V$};
+    \node[input, below=0.6cm of in_V] (in_Spi) {$\mathcal{B}_{S\pi}$};
+    \node[input, below=0.6cm of in_Spi] (in_lirpa) {LIRPA Regions};
+    \node[input, below=0.6cm of in_lirpa] (in_r) {$R_\theta$};
+
+    % ==========================================
+    % 2. LOKALE MODELL-PIPELINE (Für B_\rho)
+    % ==========================================
+    \node[model, right=1.2cm of in_x, yshift=0.4cm] (net_v) {$V_\theta$};
+    \node[model, right=1.2cm of in_x, yshift=-0.4cm] (sys_f) {$f(x, \pi_V(x))$};
+    \node[model, right=0.8cm of sys_f] (net_vpp) {$V_\theta^+$};
+
+    % Gemeinsamer Start-Punkt für x aus B_\rho
+    \coordinate (split_x) at ($(in_x.east) + (0.4, 0)$);
+
+    % Wege von B_\rho:
+    \draw[arr] (in_x.east) -- (split_x) |- (net_v.west);
+    \draw[arr] (split_x) |- (sys_f.west);
+    \draw[arr] (sys_f) -- (net_vpp) node[midway, above, font=\tiny\bfseries] {$x^+_V$};
+
+    % ==========================================
+    % 3. LOSSES (Rechte Spalte)
+    % ==========================================
+    \coordinate (loss_col) at ($(net_vpp.east) + (2.0, 0)$);
+
+    \node[loss] (l_gated) at (loss_col |- in_x) {$\mathcal{L}_{\rho\text{-gated}}$};
+    \node[loss] (l_roa)   at (loss_col |- in_roa) {$\mathcal{L}_{\text{ROA}}$};
+    \node[loss] (l_v)     at (loss_col |- in_V) {$\mathcal{L}_V$};
+    \node[loss] (l_spi)   at (loss_col |- in_Spi) {$\mathcal{L}_{S\pi}$};
+    \node[loss] (l_lirpa) at (loss_col |- in_lirpa) {$\mathcal{L}_{\text{L}}$};
+    \node[loss] (l_r)     at (loss_col |- in_r) {$\mathcal{L}_R$};
+
+    % ==========================================
+    % 4. VERBINDUNGEN (Inputs / Modelle -> Losses)
+    % ==========================================
+    \coordinate (entry) at ($(l_gated.west) - (0.4, 0)$);
+
+    \draw[arr] (net_v.east) -- (entry |- net_v.east) |- ($(l_gated.west) + (0, 0.15)$);
+    \draw[arr] (net_vpp.east) -- (entry |- net_vpp.east) |- ($(l_gated.west) + (0, -0.15)$);
+
+    \draw[arr] (in_roa) -- (l_roa);
+    \draw[arr] (in_V) -- (l_v);
+    \draw[arr] (in_Spi) -- (l_spi);
+    \draw[arr] (in_lirpa) -- (l_lirpa);
+    \draw[arr] (in_r) -- (l_r);
+
+    % ==========================================
+    % 5. GEWICHTE & TOTAL SUM
+    % ==========================================
+    \node[weight, right=0.5cm of l_gated] (w_gated) {$\omega_{\rho\text{-gated}}$};
+    \node[weight, right=0.5cm of l_roa] (w_roa) {$\omega_{\text{ROA}}$};
+    \node[weight, right=0.5cm of l_v] (w_v) {$\omega_V$};
+    \node[weight, right=0.5cm of l_spi] (w_spi) {$\omega_{S\pi}$};
+    \node[weight, right=0.5cm of l_lirpa] (w_lirpa) {$\omega_{\text{L}}$};
+    \node[weight, right=0.5cm of l_r] (w_r) {$\omega_R$};
+
+    \draw[arr] (l_gated) -- (w_gated);
+    \draw[arr] (l_roa) -- (w_roa);
+    \draw[arr] (l_v) -- (w_v);
+    \draw[arr] (l_spi) -- (w_spi);
+    \draw[arr] (l_lirpa) -- (w_lirpa);
+    \draw[arr] (l_r) -- (w_r);
+
+    % Aggregated Sum & Total Loss
+    \path coordinate (center_w) at ($(w_v.east)!0.5!(w_spi.east)$);
+    \node[sum, right=0.8cm of center_w] (sum) {$+$};
+    \node[loss, draw=navy, fill=navy!10, right=0.5cm of sum, font=\bfseries\small, text=navy, minimum width=1.6cm] (l_total) {$\mathcal{L}_{\text{total}}$};
+
+    \draw[arr] (w_gated) -| (sum);
+    \draw[arr] (w_roa) -| (sum);
+    \draw[arr] (w_v) -| (sum);
+    \draw[arr] (w_spi) -| (sum);
+    \draw[arr] (w_lirpa) -| (sum);
+    \draw[arr] (w_r) -| (sum);
+    \draw[arr, ultra thick, draw=navy] (sum) -- (l_total);
+
+\end{tikzpicture}

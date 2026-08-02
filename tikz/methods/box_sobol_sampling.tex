@@ -1,0 +1,38 @@
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={
+        group size=2 by 1,
+        horizontal sep=1.2cm,
+        ylabels at=edge left,    % <-- Korrekt für Y-Achsenbeschriftung
+        xlabels at=edge bottom   % <-- Korrekt für X-Achsenbeschriftung
+    },
+    xlabel={$x_1$},
+    ylabel={$x_2$},
+    xmin=-1, xmax=1,
+    ymin=-1, ymax=1,
+    width=0.48\textwidth,
+    axis equal image,
+]
+    % --- Plot 1: Uniform ---
+    \nextgroupplot[title={\small (a) Uniform Sampling}]
+    \addplot[
+        only marks,
+        mark=*,
+        mark size=1.5pt,
+        draw=amber,
+        fill=amber,
+        fill opacity=0.7
+    ] table [x=x, y=y, col sep=tab] {tikz/methods/box_uniform.tsv};
+
+    % --- Plot 2: Sobol ---
+    \nextgroupplot[title={\small (b) Sobol Sequence}]
+    \addplot[
+        only marks,
+        mark=*,
+        mark size=1.5pt,
+        draw=navy,
+        fill=navy,
+        fill opacity=0.7
+    ] table [x=x, y=y, col sep=tab] {tikz/methods/box_sobol.tsv};
+\end{groupplot}
+\end{tikzpicture}
