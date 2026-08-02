@@ -1,0 +1,179 @@
+\begin{tikzpicture}[
+    font=\small,
+    % --- Stylings ---
+    input/.style={
+        draw=navy, fill=gray, rounded corners=3pt, align=center, 
+        font=\footnotesize\bfseries, text=dark, inner sep=5pt, 
+        minimum width=1.5cm, minimum height=0.75cm
+    },
+    param/.style={input, minimum width=0.8cm},
+    model/.style={
+        draw=navy, fill=white, rounded corners=4pt, thick, align=center, 
+        font=\footnotesize\bfseries, text=navy, inner sep=4pt, 
+        minimum width=1.4cm, minimum height=0.75cm
+    },
+    mathloss/.style={
+        draw=teal, fill=teal!8, rounded corners=4pt, thick, align=center, 
+        font=\small, text=dark, inner sep=6pt, 
+        minimum height=1.5cm
+    },
+    weight/.style={
+        draw=amber, fill=amber!15, circle, font=\scriptsize\bfseries, 
+        text=dark, inner sep=1pt, minimum size=2.4em
+    },
+    sum/.style={
+        draw=navy, fill=navy!15, circle, thick, font=\bfseries\large, 
+        text=navy, inner sep=2pt
+    },
+    arr/.style={-Latex, thick, draw=navy},
+    bus/.style={thick, draw=navy},
+    tap/.style={circle, fill=navy, inner sep=0pt, minimum size=3.5pt},
+    val/.style={
+        anchor=south west, font=\tiny\bfseries, 
+        inner sep=1pt, xshift=2pt, yshift=2pt
+    }
+]
+
+    % ==========================================
+    % 0. Y-GRID (Kompakt & gestrafft)
+    % ==========================================
+    \coordinate (Y_sets)         at (0, 0);
+    \coordinate (Y_split1)       at (0, -0.7); 
+    
+    \coordinate (Y_models1)      at (0, -1.6); 
+    \coordinate (Y_split2)       at (0, -2.4); 
+    
+    \coordinate (Y_models2)      at (0, -3.3); 
+    
+    \coordinate (Y_split3)       at (0, -4.1); 
+    \coordinate (Y_split4)       at (0, -4.6); 
+    
+    \coordinate (Y_loss)         at (0, -6.3); % Mathe-Blöcke
+    
+    \coordinate (Y_sum_bus)      at (0, -8.2);
+    \coordinate (Y_sum)          at (0, -8.2);
+    \coordinate (Y_lcond)        at (0, -9.6); % Combined Condition Loss & w_rho
+    
+    \coordinate (Y_merge)        at (0, -11.0); 
+    \coordinate (Y_final)        at (0, -12.5); % Gated Loss
+
+    % ==========================================
+    % 1. X-GRID & EINGÄNGE 
+    % ==========================================
+    \node[param] (in_rho)   at (-5.5, 0 |- Y_sets) {$\rho$};
+    \node[input] (in_x)     at (-0.5, 0 |- Y_sets) {$\mathcal{B}_\rho$};
+
+    % ==========================================
+    % 2. MODELLE & DATEN-SPLITS
+    % ==========================================
+    % Ebene 1
+    \node[model] (net_v_x) at (-2.5, 0 |- Y_models1) {$V_\theta$};
+    \node[model] (sys_f)   at ( 1.5, 0 |- Y_models1) {$f(x, \pi_V(x))$};
+    
+    \draw[arr] (in_x.south) -- (-0.5, 0 |- Y_split1) -| (net_v_x.north);
+    \node[val] at (-2.5, 0 |- net_v_x.north) {$x$};
+    
+    \draw[arr] (-0.5, 0 |- Y_split1) -| (sys_f.north);
+    \node[val] at (1.5, 0 |- sys_f.north) {$x$};
+
+    % Ebene 2
+    \node[model] (net_v_xp) at ( 1.5, 0 |- Y_models2) {$V_\theta$};
+    
+    % Routing für f(...) -> x^+
+    \coordinate (tap_f) at (1.5, 0 |- Y_split2);
+    \node[tap] at (tap_f) {};
+    \draw[arr] (sys_f.south) -- (net_v_xp.north);
+    \node[val] at (1.5, 0 |- net_v_xp.north) {$x^+_V$};
+
+    % ==========================================
+    % 3. MATH LOSS BOXEN (inkl. Formeln)
+    % ==========================================
+    
+    % 3.1 Soft Sublevel Weight (w_rho)
+    \node[mathloss] (w_rho) at (-5.0, 0 |- Y_lcond) {
+        \textbf{Soft Sublevel Weight}\\[4pt]
+        $\displaystyle w_{\rho} = \sigma \left( s \cdot \frac{\rho - V_\theta(x)}{\max (\rho, \varepsilon_{\text{rel}})} \right)$
+    };
+
+    % 3.2 Relative Decrease Loss (L_dec)
+    \node[mathloss] (l_dec) at (-0.5, 0 |- Y_loss) {
+        \textbf{Rel. Decrease Loss} $\mathcal{L}_{\text{dec}}$\\[4pt]
+        $\displaystyle = \left[ \frac{(1 - \kappa) V_\theta(x) - V_\theta(x^+_V)}{\max(|V_\theta(x)|, \varepsilon_{\text{rel}})} \right]_+$
+    };
+
+    % 3.3 Relative Invariance Loss (L_inv)
+    \node[mathloss] (l_inv) at (4.5, 0 |- Y_loss) {
+        \textbf{Rel. Invariance Loss} $\mathcal{L}_{\text{inv}}$\\[4pt]
+        $\begin{aligned}
+            = & \left\| S_{\text{range}}^{-1} \big[ x^+_V - \bar{x}_V \big]_+ \right\|_1 \\[-2pt]
+            + & \left\| S_{\text{range}}^{-1} \big[ \underline{x}_V - x^+_V \big]_+ \right\|_1
+        \end{aligned}$
+    };
+
+    % ==========================================
+    % 4. WATERFALL ROUTING ZU DEN LOSS-BOXEN
+    % ==========================================
+    \draw[arr] (-5.5, 0 |- in_rho.south) -- (-5.5, 0 |- w_rho.north);
+    \node[val] at (-5.5, 0 |- w_rho.north) {$\rho$};
+
+    % V_theta(x) Routing
+    \coordinate (tap_vx) at (-2.5, 0 |- Y_split3);
+    \draw[bus] (net_v_x.south) -- (tap_vx);
+    \node[tap] at (tap_vx) {};
+    
+    % -> zu w_rho
+    \draw[arr] (tap_vx) -| (-4.5, 0 |- w_rho.north);
+    \node[val] at (-4.5, 0 |- w_rho.north) {$V_\theta(x)$};
+    
+    % -> zu L_dec
+    \draw[arr] (tap_vx) -| (-1.0, 0 |- l_dec.north);
+    \node[val] at (-1.0, 0 |- l_dec.north) {$V_\theta(x)$};
+
+    % -> zu L_inv (Bypass)
+    \draw[bus] (tap_f) -- (4.5, 0 |- Y_split2);
+    \draw[arr] (4.5, 0 |- Y_split2) -- (4.5, 0 |- l_inv.north);
+    \node[val] at (4.5, 0 |- l_inv.north) {$x^+_V$};
+
+    % V_theta(x_V^+) Routing
+    \draw[arr] (net_v_xp.south) |- (0.0, 0 |- Y_split4) -- (0.0, 0 |- l_dec.north);
+    \node[val] at (0.0, 0 |- l_dec.north) {$V_\theta(x_V^+)$};
+
+
+    % ==========================================
+    % 5. AGGREGATION: COMBINED CONDITION LOSS
+    % ==========================================
+    \node[sum] (sum_cond) at (2.0, 0 |- Y_sum) {$+$};
+    
+    % Routing L_dec -> Sum
+    \draw[arr] (l_dec.south) |- (sum_cond.west);
+    
+    % Routing L_inv -> Sum (mit Gewicht)
+    \draw[bus] (l_inv.south) -- (4.5, 0 |- Y_sum_bus);
+    \node[weight] (w_inv) at (3.25, 0 |- Y_sum_bus) {$\omega_{\text{inv}}$};
+    \draw[arr] (4.5, 0 |- Y_sum_bus) -- (w_inv.east);
+    \draw[arr] (w_inv.west) -- (sum_cond.east);
+
+    % Combined Loss Box
+    \node[mathloss, minimum height=1.0cm] (l_cond) at (2.0, 0 |- Y_lcond) {
+        \textbf{Combined Condition Loss}\\[4pt]
+        $\displaystyle \mathcal{L}_{\text{cond}} = \mathcal{L}_{\text{dec}} + \omega_{\text{inv}} \cdot \mathcal{L}_{\text{inv}}$
+    };
+    \draw[arr] (sum_cond.south) -- (l_cond.north);
+
+
+    % ==========================================
+    % 6. FINALES GATE: L_rho-gated
+    % ==========================================
+    \node[mathloss, minimum height=1.2cm] (l_gated) at (-1.5, 0 |- Y_final) {
+        \textbf{Combined $\rho$-Gated Condition Loss}\\[4pt]
+        $\displaystyle \mathcal{L}_{\rho\text{-gated}} = \frac{ \sum_{\mathcal{B}_{\rho}} w_{\rho} \mathcal{L}_{\text{cond}} }{ \sum_{\mathcal{B}_{\rho}} w_{\rho} }$
+    };
+
+    % Zusammenführung von w_rho und L_cond
+    \draw[arr] (w_rho.south) |- (-2.5, 0 |- Y_merge) -- (-2.5, 0 |- l_gated.north);
+    \node[val] at (-2.5, 0 |- l_gated.north) {$w_\rho$};
+    
+    \draw[arr] (l_cond.south) |- (-0.5, 0 |- Y_merge) -- (-0.5, 0 |- l_gated.north);
+    \node[val] at (-0.5, 0 |- l_gated.north) {$\mathcal{L}_{\text{cond}}$};
+
+\end{tikzpicture}
