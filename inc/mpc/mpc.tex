@@ -18,22 +18,23 @@ is solved at each time step $k$ given the current system state $x_k$ \citeSec{2.
         \text{s.t.} \quad & x_{i+1} = f(x_i, u_i), && i = 0, \dots, N-1, \\
         & x_i \in \mathcal{X}, && i = 0, \dots, N-1, \\
         & u_i \in \mathcal{U}, && i = 0, \dots, N-1, \\
-        & x_N \in \mathcal{X}_f \\
+        & x_N \in \mathcal{X}_f, \\
         & x_0 = x_k.
     \end{aligned}
 \end{equation}
 Here, $N \in \mathbb{N}$ denotes the prediction horizon, $\ell: \mathcal{X} \times \mathcal{U} \to \mathbb{R}_{\ge 0}$ is the stage cost function, 
 and $V_f: \mathcal{X}_f \to \mathbb{R}_{\ge 0}$ represents the terminal cost function defined over the terminal constraint set 
-$\mathcal{X}_f \subseteq \mathcal{X}$. The state and input sequences $\{x_i\}_{i=0}^N$ and $\{u_i\}_{i=0}^{N-1}$ 
-denote the predicted state and input vectors over the horizon, constrained by the sets $\mathcal{X}$ and $\mathcal{U}$ 
+$\mathcal{X}_f \subseteq \mathcal{X}$. To distinguish predicted states and inputs from the actual closed-loop state 
+$x_k$ and control input $u_k$, the sequences $\{x_i\}_{i=0}^N$ and $\{u_i\}_{i=0}^{N-1}$ serve as optimization variables 
+local to time step $k$, constrained by the sets $\mathcal{X}$ and $\mathcal{U}$
 \citeSec{3.2}{gruneNonlinearModelPredictive2017}.
 
-A quadratic cost function is used for the stage cost, defined as 
+For this work, the stage cost is restricted to a quadratic cost function with positive definite weighting matrices $Q \succ 0$ and $R \succ 0$, 
+which is defined as follows \citeSec{1.3}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:stage-cost}
     \ell(x_i, u_i) = x_i^\top Q x_i + u_i^\top R u_i,
 \end{equation}
-where $Q \succ 0$ and $R \succ 0$ are the state and input weighting matrices, respectively \citeSec{1.3}{rawlingsModelPredictiveControl2020}. 
 Following the receding horizon principle, only the first control input $u_0^*$ from the optimal sequence is applied to the system, 
 and the optimization is repeated at the next sampling instance \citeSec{2.2,3.1}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}.
 

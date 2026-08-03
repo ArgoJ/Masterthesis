@@ -7,8 +7,8 @@ Consequently, the continuous-time dynamics
     \label{eq:continuous-time-system}
     \dot{x}(t) = f_c(x(t), u(t))
 \end{equation}
-must be discretized, where $x(t) \in \mathcal{X} = [\underline{x}, \overline{x}] \subseteq \mathbb{R}^{n_x}$ and 
-$u(t) \in \mathcal{U} = [\underline{u}, \overline{u}] \subseteq \mathbb{R}^{n_u}$ denote the continuous-time state and input vectors, respectively, 
+must be discretized, where $x(t) \in \mathbb{R}^{n_x}$ and 
+$u(t) \in \mathbb{R}^{n_u}$ denote the continuous-time state and input vectors, respectively, 
 with state space dimension $n_x \in \mathbb{N}$ and input dimension $n_u \in \mathbb{N}$.
 In this work, the corresponding discrete-time system
 \begin{equation}
@@ -16,36 +16,36 @@ In this work, the corresponding discrete-time system
     x_{k+1} = f(x_k, u_k)
 \end{equation}
 is obtained by approximating the continuous dynamics using a numerical integration scheme with a constant sampling time $T_s > 0$. 
-Here, $k \in \mathbb{N}_0$ denotes the discrete time step index, such that $x_k := x(k T_s) \in \mathcal{X}$ and 
-$u_k := u(k T_s) \in \mathcal{U}$ represent the state and control input at time $k T_s$. 
-The discrete-time function $f: \mathcal{X} \times \mathcal{U} \to \mathcal{X}$ is evaluated using a 
+Here, $k \in \mathbb{N}_0$ denotes the discrete time step index, such that $x_k := x(k T_s) \in \mathbb{R}^{n_x}$ and 
+$u_k := u(k T_s) \in \mathbb{R}^{n_u}$ represent the state and control input at time step $k$. 
+The discrete-time function $f: \mathbb{R}^{n_x} \times \mathbb{R}^{n_u} \to \mathbb{R}^{n_x}$ is evaluated using a 
 numerical integration scheme, such as the forward Euler or a fourth-order Runge-Kutta (RK4) method 
 \cite{butcherNumericalMethodsOrdinary2016}.
+
+To account for physical and operational limits, the system states and control inputs are restricted to 
+compact constraint sets $\mathcal{X} := [\underline{x}, \overline{x}] \subseteq \mathbb{R}^{n_x}$ and 
+$\mathcal{U} := [\underline{u}, \overline{u}] \subseteq \mathbb{R}^{n_u}$. 
+Furthermore, without loss of generality, any equilibrium $(x^*, u^*)$ can be shifted to the origin 
+via deviation variables $\tilde{x} := x - x^*$ and $\tilde{u} := u - u^*$. To keep notation concise, 
+the tildes are omitted and $x$ and $u$ are used directly for the shifted variables, 
+assuming $(x^*, u^*) = (\mathbf{0}, \mathbf{0})$ throughout this chapter.
 
 
 \subsection{Lyapunov Stability}
 \label{subsec:lyapunov-stability}
-
 Consider the discrete-time closed-loop system under a state-feedback control policy 
 $\pi: \mathcal{X} \to \mathcal{U}$ with the origin $x = \mathbf{0}$ as an equilibrium point, 
 satisfying $\pi(\mathbf{0}) = \mathbf{0}$ and $f(\mathbf{0}, \mathbf{0}) = \mathbf{0}$.
 Assuming the state constraint set $\mathcal{X}$ is positively invariant under $\pi$, 
-the origin is Lyapunov stable in $\mathcal{X}$ if there exists a positive definite function 
+the origin is locally asymptotically stable in $\mathcal{X}$ if there exists a positive definite function 
 $V: \mathcal{X} \to \mathbb{R}_{\ge 0}$ satisfying \citeThm{2.13}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
-    \label{eq:lyapunov-stability}
+    \label{eq:asymptotic-lyapunov-stability}
     \begin{aligned}
-        V(\mathbf{0}) &= 0 \qquad && \\
-        V(x) &> 0 \qquad && \forall x \in \mathcal{X} \setminus \{\mathbf{0}\} \\
-        V(f(x, \pi(x))) - V(x) &\leq 0 \qquad && \forall x \in \mathcal{X} \setminus \{\mathbf{0}\}.
+        V(\mathbf{0}) &= 0, \\
+        V(x) &> 0 \qquad && \forall x \in \mathcal{X} \setminus \{\mathbf{0}\}, \\
+        V(f(x, \pi(x))) - V(x) &< 0 \qquad && \forall x \in \mathcal{X} \setminus \{\mathbf{0}\}.
     \end{aligned}
 \end{equation}
-
-If the decrease condition holds strictly along closed-loop trajectories,
-\begin{equation}
-    \label{eq:asymptotic-lyapunov-stability}
-    V(f(x, \pi(x))) - V(x) < 0 \qquad \forall x \in \mathcal{X} \setminus \{\mathbf{0}\},
-\end{equation}
-the origin is locally asymptotically stable, guaranteeing trajectory
-convergence to the origin for all initial states $x_0$ in a sufficiently small
-neighborhood of the origin \citeThm{2.13}{rawlingsModelPredictiveControl2020}.
+The strict decrease condition guarantees trajectory convergence to the origin for all initial states 
+$x_0$ within a certified domain.
