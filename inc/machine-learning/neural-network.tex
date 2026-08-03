@@ -1,13 +1,13 @@
 \section{Artificial Neural Networks}
 \label{cha:ann}
 
-In imitation learning, Artificial Neural Networks (ANNs) approximate complex control laws offline 
-to bypass the computational overhead of online Model Predictive Control (MPC) evaluations.
+In imitation learning, artificial neural networks (ANNs) approximate complex control laws offline 
+to bypass the computational overhead of online model predictive control (MPC) evaluations.
 
 \subsection{Multi-Layer Perceptrons}
 \label{subsec:mlp}
 
-Multi-Layer Perceptrons (MLPs) are fully connected feed-forward networks that map an input 
+Multi-layer perceptrons (MLPs) are fully connected feed-forward networks that map an input 
 through $L-1$ hidden layers to an output layer 
 \citeSec{1.4,3.1}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
 For a state input $x$, forward propagation to the network prediction $\hat{y}$ 
@@ -25,15 +25,14 @@ while $\sigma^{(l)}(\cdot)$ represents a non-linear activation function applied 
 the pre-activation vector $z^{(l)}$ \citeSec{3.2}{kollmannsbergerDeepLearningComputational2021}. 
 Without these non-linearities, the layers would simply be reduced to a single linear transformation, 
 drastically limiting the model's ability to capture complexity \citeSec{1.5}{aggarwalNeuralNetworksDeep2023}. 
-Common activation functions in neural control include the hyperbolic tangent, 
-the Rectified Linear Unit (ReLU), and Leaky ReLU, defined respectively as
+Common activation functions in neural control include the hyperbolic tangent \eqref{eq:tanh} and 
+the rectified linear unit (ReLU) \eqref{eq:relu}, defined respectively as
 \citeSec{3.5}{kollmannsbergerDeepLearningComputational2021}.
 \begin{subequations}
     \label{eq:act-funs}
     \begin{align}
         \tanh z &= \frac{\mathrm{e}^{2z} - 1}{\mathrm{e}^{2z} + 1} \label{eq:tanh} \\
         {[z]_+} &= \max(0, z) \label{eq:relu} \\
-        {[z]}_{\alpha} &= \max(\alpha z, z), \quad \alpha \in (0, 1) \label{eq:leaky-relu}
     \end{align}
 \end{subequations}
 Their qualitative profiles are illustrated in \cref{fig:activation-funs}.

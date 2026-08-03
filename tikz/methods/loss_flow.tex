@@ -1,195 +1,124 @@
 
 \begin{tikzpicture}[
-    font=\small,
-    % --- Komprimierte Stylings ---
-    input/.style={
-        draw=navy, fill=gray, rounded corners=3pt, align=center, 
-        font=\footnotesize\bfseries, text=dark, inner sep=4pt, minimum width=1.3cm
+    font=\scriptsize,
+    >=Stealth,
+    % --- Main Node Style ---
+    mainnode/.style={
+        draw=navy, 
+        fill=white, 
+        thick, 
+        rounded corners=3pt, 
+        align=center, 
+        text=navy, 
+        minimum width=4.0cm, 
+        minimum height=0.55cm, 
+        font=\scriptsize\bfseries
     },
-    param/.style={input, minimum width=0.8cm},
-    model/.style={
-        draw=navy, fill=white, rounded corners=4pt, thick, align=center, 
-        font=\footnotesize\bfseries, text=navy, inner sep=3pt, minimum width=1.1cm
+    bufferbox/.style={
+        draw=amber, 
+        fill=amber!5, 
+        thick, 
+        dashed, 
+        rounded corners=3pt
     },
-    loss/.style={
-        draw=teal, fill=teal!8, rounded corners=4pt, thick, align=center, 
-        font=\small\bfseries, text=dark, inner sep=4pt, minimum width=1.7cm
-    },
-    weight/.style={
-        draw=amber, fill=amber!15, circle, font=\scriptsize\bfseries, 
-        text=dark, inner sep=1pt, minimum size=2.2em
-    },
-    sum/.style={
-        draw=navy, fill=navy!15, circle, thick, font=\bfseries\large, 
-        text=navy, inner sep=2pt
-    },
-    totalloss/.style={
-        draw=navy, fill=navy!10, rounded corners=4pt, thick, align=center, 
-        font=\bfseries\small, text=navy, inner sep=5pt, minimum width=1.6cm
+    buffernode/.style={
+        draw=amber, 
+        fill=amber!15, 
+        thick, 
+        rounded corners=2pt, 
+        align=center, 
+        font=\tiny\bfseries, 
+        text=dark, 
+        minimum width=1.8cm, 
+        minimum height=0.5cm
     },
     arr/.style={-Latex, thick, draw=navy},
-    bus/.style={thick, draw=navy},
-    tap/.style={circle, fill=navy, inner sep=0pt, minimum size=3pt}
+    dataarr/.style={-Latex, semithick, draw=teal},
+    looparr/.style={-Latex, semithick, draw=navy!60, dashed},
+    innerlooparr/.style={-Latex, semithick, draw=teal, dashed},
+    outerbg/.style={draw=dark!25, fill=gray, dashed, rounded corners=4pt},
+    innerbg/.style={draw=teal!35, fill=teal!5, dashed, rounded corners=4pt},
+    tap/.style={circle, fill=teal, inner sep=0pt, minimum size=3pt}
 ]
 
-    % ==========================================
-    % 0. Y-GRID (Höhen-Schichten)
-    % ==========================================
-    \coordinate (Y_sets)         at (0, 0);
-    \coordinate (Y_rho_bus)      at (0, -0.4); % NEU: Rho-Bus ist jetzt ganz oben!
-    \coordinate (Y_split)        at (0, -0.8);
+    % ==========================================================================
+    % 1. HINTERGRUND-ZONEN (Outer vs. Inner Loop)
+    % ==========================================================================
+    % Inner Loop Box
+    \filldraw[innerbg] (-3.5, -2.8) rectangle (4.4, -6.6);
+    \node[anchor=north west, font=\tiny\bfseries, text=teal!80!black] at (-3.5, -2.8) {Inner Epoch};
+
+    % Outer Loop Box
+    \filldraw[outerbg] (-3.7, 0.8) rectangle (5.3, -7.5);
+    \node[anchor=north west, font=\tiny\bfseries, text=dark!70] at (-3.7, 0.8) {Outer Epoch};
+
+    % ==========================================================================
+    % 2. MAIN WATERFALL NODES (Spalte in der Mitte at x=0)
+    % ==========================================================================
+    \node[font=\tiny\bfseries, text=dark, draw=dark, fill=white, rounded corners=2pt, inner sep=2pt] (start_outer) at (0, 0.4) {Start Outer Epoch};
+
+    \node[mainnode] (n1) at (0, -0.5) {1. $\rho$-Estimation};
+    \node[mainnode] (n2) at (0, -1.3) {2. Adversarial Falsification};
+    \node[mainnode] (n3) at (0, -2.1) {3. State Pool Resampling};
     
-    \coordinate (Y_1)            at (0, -1.8);
-    \coordinate (Y_tap_xV)       at (0, -2.6);
-    \coordinate (Y_2)            at (0, -3.4);
+    \node[font=\tiny\bfseries, text=teal!90!black, draw=teal, fill=white, rounded corners=2pt, inner sep=2pt] (start_inner) at (0, -3.1) {Start Inner Epoch};
     
-    % Waterfall Routing (Garantiert kreuzungsfrei)
-    \coordinate (Y_waterfall_1)  at (0, -4.2); % V_theta^+ Ebene
-    \coordinate (Y_waterfall_2)  at (0, -4.5); % Reguläre V_theta Ebene
-    \coordinate (Y_waterfall_3)  at (0, -4.8); % Bypass x_V^+ (tiefste Ebene, läuft unter V_theta^+)
+    \node[mainnode] (n4) at (0, -4.1) {4. Mini-Batch Assembly};
+    \node[mainnode] (n5) at (0, -4.9) {5. Loss Computation};
+    \node[mainnode] (n6) at (0, -5.7) {6. Optimization Step};
+
+    % Hauptfluss-Pfeile
+    \draw[arr] (start_outer) -- (n1);
+    \draw[arr] (n1) -- (n2);
+    \draw[arr] (n2) -- (n3);
+    \draw[arr] (n3) -- (start_inner);
+    \draw[arr] (start_inner) -- (n4);
+    \draw[arr] (n4) -- (n5);
+    \draw[arr] (n5) -- (n6);
+
+    % ==========================================================================
+    % 3. CEGIS BUFFER (Rechts oben, x = 3.2)
+    % ==========================================================================
+    \filldraw[bufferbox] (2.3, -0.8) rectangle (4.1, -2.6);
+    \node[anchor=south, font=\tiny\bfseries, text=amber!80!black] at (3.2, -0.8) {CEGIS Buffer};
     
-    \coordinate (Y_loss)         at (0, -6.0);
-    \coordinate (Y_weight)       at (0, -7.6);
-    \coordinate (Y_sum_bus)      at (0, -8.6);
-    \coordinate (Y_sum)          at (0, -9.4);
-    \coordinate (Y_total)        at (0, -10.6);
+    \node[buffernode] (pool_c) at (3.2, -1.3) {Counterexample\\[-1pt]Pool $\mathcal{C}$};
+    \node[buffernode] (pool_s) at (3.2, -2.1) {Explorative\\[-1pt]Pool $\mathcal{S}$};
 
-    % ==========================================
-    % 1. X-GRID & EINGÄNGE (Kompakt auf ~14cm)
-    % ==========================================
-    \node[param] (in_rho)   at (-2.0, 0 |- Y_sets) {$\rho$};
-    \node[input] (in_x)     at ( 0.0, 0 |- Y_sets) {$\mathcal{B}_\rho$};
-    \node[input] (in_roa)   at ( 2.5, 0 |- Y_sets) {$\mathcal{B}_{\text{ROA}}$};
-    \node[input] (in_lirpa) at ( 4.8, 0 |- Y_sets) {LIRPA\\[-2pt]Regions};
-    \node[input] (in_V)     at ( 6.6, 0 |- Y_sets) {$\mathcal{B}_V$};
-    \node[param] (in_lv0)   at ( 7.4, 0 |- Y_sets) {$\ell_{V,0}$};
-    \node[input] (in_Spi)   at ( 9.4, 0 |- Y_sets) {$\mathcal{B}_{S\pi}$};
-    \node[input] (in_r)     at (11.4, 0 |- Y_sets) {$R_\theta$};
-    \node[param] (in_lr0)   at (12.2, 0 |- Y_sets) {$\ell_{R,0}$};
+    % Eingänge in den Puffer (horizontal, überschneidungsfrei)
+    \draw[dataarr] (n2.east) -- (pool_c.west) node[midway, above, font=\tiny, text=teal] {$x_{\text{adv}}$};
+    \draw[dataarr] (n3.east) -- (pool_s.west) node[midway, above, font=\tiny, text=teal] {$x$};
 
-    % ==========================================
-    % 2. MODELLE & SPLITS
-    % ==========================================
-    % Gated Split (-0.4 und 0.4)
-    \node[model] (sys_f)     at (-0.4, 0 |- Y_1) {$f(x, \pi_V(x))$};
-    \node[model] (net_v_rho) at ( 0.4, 0 |- Y_tap_xV) {$V_\theta$};
-    \draw[arr] (in_x.south) -- (0.0, 0 |- Y_split) -| (sys_f.north);
-    \draw[arr] (0.0, 0 |- Y_split) -| (net_v_rho.north);
+    % Ausgang aus dem Puffer (verlässt Box nach unten bei y = -3.5, unterhalb von start_inner!)
+    \draw[dataarr, rounded corners=3pt] (3.2, -2.6) -- (3.2, -4.1) -- (n4.east);
 
-    \node[model] (net_v_roa) at ( 2.5, 0 |- Y_1) {$V_\theta$};
-    \draw[arr] (in_roa.south) -- (net_v_roa.north);
+    % ==========================================================================
+    % 4. DATENBUSSE (Links)
+    % ==========================================================================
+    % Bus 1: Rho & ROA
+    \draw[dataarr] ($(n1.west)+(0,0.08)$) -- (-2.5, -0.42);
+    \node[anchor=east, font=\tiny\bfseries, text=teal] at (-2.5, -0.65) {$\rho, \mathcal{B}_{\text{ROA}}$};
+    \draw[dataarr, rounded corners=2pt] (-2.5, -0.42) -- (-2.5, -4.82) -- ($(n5.west)+(0,0.08)$);
     
-    \node[model] (net_v_V)   at ( 6.6, 0 |- Y_1) {$V_\theta$};
-    \draw[arr] (in_V.south) -- (net_v_V.north);
+    % Abzweigungen für Rho
+    \node[tap] at (-2.5, -1.3) {}; \draw[dataarr] (-2.5, -1.3) -- (n2.west);
+    \node[tap] at (-2.5, -2.1) {}; \draw[dataarr] (-2.5, -2.1) -- (n3.west);
 
-    % Policy Split (9.0 und 9.8)
-    \node[model] (net_pi_V)  at ( 9.0, 0 |- Y_1) {$\pi_V$};
-    \node[model] (net_pi)    at ( 9.8, 0 |- Y_1) {$\pi$};
-    \draw[arr] (in_Spi.south) -- (9.4, 0 |- Y_split) -| (net_pi_V.north);
-    \draw[arr] (9.4, 0 |- Y_split) -| (net_pi.north);
+    % Bus 2: LIRPA
+    \node[font=\tiny\bfseries, text=navy] (lirpa) at (-3.2, 0.4) {LIRPA};
+    \draw[dataarr, rounded corners=2pt] (lirpa.south) -- (-3.2, -4.98) -- ($(n5.west)-(0,0.08)$);
 
-    % V_theta^+ (Y_2)
-    \node[model] (net_vpp)   at (-0.4, 0 |- Y_2) {$V_\theta^+$};
-    \draw[arr] (sys_f.south) -- (net_vpp.north);
+    % ==========================================================================
+    % 5. SCHLEIFEN-RÜCKFÜHRUNGEN (Rechts gestaffelt, ohne Kreuzung)
+    % ==========================================================================
+    % Inner Loop: Mündet genau auf Höhe y = -3.1 (oberhalb des Puffer-Ausgangs!)
+    \draw[arr] (n6.south) -- (0, -6.3);
+    \draw[innerlooparr, rounded corners=3pt] (0, -6.3) -- (4.7, -6.3) -- (4.7, -3.1) -- (start_inner.east);
+    \node[fill=white, draw=teal!40, rounded corners=2pt, font=\tiny\bfseries, text=teal!90!black, inner sep=1pt] at (4.7, -4.9) {\rotatebox{90}{Inner Loop ($K$ steps)}};
 
-    % ==========================================
-    % 3. LOSS BOXEN
-    % ==========================================
-    \node[loss] (l_gated) at ( 0.0, 0 |- Y_loss) {$\mathcal{L}_{\rho\text{-gated}}$\\[2pt] \tiny \eqref{eq:rho-gated-condition-loss}};
-    \node[loss] (l_roa)   at ( 2.5, 0 |- Y_loss) {$\mathcal{L}_{\text{ROA}}$\\[2pt] \tiny \eqref{eq:roa-loss}};
-    \node[loss] (l_lirpa) at ( 4.8, 0 |- Y_loss) {$\mathcal{L}_{\text{L}}$\\[2pt] \tiny \eqref{eq:relative-lirpa-condition-loss}};
-    \node[loss] (l_v)     at ( 7.0, 0 |- Y_loss) {$\mathcal{L}_V$\\[2pt] \tiny \eqref{eq:scaling-loss}};
-    \node[loss] (l_spi)   at ( 9.4, 0 |- Y_loss) {$\mathcal{L}_{S\pi}$\\[2pt] \tiny \eqref{eq:policy-scaling-loss}};
-    \node[loss] (l_r)     at (11.8, 0 |- Y_loss) {$\mathcal{L}_R$\\[2pt] \tiny \eqref{eq:r-matrix-loss}};
-
-    % ==========================================
-    % 4. RHO BUS ROUTING (GANZ OBEN -> SAUBERE DROPS)
-    % ==========================================
-    % Der Bus verläuft oben bei Y = -0.4
-    \draw[bus] (in_rho.south) -- (-2.0, 0 |- Y_rho_bus) -- (3.7, 0 |- Y_rho_bus);
-    
-    % Drop 1: Gated
-    \node[tap] at (-2.0, 0 |- Y_rho_bus) {};
-    \draw[arr] (-2.0, 0 |- Y_rho_bus) |- (l_gated.west);
-    \node[anchor=south east, inner sep=1pt, font=\tiny\bfseries] at (l_gated.west) {$\rho$};
-
-    % Drop 2: ROA
-    \node[tap] at (1.3, 0 |- Y_rho_bus) {};
-    \draw[arr] (1.3, 0 |- Y_rho_bus) |- (l_roa.west);
-    \node[anchor=south east, inner sep=1pt, font=\tiny\bfseries] at (l_roa.west) {$\rho$};
-
-    % Drop 3: LIRPA
-    \draw[arr] (3.7, 0 |- Y_rho_bus) |- (l_lirpa.west);
-    \node[anchor=south east, inner sep=1pt, font=\tiny\bfseries] at (l_lirpa.west) {$\rho$};
-
-    % ==========================================
-    % 5. WATERFALL ROUTING (Zero-Crossing)
-    % ==========================================
-    % a) x_V^+ Bypass (fällt auf -1.4 aus und springt dann als UNTERSTE Linie über -0.6 rein)
-    \coordinate (tap_x) at (-0.4, 0 |- Y_tap_xV);
-    \node[tap] at (tap_x) {};
-    \draw[bus] (tap_x) -- (-1.4, 0 |- Y_tap_xV) -- (-1.4, 0 |- Y_waterfall_3) -- (-0.6, 0 |- Y_waterfall_3);
-    \draw[arr] (-0.6, 0 |- Y_waterfall_3) -- (-0.6, 0 |- l_gated.north);
-    \node[anchor=south, inner sep=2pt, font=\tiny\bfseries] at (-0.6, 0 |- l_gated.north) {$x_V^+$};
-
-    % b) V_theta^+ (Mittlere Linie)
-    \draw[arr] (net_vpp.south) |- (0.0, 0 |- Y_waterfall_1) -- (0.0, 0 |- l_gated.north);
-    \node[anchor=south, inner sep=2pt, font=\tiny\bfseries] at (0.0, 0 |- l_gated.north) {$V_\theta^+$};
-
-    % c) V_theta für Gated (Obere Linie)
-    \draw[arr] (net_v_rho.south) |- (0.6, 0 |- Y_waterfall_2) -- (0.6, 0 |- l_gated.north);
-    \node[anchor=south, inner sep=2pt, font=\tiny\bfseries] at (0.6, 0 |- l_gated.north) {$V_\theta$};
-
-    % Restliche Loss-Routings (Symmetrisch ausbalanciert)
-    \draw[arr] (net_v_roa.south) -- (2.5, 0 |- l_roa.north);
-    \node[anchor=south, inner sep=2pt, font=\tiny\bfseries] at (2.5, 0 |- l_roa.north) {$V_\theta$};
-
-    \draw[arr] (in_lirpa.south) -- (4.8, 0 |- l_lirpa.north);
-
-    \draw[arr] (net_v_V.south) |- (6.6, 0 |- Y_waterfall_2) -- (6.6, 0 |- l_v.north);
-    \node[anchor=south, inner sep=2pt, font=\tiny\bfseries] at (6.6, 0 |- l_v.north) {$V_\theta$};
-    \draw[arr] (in_lv0.south) |- (7.4, 0 |- Y_waterfall_3) -- (7.4, 0 |- l_v.north);
-    \node[anchor=south, inner sep=2pt, font=\tiny\bfseries] at (7.4, 0 |- l_v.north) {$\ell_{V,0}$};
-
-    \draw[arr] (net_pi_V.south) |- (9.0, 0 |- Y_waterfall_2) -- (9.0, 0 |- l_spi.north);
-    \node[anchor=south, inner sep=2pt, font=\tiny\bfseries] at (9.0, 0 |- l_spi.north) {$\pi_V$};
-    \draw[arr] (net_pi.south) |- (9.8, 0 |- Y_waterfall_3) -- (9.8, 0 |- l_spi.north);
-    \node[anchor=south, inner sep=2pt, font=\tiny\bfseries] at (9.8, 0 |- l_spi.north) {$\pi$};
-
-    \draw[arr] (in_r.south) |- (11.4, 0 |- Y_waterfall_2) -- (11.4, 0 |- l_r.north);
-    \draw[arr] (in_lr0.south) |- (12.2, 0 |- Y_waterfall_3) -- (12.2, 0 |- l_r.north);
-
-    % ==========================================
-    % 6. GEWICHTE & SUMMEN-BUS
-    % ==========================================
-    \node[weight] (w_gated) at ( 0.0, 0 |- Y_weight) {$\omega_{\rho\text{-gated}}$};
-    \node[weight] (w_roa)   at ( 2.5, 0 |- Y_weight) {$\omega_{\text{ROA}}$};
-    \node[weight] (w_lirpa) at ( 4.8, 0 |- Y_weight) {$\omega_{\text{L}}$};
-    \node[weight] (w_v)     at ( 7.0, 0 |- Y_weight) {$\omega_V$};
-    \node[weight] (w_spi)   at ( 9.4, 0 |- Y_weight) {$\omega_{S\pi}$};
-    \node[weight] (w_r)     at (11.8, 0 |- Y_weight) {$\omega_R$};
-
-    \draw[arr] (l_gated.south) -- (w_gated.north);
-    \draw[arr] (l_roa.south) -- (w_roa.north);
-    \draw[arr] (l_lirpa.south) -- (w_lirpa.north);
-    \draw[arr] (l_v.south) -- (w_v.north);
-    \draw[arr] (l_spi.south) -- (w_spi.north);
-    \draw[arr] (l_r.south) -- (w_r.north);
-
-    % Zentraler Summen-Bus (Endet passgenau am letzten Gewicht)
-    \draw[bus] (0.0, 0 |- Y_sum_bus) -- (11.8, 0 |- Y_sum_bus);
-    
-    \foreach \x in {0.0, 2.5, 4.8, 7.0, 9.4, 11.8} {
-        \draw[bus] (\x, 0 |- w_gated.south) -- (\x, 0 |- Y_sum_bus);
-    }
-
-    \node[sum] (sum) at (5.9, 0 |- Y_sum) {$+$}; 
-    \draw[arr] (5.9, 0 |- Y_sum_bus) -- (sum.north);
-
-    % ==========================================
-    % 7. TOTAL LOSS
-    % ==========================================
-    \node[totalloss] (l_total) at (5.9, 0 |- Y_total) {$\mathcal{L}_{\text{total}}$\\[2pt] \tiny \eqref{eq:combined-loss}};
-    \draw[arr, ultra thick] (sum.south) -- (l_total.north);
+    % Outer Loop: Führt weiter nach unten und außen herum zurück zu start_outer
+    \draw[arr] (0, -6.3) -- (0, -7.1);
+    \draw[looparr, rounded corners=3pt] (0, -7.1) -- (5.5, -7.1) -- (5.5, 0.4) -- (start_outer.east);
+    \node[fill=white, draw=dark!25, rounded corners=2pt, font=\tiny\bfseries, text=dark, inner sep=1pt] at (5.5, -3.3) {\rotatebox{90}{Outer Loop ($N$ epochs)}};
 
 \end{tikzpicture}

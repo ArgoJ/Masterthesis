@@ -30,7 +30,7 @@ Consider the discrete-time closed-loop system under a state-feedback control pol
 $\pi: \mathcal{X} \to \mathcal{U}$ with the origin $x = \mathbf{0}$ as an equilibrium point, 
 satisfying $\pi(\mathbf{0}) = \mathbf{0}$ and $f(\mathbf{0}, \mathbf{0}) = \mathbf{0}$.
 Assuming the state constraint set $\mathcal{X}$ is positively invariant under $\pi$, 
-the origin is \textit{Lyapunov stable} in $\mathcal{X}$ if there exists a positive definite function 
+the origin is Lyapunov stable in $\mathcal{X}$ if there exists a positive definite function 
 $V: \mathcal{X} \to \mathbb{R}_{\ge 0}$ satisfying \citeThm{2.13}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:lyapunov-stability}
@@ -46,6 +46,6 @@ If the decrease condition holds strictly along closed-loop trajectories,
     \label{eq:asymptotic-lyapunov-stability}
     V(f(x, \pi(x))) - V(x) < 0 \qquad \forall x \in \mathcal{X} \setminus \{\mathbf{0}\},
 \end{equation}
-the origin is \textit{locally asymptotically stable}, guaranteeing trajectory
+the origin is locally asymptotically stable, guaranteeing trajectory
 convergence to the origin for all initial states $x_0$ in a sufficiently small
 neighborhood of the origin \citeThm{2.13}{rawlingsModelPredictiveControl2020}.

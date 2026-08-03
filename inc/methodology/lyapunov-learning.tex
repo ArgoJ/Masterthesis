@@ -164,14 +164,14 @@ causing the loss to decrease.
 
 
 \paragraph{LIRPA-Condition Loss} makes the Lyapunov function more verifier-friendly 
-by including formal violations of the Lyapunov decrease condition as defined in \eqref{eq:lyapunov-decrease}, 
-which are identified using the LIRPA framework \cite{xuFastCompleteEnabling2021}.
+by penalizing formal violations of the Lyapunov decrease condition as defined in \eqref{eq:lyapunov-decrease}. 
+These violations are identified using the LIRPA framework \cite{xuFastCompleteEnabling2021}.
 To reduce the computational cost during training, LIRPA is applied only to a 
-heuristic subset of regions. A cell is selected when its center 
-$x_{\mathrm{center}}$, lower bound $x_{\mathrm{lower}}$, or 
-upper bound $x_{\mathrm{upper}}$ lies in $\mathcal{V}_\rho$.
-LIRPA then provides a formal lower bound $e_{V,\mathrm{lower}}$ on the 
-signed Lyapunov decrease $-e_V$ for each selected region. 
+heuristic subset of regions. Specifically, a hyper-rectangular cell is selected 
+if at least one of its $2^{n_x}$ corners, or optionally its center point $x_{\mathrm{center}}$, 
+lies within the sublevel set $\mathcal{V}_\rho$ (i.e., $\min(V(x)) \leq \rho$ evaluated over these points).
+For each selected region, LIRPA then provides a formal lower bound $e_{V,\mathrm{lower}}$ on the 
+signed Lyapunov decrease $-e_V$. 
 After evaluation, the LIRPA-condition violation for each region is computed as
 \begin{equation}
     \label{eq:relative-lirpa-condition}
@@ -201,11 +201,18 @@ Finally, the LIRPA-condition loss over $N_{\mathrm{L}}$ regions is computed as
     }.
 \end{equation}
 
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/methods/lirpa_region_selection.tex}
+    \caption[Lirpa region selection]{Lirpa regions selection with $\mathcal{V}_\rho$.}
+    \label{fig:lirpa-regions}
+\end{figure}
+
 
 \paragraph{Lyapunov Scaling Loss} prevents numerical collapse to zero 
 by penalizing deviations from the initial average magnitude over a 
 quasi-Monte Carlo batch $\mathcal{B}_V \subset \mathcal{X}_V$, 
-sampled via a low-discrepancy Sobol sequence \cite{sobol}, as illustrated in \cref{fig:sobol-sampling}.
+sampled via a low-discrepancy Sobol sequence \cite{joeConstructingSobolSequences2008}, as illustrated in \cref{fig:sobol-sampling}.
 The logarithm of the mean Lyapunov value over this batch is defined as
 \begin{equation}
     \label{eq:mean-lyapunov-log}
@@ -224,7 +231,7 @@ with a specified probability at each optimization step.
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/box_sobol_sampling.tex}
-    \caption[Sobol iequence illustration]{Comparisson of Sobol and uniform sampling in two dimensions.}
+    \caption[Sobol sequence illustration]{Comparisson of Sobol and uniform sampling in two dimensions.}
     \label{fig:sobol-sampling}
 \end{figure}
 
@@ -232,7 +239,7 @@ with a specified probability at each optimization step.
 \paragraph{Policy Scaling Loss} encourages the learned policy $\pi_V$ to remain close 
 to the output of the original imitation controller $\pi$, which is based on the MPC teacher. 
 A quasi-Monte Carlo batch $\mathcal{B}_{S\pi} \subset \mathcal{X}_V$ is sampled using a 
-low-discrepancy Sobol sequence \cite{sobol}. 
+low-discrepancy Sobol sequence \cite{joeConstructingSobolSequences2008}. 
 To prevent overfitting to a static set of states, this batch also is resampled from $\mathcal{X}_V$ 
 after a specified number of optimization steps. 
 The normalized deviation between the learned policy and the imitation controller over this batch is formulated as
