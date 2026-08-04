@@ -52,8 +52,9 @@ meaning that any trajectory originating in $\mathcal{X}_f$ remains inside the se
 time steps while respecting input constraints \citeDef{2.9}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:positive-invariance}
-    f(x, \pi(x)) \in \mathcal{X}_f \quad \text{and} \quad \pi(x) \in \mathcal{U}, \qquad \forall x \in \mathcal{X}_f.
+    f(x, \pi(x)) \in \mathcal{X}_f \quad \text{and} \quad \pi_f(x) \in \mathcal{U}, \qquad \forall x \in \mathcal{X}_f.
 \end{equation}
+\todo[inline]{add contraction: $V_f(f(x,\pi_f(x))) - V_f(x) \leq -ell(x,\pi_f(x))$}
 
 The predictive mechanism is illustrated in \cref{fig:terminal-set-comparison}. 
 While the intermediate states $x_0, \dots, x_{N-1}$ are merely constrained to the 
@@ -107,9 +108,10 @@ linearization errors of the nonlinear dynamics.
 \end{figure}
 
 
-\subsection{Closed-Loop Stability}
+\subsection{Recursive Feasibility and Closed-Loop Stability}
 \label{subsec:closed-loop-stability}
 
+\todo[inline]{more detail on recursive feasibility, smoother transition to closed loop stability.}
 Under the MPC policy $\pi_0(x_k) := u_0^*(x_k)$, 
 the optimal value function $V_N^*(x_k)$ of \eqref{eq:mpc-problem} serves as a Lyapunov candidate 
 over the feasible set $\mathcal{X}_N \subseteq \mathcal{X}$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}. 

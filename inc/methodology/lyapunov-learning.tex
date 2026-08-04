@@ -364,7 +364,7 @@ However, since the boundary is a high-dimensional surface and the neural network
 forms a highly non-convex landscape, simple uniform sampling on the boundary is insufficient to find the true minimum. 
 Therefore, a Projected Gradient Descent (PGD) approach is employed to actively search for the worst-case boundary points. 
 Starting from uniformly sampled points $\mathcal{B}_{\partial} \sim \mathcal{U}(\partial \mathcal{X}_V)$, 
-visualized in \cref{fig:boundary-sampling}, PGD iteratively minimizes $V_\theta(x)$ by taking steps along 
+PGD iteratively minimizes $V_\theta(x)$ by taking steps along 
 the negative gradient and projecting the updated states strictly back onto the boundary surfaces.
 To actively encourage the region of attraction to expand over the course of the co-training process, 
 the formally certifiable limit is intentionally overestimated, as suggested in \cite{yangLyapunovstableNeuralControl2024}.
@@ -375,13 +375,6 @@ Specifically, a target $\rho$ is computed by applying a growth factor $\gamma > 
         \rho_{\text{min}}, \gamma \cdot \min_{x \in \mathcal{B}_{\partial}} V_\theta(x) 
     \right).
 \end{equation}
-
-\begin{figure}[htbp]
-    \centering
-    \input{tikz/methods/box_boundary_sampling.tex}
-    \caption[Boundary Sampling]{Visualization for boundary sampling of a 2 dimensional example.}
-    \label{fig:boundary-sampling}
-\end{figure}
 
 By targeting a value for $\tilde{\rho}$ that is slightly above the currently safe maximum, the formulation deliberately 
 leads to small violations near the boundary. These violations are then captured by the aforementioned 
