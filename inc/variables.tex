@@ -107,7 +107,6 @@ $\rho$ & Target Lyapunov sublevel value \\
 $\mathcal{V}_\rho$ & Certified sublevel set \\
 $\mathcal{X}_V$ & Lyapunov training domain \\
 $\rho_{\min}$ & Minimum sublevel target bound \\
-$\pi_V(x)$ & Co-trained policy \\
 $e_V$ & Lyapunov decrease violation \\
 $\kappa$ & Target decrease rate \\
 $\varepsilon_{\text{rel}}$ & Numerical stabilization constant \\
@@ -118,19 +117,22 @@ $\loss_{\text{cond}}$ & Combined condition violation loss \\
 $w_\rho$ & Soft sublevel gating weight \\
 $s$ & Gate sharpness parameter \\
 $\loss_{\rho\text{-gated}}$ & Soft-gated condition loss \\
-$\mathcal{B}_{\text{ROA}}$ & Shell sample set \\
+$\mathcal{B}_{\partial}$ & Boundary candidate sample set \\
+$\mathcal{B}_{\mathrm{ROA}}$ & ROA shell sample set \\
 $\xi$ & Inner boundary shell factor \\
 $\loss_{\text{ROA}}$ & Region of Attraction expansion loss \\
 $e_{V,\text{lower}}$ & Signed Lyapunov decrease lower bound \\
 $\mathcal{M}_{\text{L}}$ & Region LIRPA condition violation \\
 $w_{\text{L}}$ & LIRPA region weight \\
 $\alpha_{\text{L}}$ & LIRPA weight decay rate \\
-$N_{\text{L}}$ & Region count \\
+$N_{\text{L}}$ & LIRPA region count \\
 $\loss_{\text{L}}$ & LIRPA loss \\
+$\mathcal{B}_V$ & Lyapunov scaling Sobol sample batch \\
 $\ell_V$ & Mean Lyapunov log-value \\
 $\ell_{V,0}$ & Initial mean Lyapunov log-value \\
 $\loss_V$ & Lyapunov magnitude scaling loss \\
-$\loss_\pi$ & Policy scaling loss \\
+$\mathcal{B}_{\mathrm{pol}}$ & Policy scaling Sobol sample batch \\
+$\loss_{\mathrm{pol}}$ & Policy scaling loss \\
 $\ell_{R,0}$ & Initial matrix $R$ Frobenius norm \\
 $\loss_R$ & Matrix $R$ regularization loss \\
 $\loss_{\text{total}}$ & Total combined Lyapunov loss \\
@@ -138,10 +140,12 @@ $\omega_{\text{cond}}$ & Soft-gated condition loss weight \\
 $\omega_{\text{ROA}}$ & Region of Attraction expansion loss weight \\
 $\omega_{\text{L}}$ & LIRPA loss weight \\
 $\omega_V$ & Lyapunov magnitude scaling loss weight \\
-$\omega_{S\pi}$ & Policy scaling loss weight \\
+$\omega_{\mathrm{pol}}$ & Policy scaling loss weight \\
 $\omega_R$ & Matrix $R$ regularization loss weight \\
 $\mathcal{C}$ & Counterexample pool \\
 $\mathcal{S}$ & Explorative pool \\
+$\mathcal{B}_{\mathcal{S}}$ & Explorative pool candidate sample set \\
+$N_{\mathcal{S}}$ & Explorative pool target size \\
 $x_{\text{adv}}$ & Counterexample state \\
 $J_{\text{PGD}}$ & PGD objective \\
 $\tau$ & Counterexample age \\
@@ -150,6 +154,9 @@ $m$ & Sublevel margin \\
 $\gamma$ & Overestimation factor \\
 $\tilde{\rho}$ & Estimated ROA boundary minimum \\
 $\beta$ & EMA decay rate \\
+$N_{\mathrm{outer}}$ & Outer epoch count \\
+$K_{\mathrm{steps}}$ & Inner mini-batch optimization steps per epoch \\
+$N_{\mathrm{cex}}$ & Counterexample mining step interval \\
 \midrule
 
 % --- Formal Verification ---

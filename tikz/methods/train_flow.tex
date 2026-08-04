@@ -1,0 +1,470 @@
+\begin{tikzpicture}[
+    >=Latex,
+    font=\scriptsize,
+    process/.style={
+        draw=navy,
+        fill=white,
+        thick,
+        rounded corners=3pt,
+        minimum width=\wmain cm,
+        minimum height=7mm,
+        align=center,
+        text=navy,
+        font=\scriptsize\bfseries
+    },
+    loss/.style={
+        process,
+        draw=purple,
+        text=purple!90!black,
+        minimum height=11mm
+    },
+    % Dynamic / Mutable Sets (veränderlich, modellabhängig): Amber Theme
+    dynamicset/.style={
+        draw=amber!90!black,
+        fill=amber!14,
+        thick,
+        rounded corners=3pt,
+        minimum width=\wside cm,
+        minimum height=7.5mm,
+        align=center,
+        font=\tiny\bfseries,
+        text=dark
+    },
+    % Static / Domain Sets (unveränderlich, feste Samplings): Purple Theme
+    staticset/.style={
+        draw=purple!85!black,
+        fill=purple!8,
+        thick,
+        rounded corners=3pt,
+        minimum width=\wside cm,
+        minimum height=7.5mm,
+        align=center,
+        font=\tiny\bfseries,
+        text=purple!90!black
+    },
+    mainarrow/.style={-Latex,thick,draw=navy},
+    dataarrow/.style={-Latex,semithick,rounded corners=5pt,draw=#1},
+    dataarrow/.default=teal,
+    looparrow/.style={-Latex,semithick,dashed,rounded corners=6pt,draw=#1},
+    looparrow/.default=navy!80,
+    tap/.style={
+        circle,
+        fill=teal,
+        draw=teal,
+        inner sep=0pt,
+        minimum size=3.4pt
+    },
+    entry/.style={
+        circle,
+        fill=white,
+        draw=#1,
+        thick,
+        minimum size=4.5pt,
+        inner sep=0pt
+    },
+    scopelabel/.style 2 args={
+        at={($(#1.north west)+(0.15,-0.2)$)},
+        anchor=west,
+        fill=#2!6,
+        text=#2!90!black,
+        font=\tiny\bfseries,
+        inner sep=1.5pt
+    },
+    scopebox/.style={
+        dashed,
+        thick,
+        rounded corners=6pt,
+        draw=#1!80!black,
+        fill=#1!5
+    },
+    scopebox/.default=navy
+]
+
+    \tikzset{
+        at x mid/.style n args={3}{
+            at={($ (#1 |- #2)!0.5!(#2) $)},
+            yshift=#3
+        }
+    }
+        % =====================================================================
+    % 1. STATIC LAYOUT & NODE DIMENSION PARAMETERS
+    % =====================================================================
+
+    % Dynamically fetch current text width in cm
+    \pgfmathsetmacro{\targetwidth}{\linewidth/1cm}
+
+    % Node widths & channel gaps (scaled relative to \linewidth)
+    \pgfmathsetmacro{\wmain}{0.29 * \targetwidth}
+    \pgfmathsetmacro{\wside}{0.18 * \targetwidth}
+    \pgfmathsetmacro{\gapmainside}{0.07 * \targetwidth}
+
+    % Node column X-coordinates (dynamically calculated)
+    \def\xmain{0.0}
+    \pgfmathsetmacro{\xleft}{\xmain - (\wmain/2) - \gapmainside - (\wside/2)}
+    \pgfmathsetmacro{\xright}{\xmain + (\wmain/2) + \gapmainside + (\wside/2)}
+
+    % Reserved routing channel for Rho (centered between main and left column)
+    \pgfmathsetmacro{\xrho}{\xmain - (\wmain/2) - (\gapmainside/2)}
+
+    % Dynamic Row Distances
+    \def\outerdist{1.50}
+    \def\innerdist{1.60}
+    \def\gapouterinner{3.00}
+
+    % Main rows (calculated dynamically)
+    \def\ymain{0.00}
+    \pgfmathsetmacro{\yrho}{\ymain - \outerdist}
+    \pgfmathsetmacro{\yroabatch}{\yrho - \outerdist}
+    \pgfmathsetmacro{\ymining}{\yroabatch - \outerdist}
+    \pgfmathsetmacro{\yresample}{\ymining - \outerdist}
+    \pgfmathsetmacro{\ybatch}{\yresample - \gapouterinner}
+    \pgfmathsetmacro{\yloss}{\ybatch - \innerdist}
+    \pgfmathsetmacro{\yoptim}{\yloss - \innerdist}
+
+    % Dynamic replay-buffer frame anchors (wrapping counterexample_pool & explorative_pool)
+    \pgfmathsetmacro{\cegisleft}{\xright - (\wside/2) - 0.15}
+    \pgfmathsetmacro{\cegisright}{\xright + (\wside/2) + 0.15}
+    \pgfmathsetmacro{\cegistop}{\ymining + \outerdist/2}
+    \pgfmathsetmacro{\cegisbottom}{\yresample - \outerdist/2}
+
+    % Reserved routing channel for ROA batch (running RIGHT of the batch strand / cegis box)
+    \pgfmathsetmacro{\xbatchroute}{\cegisright + 0.35}
+
+    % Dynamic inner-loop frame anchors (derived from node bounds & ROA route)
+    \pgfmathsetmacro{\innerleft}{\xleft - (\wside/2) - 0.20}
+    \pgfmathsetmacro{\innerright}{\xbatchroute + 0.35}
+    \pgfmathsetmacro{\innertop}{(\yresample + \ybatch)/2}
+    \pgfmathsetmacro{\innerbottom}{\yoptim - \innerdist/2}
+
+    % =====================================================================
+    % 2. DYNAMIC PADDING & LOOP SPACING
+    % =====================================================================
+    
+    \def\loopgap{0.30} 
+    \def\railpad{0.35} 
+    \def\outerpad{0.35}
+
+    % --- Automatische Berechnungen (Rechte Seite) ---
+    \pgfmathsetmacro{\xinnerloop}{\innerright + \railpad}
+    \pgfmathsetmacro{\outerright}{\xinnerloop + \outerpad}
+    \pgfmathsetmacro{\xouterloop}{\outerright + \railpad}
+
+    % --- Automatische Berechnungen (Linke Seite & Unten) ---
+    \pgfmathsetmacro{\outerleft}{\innerleft - \outerpad}
+    \pgfmathsetmacro{\outerbottom}{\innerbottom - \loopgap - \outerpad}
+    \pgfmathsetmacro{\outertop}{\ymain + 0.70}
+
+    \begin{scope}[on background layer]
+
+        % Outer frame
+        \node[
+            scopebox=navy,
+            minimum width=\dimexpr\outerright cm-\outerleft cm\relax,
+            minimum height=\dimexpr\outertop cm-\outerbottom cm\relax
+        ] (outer_box) at (
+            {(\outerleft+\outerright)/2},
+            {(\outertop+\outerbottom)/2}
+        ) {};
+
+        % Inner frame
+        \node[
+            scopebox=teal,
+            minimum width=\dimexpr\innerright cm-\innerleft cm\relax,
+            minimum height=\dimexpr\innertop cm-\innerbottom cm\relax
+        ] (inner_box) at (
+            {(\innerleft+\innerright)/2},
+            {(\innertop+\innerbottom)/2}
+        ) {};
+
+        % Replay-buffer frame
+        \node[
+            scopebox=amber,
+            minimum width=\dimexpr\cegisright cm-\cegisleft cm\relax,
+            minimum height=\dimexpr\cegistop cm-\cegisbottom cm\relax
+        ] (cegis_box) at (
+            {(\cegisleft+\cegisright)/2},
+            {(\cegistop+\cegisbottom)/2}
+        ) {};
+
+    \end{scope}
+
+    \node[scopelabel={outer_box}{navy}] {Outer loop};
+    \node[scopelabel={inner_box}{teal}] {Inner loop};
+    \node[scopelabel={cegis_box}{amber}] {Adversarial replay buffer};
+
+    % =====================================================================
+    % MAIN PIPELINE
+    % =====================================================================
+
+    \node[process] (boundary_sampling)
+    at (\xmain,\ymain)
+    {Sample boundary batch $\mathcal{B}_\partial$};
+
+    \node[process] (rho_estimation)
+    at (\xmain,\yrho)
+    {Estimate $\rho$};
+    
+    \node[process] (roa_sampling)
+    at (\xmain,\yroabatch)
+    {Sample ROA shell batch $\mathcal{B}_{\mathrm{ROA}}$};
+
+    \node[process] (mining)
+    at (\xmain,\ymining)
+    {Adversarial mining\\[-1pt]
+    {\tiny\color{navy!75!black}\itshape (every $N_{\mathrm{cex}}$ epochs)}};
+
+    \node[process] (resampling)
+    at (\xmain,\yresample)
+    {Resample explorative pool $\mathcal{S}$};
+
+    \node[process] (batch)
+    at (\xmain,\ybatch)
+    {Draw mini-batch $\mathcal{B}_\rho$};
+
+    \node[loss] (loss_node)
+    at (\xmain,\yloss)
+    {Compute $\mathcal{L}_{\mathrm{total}}$};
+
+    \node[process] (optim)
+    at (\xmain,\yoptim)
+    {Update parameters $\theta$};
+
+    \draw[mainarrow] (boundary_sampling) -- (rho_estimation);
+    \draw[mainarrow] (rho_estimation) -- (roa_sampling);
+    \draw[mainarrow] (roa_sampling) -- (mining);
+    \draw[mainarrow] (mining) -- (resampling);
+    \draw[mainarrow] (resampling) -- (batch);
+    \draw[mainarrow] (batch) -- (loss_node);
+    \draw[mainarrow] (loss_node) -- (optim);
+
+    % =====================================================================
+    % SETS AND BUFFERS (COLOR-CODED: Purple = Static, Amber/Teal = Dynamic)
+    % =====================================================================
+
+    % Left Column (Static vs Dynamic)
+    \node[staticset] (region_builder)
+    at (\xleft,\ymain)
+    {LiRPA region builder\\[-1pt]
+    (static hyperboxes)};
+
+    \node[staticset] (region_filter)
+    at (\xleft,\yresample)
+    {Select active regions\\[-1pt]
+    ($\min V_\theta \leq \rho$)};
+
+    % Right Column (Static vs Dynamic 1-to-1 alignment)
+    \node[staticset] (boundary_batch)
+    at (\xright,\ymain)
+    {Boundary candidate batch\\[-1pt]
+    $\mathcal{B}_{\partial}$};
+
+    \node[dynamicset] (counterexample_pool)
+    at (\xright,\ymining)
+    {Counterexample pool $\mathcal{C}$\\[-1pt]
+    {(PGD violations / periodic)}};
+
+    \node[dynamicset] (explorative_pool)
+    at (\xright,\yresample)
+    {Explorative pool $\mathcal{S}$\\[-1pt]
+    ($\rho$-sublevel samples)};
+
+    \node[staticset] (roa_shell)
+    at (\xright,\yroabatch)
+    {ROA shell batch\\[-1pt]
+    $\mathcal{B}_{\mathrm{ROA}}$};
+
+    % Outer-Loop Straight Connections (Zero Crossing Lines!)
+    \draw[dataarrow=purple] (boundary_sampling.east) -- (boundary_batch.west);
+    \node[
+        font=\tiny,
+        text=purple!90!black,
+        anchor=south,
+        at x mid={boundary_sampling.east}{boundary_batch.west}{0.05cm}
+    ] {$\mathcal{B}_{\partial}$};
+
+    \draw[dataarrow=amber!90!black] (mining.east) -- (counterexample_pool.west);
+    \node[
+        font=\tiny,
+        text=amber!90!black,
+        anchor=south,
+        at x mid={mining.east}{counterexample_pool.west}{0.05cm}
+    ] {$x_{\mathrm{adv}}$};
+
+    \draw[dataarrow=amber!90!black] (resampling.east) -- (explorative_pool.west);
+    \node[
+        font=\tiny,
+        text=amber!90!black,
+        anchor=south,
+        at x mid={resampling.east}{explorative_pool.west}{0.05cm}
+    ] {$\mathcal{S}$};
+
+    \draw[dataarrow=purple] (roa_sampling.east) -- (roa_shell.west);
+    \node[
+        font=\tiny,
+        text=purple!90!black,
+        anchor=south,
+        at x mid={roa_sampling.east}{roa_shell.west}{0.05cm}
+    ] {$\mathcal{B}_{\mathrm{ROA}}$};
+
+    \draw[dataarrow=purple] (region_builder.south) -- (region_filter.north);
+
+    % =====================================================================
+    % RHO DISTRIBUTION RAIL
+    % =====================================================================
+
+    \coordinate (rho_top) at (\xrho,\yrho);
+    \coordinate (rho_mid) at (\xrho,\ymining);
+    \coordinate (rho_low) at (\xrho,\yresample);
+
+    \draw[semithick, draw=teal, rounded corners=6pt] 
+        (rho_estimation.west) -- (rho_top) -- (rho_low);
+
+    \node[
+        anchor=south,
+        font=\tiny\bfseries,
+        text=teal,
+        inner sep=1pt
+    ] at ($(rho_top)+(0,0.02)$)
+    {$\rho$};
+
+    \node[tap] at (rho_mid) {};
+    \node[tap] (rho_low_tap) at (rho_low) {};
+
+    \draw[dataarrow=teal] (rho_mid) -- (mining.west);
+    \draw[dataarrow=teal] (rho_low_tap) -- (resampling.west);
+    \draw[dataarrow=teal] (rho_low_tap) -- (region_filter.east);
+
+    % =====================================================================
+    % ROUTING FROM OUTER SETS/BUFFERS TO INNER LOOP
+    % =====================================================================
+
+    % Replay Buffer (Dynamic) -> Step 5 Mini-Batch
+    \coordinate (batch_entry) at ($(batch.east)+(0.08,0)$);
+
+    \draw[dataarrow=amber!90!black]
+    (cegis_box.south)
+    |- (batch_entry);
+
+    \node[
+        font=\tiny\bfseries,
+        text=amber!90!black,
+        inner sep=1.2pt,
+        anchor=south,
+        at x mid={cegis_box.south}{batch_entry}{0.05cm}
+    ] {$\mathcal{S}\cup\mathcal{C}$};
+
+    % ROA Shell Batch (Static) -> Step 6 Loss Computation
+    \coordinate (loss_entry_east) at ($(loss_node.east)+(0,0)$);
+    \coordinate (roa_route_top) at (\xbatchroute, \yroabatch);
+    \coordinate (roa_route_corner) at (\xbatchroute, \yloss);
+
+    \draw[dataarrow=purple]
+    (roa_shell.east)
+    -- (roa_route_top)
+    -- (roa_route_corner)
+    -- (loss_entry_east);
+
+    \node[
+        font=\tiny,
+        text=purple,
+        inner sep=1.2pt,
+        anchor=south,
+        at x mid={loss_entry_east}{roa_route_corner}{0.05cm}
+    ] {$\mathcal{B}_{\mathrm{ROA}}$};
+
+    % =====================================================================
+    % LIRPA AND SOBOL INPUTS TO LOSS
+    % =====================================================================
+
+    \coordinate (lirpa_entry) at ($(loss_node.west)+(0,0.3)$);
+    \coordinate (sobol_entry) at ($(loss_node.west)+(0,-0.3)$);
+
+    \node[staticset, anchor=north] (sobol)
+    at ($ (\xleft, 0 |- sobol_entry) + (0, -\railpad) $)
+    {Sobol sample batches\\[-1pt]
+    $\mathcal{B}_{V},\,\mathcal{B}_{\mathrm{pol}}$\\[1.5pt]
+    {\tiny\color{purple!85!black}\itshape (stochastic / periodic)}};
+
+    \draw[dataarrow=purple]
+    (region_filter.south)
+    |- (lirpa_entry);
+
+    \node[
+        font=\tiny,
+        text=purple,
+        inner sep=1pt,
+        anchor=south,
+        at x mid={region_filter.south}{lirpa_entry}{0.05cm}
+    ] {active regions};
+
+    \draw[dataarrow=purple] (sobol.north) |- (sobol_entry);
+
+    \node[
+        font=\tiny,
+        text=purple,
+        inner sep=1pt,
+        anchor=south,
+        at x mid={sobol.north}{sobol_entry}{0.05cm}
+    ] {$\mathcal{B}_{V},\,\mathcal{B}_{\mathrm{pol}}$};
+
+    % =====================================================================
+    % LOOPBACKS (DYNAMIC)
+    % =====================================================================
+
+    % Inner loop:
+    \coordinate (inner_box_south) at (\xmain, \innerbottom);
+    \coordinate (inner_box_north) at (\xmain, \innertop);
+
+    \coordinate (inner_return_start) at (\xmain, {(\innerbottom-\loopgap)});
+    \coordinate (inner_return_bottom) at (\xinnerloop, {(\innerbottom-\loopgap)});
+    \coordinate (inner_return_top) at (\xinnerloop, {(\innertop+\loopgap)});
+    \coordinate (inner_return_end) at (\xmain, {(\innertop+\loopgap)});
+
+    \draw[looparrow=teal!85]
+        (inner_box_south)
+        -- (inner_return_start)
+        -- (inner_return_bottom)
+        -- (inner_return_top)
+        -- (inner_return_end)
+        -- (batch.north);
+
+    \node[
+        fill=white,
+        draw=teal!55,
+        rounded corners=2pt,
+        text=teal!90!black,
+        font=\tiny\bfseries,
+        inner sep=1.4pt,
+        rotate=90
+    ] at (\xinnerloop,\yloss)
+    {repeat $K_{\mathrm{steps}}$};
+
+    % Outer loop:
+    \coordinate (outer_box_south) at (\xmain, \outerbottom);
+    \coordinate (outer_box_north) at (\xmain, \outertop);
+
+    \coordinate (outer_return_start) at (\xmain, {(\outerbottom-\loopgap)});
+    \coordinate (outer_return_bottom) at (\xouterloop, {(\outerbottom-\loopgap)});
+    \coordinate (outer_return_top) at (\xouterloop, {(\outertop+\loopgap)});
+    \coordinate (outer_return_end) at (\xmain, {(\outertop+\loopgap)});
+
+    \draw[looparrow=navy!80]
+        (outer_box_south)
+        -- (outer_return_start)
+        -- (outer_return_bottom)
+        -- (outer_return_top)
+        -- (outer_return_end)
+        -- (boundary_sampling.north);
+
+    \node[
+        fill=white,
+        draw=navy!45,
+        rounded corners=2pt,
+        text=navy,
+        font=\tiny\bfseries,
+        inner sep=1.4pt,
+        rotate=90
+    ] at (\xouterloop, {(\innertop + \innerbottom)/2})
+    {repeat $N_{\mathrm{outer}}$ epochs};
+
+\end{tikzpicture}

@@ -238,17 +238,17 @@ with a specified probability at each optimization step.
 
 \paragraph{Policy Scaling Loss} encourages the learned policy $\pi_V$ to remain close 
 to the output of the original imitation controller $\pi$, which is based on the MPC teacher. 
-A quasi-Monte Carlo batch $\mathcal{B}_{S\pi} \subset \mathcal{X}_V$ is sampled using a 
+A quasi-Monte Carlo batch $\mathcal{B}_{\mathrm{pol}} \subset \mathcal{X}_V$ is sampled using a 
 low-discrepancy Sobol sequence \cite{joeConstructingSobolSequences2008}. 
 To prevent overfitting to a static set of states, this batch also is resampled from $\mathcal{X}_V$ 
 after a specified number of optimization steps. 
 The normalized deviation between the learned policy and the imitation controller over this batch is formulated as
 \begin{equation}
     \label{eq:policy-scaling-loss}
-    \loss_{S\pi} = \frac{
-        \sum_{x \in \mathcal{B}_{S\pi}} \lVert \pi_V(x) - \pi(x) \rVert_2^2
+    \loss_{\mathrm{pol}} = \frac{
+        \sum_{x \in \mathcal{B}_{\mathrm{pol}}} \lVert \pi_V(x) - \pi(x) \rVert_2^2
     }{
-        \sum_{x \in \mathcal{B}_{S\pi}} \lVert \pi(x) \rVert_2^2
+        \sum_{x \in \mathcal{B}_{\mathrm{pol}}} \lVert \pi(x) \rVert_2^2
     }
 \end{equation}
 
@@ -270,16 +270,10 @@ summing all previously defined weighted components, given by
     \loss_{\text{total}} = \sum_{m}
         \omega_m \loss_m
 \end{equation}
-where the weights $\omega_m > 0$, with $m \in \{ \rho\text{-gated},\;\text{ROA},\;\text{L},\;V,\;S\pi,\;R \}$ are 
+where the weights $\omega_m > 0$, with $m \in \{ \rho\text{-gated},\;\text{ROA},\;\text{L},\;V,\;\text{pol},\;R \}$ are 
 hyperparameters that balance the relative importance of the individual loss components. 
-The full loss flow is pictured in \cref{fig:loss-flow}
 
-\begin{figure}[htbp]
-    \centering
-    \input{tikz/methods/loss_flow.tex}
-    \caption{Loss flow visualization.}
-    \label{fig:loss-flow}
-\end{figure}
+
 
 \subsection{Falsification-Guided Training}
 \label{subsec:fals-guided-training}
@@ -316,8 +310,8 @@ It maintains two distinct state pools: an explorative pool $\mathcal{S}$ and a c
 
 As outlined in \cref{alg:state-pool-resample}, the explorative state pool $\mathcal{S}$ is repopulated 
 at each outer epoch to balance global exploration with local refinement. 
-First, candidate states $\mathcal{B}_{\text{ROA}}$ are oversampled uniformly from the training domain $\mathcal{X}_V$. 
-From these candidates, $N_{\text{ROA}}$ states are probabilistically sampled based on a sigmoid weighting function 
+First, candidate states $\mathcal{B}_{\mathcal{S}}$ are oversampled uniformly from the training domain $\mathcal{X}_V$. 
+From these candidates, $N_{\mathcal{S}}$ states are probabilistically sampled based on a sigmoid weighting function 
 centered around an expanded sublevel boundary $m \cdot \rho$ (with margin $m > 1$). 
 This weighting smoothly penalizes states further outside the estimated region of attraction, 
 significantly reducing their likelihood of being selected.
@@ -326,19 +320,19 @@ significantly reducing their likelihood of being selected.
     \caption{Probabilistic Explorative State Pool Resampling}
     \label{alg:state-pool-resample}
 
-    \KwIn{Lyapunov function $V_\theta$, current ROA estimate $\rho$, margin $m$, sharpness $s$, target size $N_{\text{ROA}}$}
-    \KwOut{Updated state pool $\mathcal{S}$ of size $N_{\text{ROA}}$}
+    \KwIn{Lyapunov function $V_\theta$, current ROA estimate $\rho$, margin $m$, sharpness $s$, target size $N_{\mathcal{S}}$}
+    \KwOut{Updated state pool $\mathcal{S}$ of size $N_{\mathcal{S}}$}
 
     \BlankLine
-    Generate $4 N_{\text{ROA}}$ candidates: $\mathcal{B}_{\text{ROA}} \sim \mathcal{U}(\mathcal{X}_V)$\;
+    Generate $4 N_{\mathcal{S}}$ candidates: $\mathcal{B}_{\mathcal{S}} \sim \mathcal{U}(\mathcal{X}_V)$\;
 
     \BlankLine
-    For all $x \in \mathcal{B}_{\text{ROA}}$, assign weight $w(x) \leftarrow \sigma \left(
+    For all $x \in \mathcal{B}_{\mathcal{S}}$, assign weight $w(x) \leftarrow \sigma \left(
         s \, \frac{m \cdot \rho - V_\theta(x)}{\max(\rho, 10^{-9})}
     \right) + \varepsilon$\;
 
     \BlankLine
-    $\mathcal{S} \leftarrow$ Sample $N_{\text{ROA}}$ states from $\mathcal{B}_{\text{ROA}}$ with probability $P(x) \propto w(x)$\;
+    $\mathcal{S} \leftarrow$ Sample $N_{\mathcal{S}}$ states from $\mathcal{B}_{\mathcal{S}}$ with probability $P(x) \propto w(x)$\;
 \end{algorithm}
 
 The counterexample pool $\mathcal{C}$ stores the critical violations identified during the PGD falsification step. 
@@ -386,3 +380,12 @@ across different batches, the $\rho$ value actually used for gating is updated u
     \rho = \beta \rho + (1 - \beta) \tilde{\rho},
 \end{equation}
 where $\beta \in [0, 1)$ is the decay rate.
+
+For the ease of simplification, the complete training flow is visualized in \cref{fig:train-flow}.
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/methods/train_flow.tex}
+    \caption{Training flow visualization.}
+    \label{fig:train-flow}
+\end{figure}

@@ -23,16 +23,6 @@
         ultra thick
     ] {max(0, x)};
     \addlegendentry{$[z]_+$}
-    
-    % Leaky ReLU
-    \addplot[
-        domain=-3.5:3.5,
-        samples=100,
-        color=teal,
-        ultra thick,
-        dashed
-    ] {max(0.1*x, x)};
-    \addlegendentry{$[z]_{\alpha=0.1}$}
 
     % Tanh
     \addplot[
