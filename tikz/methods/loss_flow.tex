@@ -1,124 +1,483 @@
 
+
 \begin{tikzpicture}[
+    >=Latex,
     font=\scriptsize,
-    >=Stealth,
-    % --- Main Node Style ---
-    mainnode/.style={
-        draw=navy, 
-        fill=white, 
-        thick, 
-        rounded corners=3pt, 
-        align=center, 
-        text=navy, 
-        minimum width=4.0cm, 
-        minimum height=0.55cm, 
+    process/.style={
+        draw=navy,
+        fill=white,
+        thick,
+        rounded corners=3pt,
+        minimum width=5.25cm,
+        minimum height=7mm,
+        align=center,
+        text=navy,
         font=\scriptsize\bfseries
     },
-    bufferbox/.style={
-        draw=amber, 
-        fill=amber!5, 
-        thick, 
-        dashed, 
-        rounded corners=3pt
+    loss/.style={
+        process,
+        draw=purple,
+        text=purple!90!black,
+        minimum height=11mm
     },
-    buffernode/.style={
-        draw=amber, 
-        fill=amber!15, 
-        thick, 
-        rounded corners=2pt, 
-        align=center, 
-        font=\tiny\bfseries, 
-        text=dark, 
-        minimum width=1.8cm, 
-        minimum height=0.5cm
+    external/.style={
+        draw=#1,
+        fill=#1!8,
+        thick,
+        rounded corners=3pt,
+        minimum width=3.05cm,
+        minimum height=7mm,
+        align=center,
+        font=\tiny\bfseries,
+        text=#1!90!black
     },
-    arr/.style={-Latex, thick, draw=navy},
-    dataarr/.style={-Latex, semithick, draw=teal},
-    looparr/.style={-Latex, semithick, draw=navy!60, dashed},
-    innerlooparr/.style={-Latex, semithick, draw=teal, dashed},
-    outerbg/.style={draw=dark!25, fill=gray, dashed, rounded corners=4pt},
-    innerbg/.style={draw=teal!35, fill=teal!5, dashed, rounded corners=4pt},
-    tap/.style={circle, fill=teal, inner sep=0pt, minimum size=3pt}
+    buffer/.style={
+        draw=amber,
+        fill=amber!13,
+        thick,
+        rounded corners=3pt,
+        minimum width=3.15cm,
+        minimum height=7mm,
+        align=center,
+        font=\tiny\bfseries,
+        text=dark
+    },
+    mainarrow/.style={-Latex,thick,draw=navy},
+    dataarrow/.style={-Latex,semithick,draw=teal},
+    lossarrow/.style={-Latex,semithick,draw=purple},
+    innerarrow/.style={-Latex,semithick,draw=teal!85,dashed},
+    outerarrow/.style={-Latex,semithick,draw=navy!80,dashed},
+    tap/.style={
+        circle,
+        fill=teal,
+        draw=teal,
+        inner sep=0pt,
+        minimum size=3.4pt
+    },
+    entry/.style={
+        circle,
+        fill=white,
+        draw=#1,
+        thick,
+        minimum size=4.5pt,
+        inner sep=0pt
+    }
 ]
 
-    % ==========================================================================
-    % 1. HINTERGRUND-ZONEN (Outer vs. Inner Loop)
-    % ==========================================================================
-    % Inner Loop Box
-    \filldraw[innerbg] (-3.5, -2.8) rectangle (4.4, -6.6);
-    \node[anchor=north west, font=\tiny\bfseries, text=teal!80!black] at (-3.5, -2.8) {Inner Epoch};
+    \tikzset{
+        at x mid/.style n args={3}{
+            at={($ (#1 |- #2)!0.5!(#2) $)},
+            yshift=#3
+        }
+    }
 
-    % Outer Loop Box
-    \filldraw[outerbg] (-3.7, 0.8) rectangle (5.3, -7.5);
-    \node[anchor=north west, font=\tiny\bfseries, text=dark!70] at (-3.7, 0.8) {Outer Epoch};
+    % =====================================================================
+    % LAYOUT PARAMETERS
+    % =====================================================================
 
-    % ==========================================================================
-    % 2. MAIN WATERFALL NODES (Spalte in der Mitte at x=0)
-    % ==========================================================================
-    \node[font=\tiny\bfseries, text=dark, draw=dark, fill=white, rounded corners=2pt, inner sep=2pt] (start_outer) at (0, 0.4) {Start Outer Epoch};
+    % Node columns
+    \def\xmain{0}
+    \def\xleft{-5.4}
+    \def\xright{5.6}
 
-    \node[mainnode] (n1) at (0, -0.5) {1. $\rho$-Estimation};
-    \node[mainnode] (n2) at (0, -1.3) {2. Adversarial Falsification};
-    \node[mainnode] (n3) at (0, -2.1) {3. State Pool Resampling};
-    
-    \node[font=\tiny\bfseries, text=teal!90!black, draw=teal, fill=white, rounded corners=2pt, inner sep=2pt] (start_inner) at (0, -3.1) {Start Inner Epoch};
-    
-    \node[mainnode] (n4) at (0, -4.1) {4. Mini-Batch Assembly};
-    \node[mainnode] (n5) at (0, -4.9) {5. Loss Computation};
-    \node[mainnode] (n6) at (0, -5.7) {6. Optimization Step};
+    % Exclusively reserved routing columns
+    \def\xrho{-3.25}
+    \def\xbatchroute{3.35}
+    \def\xroaroute{7.45}
 
-    % Hauptfluss-Pfeile
-    \draw[arr] (start_outer) -- (n1);
-    \draw[arr] (n1) -- (n2);
-    \draw[arr] (n2) -- (n3);
-    \draw[arr] (n3) -- (start_inner);
-    \draw[arr] (start_inner) -- (n4);
-    \draw[arr] (n4) -- (n5);
-    \draw[arr] (n5) -- (n6);
+    % Loop rails:
+    \def\xinnerloop{9.10}
+    \def\xouterloop{11.10}
+    \def\loopgap{0.35}
+    \def\outerright{9.70}
 
-    % ==========================================================================
-    % 3. CEGIS BUFFER (Rechts oben, x = 3.2)
-    % ==========================================================================
-    \filldraw[bufferbox] (2.3, -0.8) rectangle (4.1, -2.6);
-    \node[anchor=south, font=\tiny\bfseries, text=amber!80!black] at (3.2, -0.8) {CEGIS Buffer};
-    
-    \node[buffernode] (pool_c) at (3.2, -1.3) {Counterexample\\[-1pt]Pool $\mathcal{C}$};
-    \node[buffernode] (pool_s) at (3.2, -2.1) {Explorative\\[-1pt]Pool $\mathcal{S}$};
+    % Main rows
+    \def\yrho{0.00}
+    \def\ymining{-1.60}
+    \def\yresample{-3.20}
+    \def\ybatch{-5.35}
+    \def\yloss{-7.10}
+    \def\yoptim{-8.80}
+    \def\yreturn{-9.85}
 
-    % Eingänge in den Puffer (horizontal, überschneidungsfrei)
-    \draw[dataarr] (n2.east) -- (pool_c.west) node[midway, above, font=\tiny, text=teal] {$x_{\text{adv}}$};
-    \draw[dataarr] (n3.east) -- (pool_s.west) node[midway, above, font=\tiny, text=teal] {$x$};
+    % Explicit outer-loop frame
+    \def\outerleft{-7.35}
+    \def\outerright{10.10}
+    \def\outertop{0.80}
+    \def\outerbottom{-10.35}
 
-    % Ausgang aus dem Puffer (verlässt Box nach unten bei y = -3.5, unterhalb von start_inner!)
-    \draw[dataarr, rounded corners=3pt] (3.2, -2.6) -- (3.2, -4.1) -- (n4.east);
+    % Explicit inner-loop frame
+    \def\innerleft{-7.00}
+    \def\innerright{8.65}
+    \def\innertop{-4.35}
+    \def\innerbottom{-9.40}
 
-    % ==========================================================================
-    % 4. DATENBUSSE (Links)
-    % ==========================================================================
-    % Bus 1: Rho & ROA
-    \draw[dataarr] ($(n1.west)+(0,0.08)$) -- (-2.5, -0.42);
-    \node[anchor=east, font=\tiny\bfseries, text=teal] at (-2.5, -0.65) {$\rho, \mathcal{B}_{\text{ROA}}$};
-    \draw[dataarr, rounded corners=2pt] (-2.5, -0.42) -- (-2.5, -4.82) -- ($(n5.west)+(0,0.08)$);
-    
-    % Abzweigungen für Rho
-    \node[tap] at (-2.5, -1.3) {}; \draw[dataarr] (-2.5, -1.3) -- (n2.west);
-    \node[tap] at (-2.5, -2.1) {}; \draw[dataarr] (-2.5, -2.1) -- (n3.west);
+    % Explicit replay-buffer frame
+    \def\cegisleft{3.85}
+    \def\cegisright{7.35}
+    \def\cegistop{-1.00}
+    \def\cegisbottom{-3.90}
+    % =====================================================================
+    % BACKGROUND FRAMES
+    % =====================================================================
 
-    % Bus 2: LIRPA
-    \node[font=\tiny\bfseries, text=navy] (lirpa) at (-3.2, 0.4) {LIRPA};
-    \draw[dataarr, rounded corners=2pt] (lirpa.south) -- (-3.2, -4.98) -- ($(n5.west)-(0,0.08)$);
+    \begin{scope}[on background layer]
 
-    % ==========================================================================
-    % 5. SCHLEIFEN-RÜCKFÜHRUNGEN (Rechts gestaffelt, ohne Kreuzung)
-    % ==========================================================================
-    % Inner Loop: Mündet genau auf Höhe y = -3.1 (oberhalb des Puffer-Ausgangs!)
-    \draw[arr] (n6.south) -- (0, -6.3);
-    \draw[innerlooparr, rounded corners=3pt] (0, -6.3) -- (4.7, -6.3) -- (4.7, -3.1) -- (start_inner.east);
-    \node[fill=white, draw=teal!40, rounded corners=2pt, font=\tiny\bfseries, text=teal!90!black, inner sep=1pt] at (4.7, -4.9) {\rotatebox{90}{Inner Loop ($K$ steps)}};
+        % Outer frame: has anchors outer_box.north, .south, .east, .west
+        \node[
+            draw=navy!55,
+            fill=navy!3,
+            dashed,
+            thick,
+            rounded corners=7pt,
+            minimum width=\dimexpr\outerright cm-\outerleft cm\relax,
+            minimum height=\dimexpr\outertop cm-\outerbottom cm\relax
+        ] (outer_box) at (
+            {(\outerleft+\outerright)/2},
+            {(\outertop+\outerbottom)/2}
+        ) {};
 
-    % Outer Loop: Führt weiter nach unten und außen herum zurück zu start_outer
-    \draw[arr] (0, -6.3) -- (0, -7.1);
-    \draw[looparr, rounded corners=3pt] (0, -7.1) -- (5.5, -7.1) -- (5.5, 0.4) -- (start_outer.east);
-    \node[fill=white, draw=dark!25, rounded corners=2pt, font=\tiny\bfseries, text=dark, inner sep=1pt] at (5.5, -3.3) {\rotatebox{90}{Outer Loop ($N$ epochs)}};
+        % Inner frame: has anchors inner_box.north, .south, .east, .west
+        \node[
+            draw=teal!75,
+            fill=teal!6,
+            dashed,
+            thick,
+            rounded corners=7pt,
+            minimum width=\dimexpr\innerright cm-\innerleft cm\relax,
+            minimum height=\dimexpr\innertop cm-\innerbottom cm\relax
+        ] (inner_box) at (
+            {(\innerleft+\innerright)/2},
+            {(\innertop+\innerbottom)/2}
+        ) {};
+
+        % Replay-buffer frame
+        \node[
+            draw=amber!90!black,
+            fill=amber!6,
+            dashed,
+            thick,
+            rounded corners=5pt,
+            minimum width=\dimexpr\cegisright cm-\cegisleft cm\relax,
+            minimum height=\dimexpr\cegistop cm-\cegisbottom cm\relax
+        ] (cegis_box) at (
+            {(\cegisleft+\cegisright)/2},
+            {(\cegistop+\cegisbottom)/2}
+        ) {};
+
+    \end{scope}
+
+    \node[
+        anchor=west,
+        fill=navy!3,
+        text=navy,
+        font=\tiny\bfseries,
+        inner sep=1.5pt
+    ] at ($(outer_box.north west)+(0.15,-0.18)$)
+    {Outer loop: epoch-level CEGIS and resampling};
+
+    \node[
+        anchor=west,
+        fill=teal!6,
+        text=teal!90!black,
+        font=\tiny\bfseries,
+        inner sep=1.5pt
+    ] at ($(inner_box.north west)+(0.15,-0.18)$)
+    {Inner loop: step-level optimization};
+
+    \node[
+        anchor=west,
+        fill=amber!6,
+        text=amber!90!black,
+        font=\tiny\bfseries,
+        inner sep=1.5pt
+    ] at ($(cegis_box.north west)+(0.15,-0.18)$)
+    {Adversarial replay buffer};
+
+    % =====================================================================
+    % MAIN PIPELINE
+    % =====================================================================
+
+    \node[process] (rho_estimation)
+    at (\xmain,\yrho)
+    {1. Estimate $\rho$ from boundary evaluation};
+
+    \node[process] (mining)
+    at (\xmain,\ymining)
+    {2. PGD falsification / adversarial mining};
+
+    \node[process] (resampling)
+    at (\xmain,\yresample)
+    {3. Resample explorative state pool};
+
+    \node[process] (batch)
+    at (\xmain,\ybatch)
+    {4. Draw mini-batch for condition loss};
+
+    \node[loss] (loss_node)
+    at (\xmain,\yloss)
+    {
+        5. Compute $\mathcal{L}_{\mathrm{total}}$
+    };
+
+    \node[process] (optim)
+    at (\xmain,\yoptim)
+    {6. Update policy and Lyapunov parameters};
+
+    \draw[mainarrow] (rho_estimation) -- (mining);
+    \draw[mainarrow] (mining) -- (resampling);
+    \draw[mainarrow] (resampling) -- (batch);
+    \draw[mainarrow] (batch) -- (loss_node);
+    \draw[mainarrow] (loss_node) -- (optim);
+
+    % =====================================================================
+    % OUTER-LOOP INPUTS AND REPLAY BUFFER
+    % =====================================================================
+
+    \node[external=purple] (region_builder)
+    at (\xleft,\yrho)
+    {LiRPA region builder\\[-1pt]
+    (static hyperboxes)};
+
+    \node[external=purple] (region_filter)
+    at (\xleft,\yresample)
+    {Select active regions\\[-1pt]
+    ($\min V_\theta \leq \rho$)};
+
+    \node[buffer] (boundary_batch)
+    at (\xright,\yrho)
+    {Boundary candidate batch\\[-1pt]
+    $\mathcal{B}_{\partial}$};
+
+    \node[buffer] (counterexample_pool)
+    at (\xright,\ymining)
+    {Counterexample pool $\mathcal{C}$\\[-1pt]
+    (PGD violations)};
+
+    \node[buffer] (explorative_pool)
+    at (\xright,\yresample)
+    {Explorative pool $\mathcal{S}$\\[-1pt]
+    ($\rho$-sublevel samples)};
+
+    \draw[dataarrow] (rho_estimation.east) -- (boundary_batch.west);
+    \node[
+        font=\tiny,
+        text=teal,
+        anchor=south,
+        at x mid={rho_estimation.east}{boundary_batch.west}{0.05cm}
+    ] {evaluate};
+
+    \draw[dataarrow] (mining.east) -- (counterexample_pool.west);
+    \node[
+        font=\tiny,
+        text=teal,
+        anchor=south,
+        at x mid={mining.east}{counterexample_pool.west}{0.05cm}
+    ] {$x_{\mathrm{adv}}$};
+
+    \draw[dataarrow] (resampling.east) -- (explorative_pool.west);
+    \node[
+        font=\tiny,
+        text=teal,
+        anchor=south,
+        at x mid={resampling.east}{explorative_pool.west}{0.05cm}
+    ] {$x_{\mathrm{resamp}}$};
+
+    \draw[lossarrow] (region_builder.south) -- (region_filter.north);
+
+    % =====================================================================
+    % RHO DISTRIBUTION
+    % =====================================================================
+
+    \coordinate (rho_top) at (\xrho,\yrho);
+    \coordinate (rho_mid) at (\xrho,\ymining);
+    \coordinate (rho_low) at (\xrho,\yresample);
+
+    \draw[dataarrow] (rho_estimation.west) -- (rho_top);
+    \draw[dataarrow] (rho_top) -- (rho_low);
+
+    \node[
+        anchor=south,
+        font=\tiny\bfseries,
+        text=teal,
+        fill=white,
+        inner sep=1pt
+    ] at ($(rho_top)+(0,0.02)$)
+    {$\rho$};
+
+    \node[tap] at (rho_mid) {};
+    \node[tap] (rho_low_tap) at (rho_low) {};
+
+    \draw[dataarrow] (rho_mid) -- (mining.west);
+    \draw[dataarrow] (rho_low_tap) -- (resampling.west);
+    \draw[lossarrow] (rho_low_tap) -- (region_filter.east);
+
+    % =====================================================================
+    % BUFFER -> MINI-BATCH
+    % =====================================================================
+
+    % Route sits between replay buffer and inner-loop box.
+    \coordinate (batch_route_a) at (\xright,-4.12);
+    \coordinate (batch_route_b) at (\xbatchroute,-4.12);
+    \coordinate (batch_entry) at ($(batch.east)+(0.08,0)$);
+
+    \draw[dataarrow,rounded corners=5pt]
+    (explorative_pool.south)
+    |- (batch_entry);
+
+    \node[
+        font=\tiny\bfseries,
+        text=teal,
+        fill=white,
+        inner sep=1.2pt,
+        anchor=south,
+        at x mid={explorative_pool.south}{batch_entry}{0.05cm}
+    ] {$\mathcal{B}_{\rho}\sim\mathcal{S}\cup\mathcal{C}$};
+
+    % =====================================================================
+    % LIRPA AND SOBOL INPUTS TO LOSS
+    % =====================================================================
+
+    \coordinate (lirpa_entry) at ($(loss_node.west)+(0,0.3)$);
+    \coordinate (sobol_entry) at ($(loss_node.west)+(0,-0.3)$);
+
+    % Place Sobol node lower-left so it has its own non-overlapping route.
+    \node[external=teal] (sobol)
+    at ($ (\xleft, 0 |- sobol_entry) + (0, -0.7) $)
+    {Sobol sample batches\\[-1pt]
+    $\mathcal{B}_{V},\,\mathcal{B}_{S\pi}$};
+
+    % LiRPA -> upper-left port of loss node.
+    \draw[lossarrow,rounded corners=5pt]
+    (region_filter.south)
+    |- (lirpa_entry);
+
+    \node[
+        font=\tiny,
+        text=purple,
+        fill=white,
+        inner sep=1pt,
+        anchor=south,
+        at x mid={region_filter.south}{lirpa_entry}{0.05cm}
+    ] {active LiRPA regions};
+
+    % Sobol -> lower-left port of loss node
+    \draw[dataarrow,rounded corners=5pt] (sobol.north) |- (sobol_entry);
+
+    \node[
+        font=\tiny,
+        text=teal,
+        fill=white,
+        inner sep=1pt,
+        anchor=south,
+        at x mid={sobol.north}{sobol_entry}{0.05cm}
+    ] {$\mathcal{B}_{V},\,\mathcal{B}_{S\pi}$};
+
+    % =====================================================================
+    % ROA LOSS INPUT
+    % =====================================================================
+
+    % This represents an explicit shell batch for L_ROA.
+    \node[external=purple] (roa_shell)
+    at (\xroaroute,\yloss-0.85)
+    {ROA shell batch\\[-1pt]
+    $\mathcal{B}_{\mathrm{ROA}}$};
+
+    \draw[lossarrow, rounded corners=5pt]
+    (boundary_batch.east)
+    -| (\xroaroute,\yrho-0.40)
+    -- (roa_shell.north);
+
+    \draw[lossarrow] (roa_shell.west) -- (loss_node.east);
+
+    \node[
+        anchor=west,
+        font=\tiny,
+        text=purple,
+        fill=white,
+        inner sep=1pt,
+        align=left
+    ] at (\xroaroute+0.15,\yloss-0.45)
+    {$\rho$ and shell samples\\[-2pt]
+    for $\mathcal{L}_{\mathrm{ROA}}$};
+
+    % =====================================================================
+    % LOOPBACKS
+    % The waterfall terminates at the optimization step.
+    % =====================================================================
+
+    % ---------------------------------------------------------------------
+    % Inner loop:
+    % outside inner_box, but inside outer_box.
+    % ---------------------------------------------------------------------
+
+    % Start just below the inner frame, then route around its right exterior.
+    \coordinate (inner_return_start) at
+        ($(inner_box.south)+(0,-\loopgap)$);
+
+    \coordinate (inner_return_bottom) at
+        (\xinnerloop,{(\innerbottom-\loopgap)});
+
+    \coordinate (inner_return_top) at
+        (\xinnerloop,{(\innertop+\loopgap)});
+
+    % End just above the inner frame.
+    \coordinate (inner_return_end) at
+        ($(inner_box.north)+(0,\loopgap)$);
+
+    \draw[innerarrow, rounded corners=6pt]
+        (inner_box.south)
+        -- (inner_return_start)
+        -- (inner_return_bottom)
+        -- (inner_return_top)
+        -- (inner_return_end)
+        -- (inner_box.north);
+
+    \node[
+        fill=white,
+        draw=teal!55,
+        rounded corners=2pt,
+        text=teal!90!black,
+        font=\tiny\bfseries,
+        inner sep=1.4pt,
+        rotate=90
+    ] at (\xinnerloop,\yloss)
+    {repeat $K_{\mathrm{steps}}$};
+
+    % ---------------------------------------------------------------------
+    % Outer loop:
+    % outside outer_box, from its bottom exterior to its top exterior.
+    % ---------------------------------------------------------------------
+
+    \coordinate (outer_return_start) at
+        ($(outer_box.south)+(0,-\loopgap)$);
+
+    \coordinate (outer_return_bottom) at
+        (\xouterloop,{(\outerbottom-\loopgap)});
+
+    \coordinate (outer_return_top) at
+        (\xouterloop,{(\outertop+\loopgap)});
+
+    \coordinate (outer_return_end) at
+        ($(outer_box.north)+(0,\loopgap)$);
+
+    \draw[outerarrow, rounded corners=6pt]
+        (outer_box.south)
+        -- (outer_return_start)
+        -- (outer_return_bottom)
+        -- (outer_return_top)
+        -- (outer_return_end)
+        -- (outer_box.north);
+
+    \node[
+        fill=white,
+        draw=navy!45,
+        rounded corners=2pt,
+        text=navy,
+        font=\tiny\bfseries,
+        inner sep=1.4pt,
+        rotate=90
+    ] at (\xouterloop,-4.85)
+    {repeat $N_{\mathrm{outer}}$ epochs};
 
 \end{tikzpicture}
