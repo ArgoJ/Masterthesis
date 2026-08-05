@@ -45,8 +45,10 @@ Their qualitative profiles are illustrated in \cref{fig:activation-funs}.
 \end{figure}
 
 Based on the universal approximation theorem, an MLP with at least one sufficiently sized hidden layer and non-linear activations 
-can approximate any continuous multidimensional function on compact sets to arbitrary accuracy \citeSec{3.1}{kollmannsbergerDeepLearningComputational2021}. 
-The trainable parameters are represented by $\theta = \{W^{(l)}, b^{(l)}\}_{l=1}^L$. \Cref{fig:mlp-architecture} illustrates a representative architecture.
+can approximate any continuous multidimensional function on compact sets to arbitrary accuracy 
+\citeSec{3.1}{kollmannsbergerDeepLearningComputational2021}. 
+The trainable parameters are represented by $\theta = \{W^{(l)}, b^{(l)}\}_{l=1}^L$. \Cref{fig:mlp-architecture} 
+illustrates a representative architecture.
 
 \begin{figure}[htbp]
     \centering
@@ -63,9 +65,81 @@ The trainable parameters are represented by $\theta = \{W^{(l)}, b^{(l)}\}_{l=1}
 \subsection{Optimization and Training}
 \label{subsec:opt-training}
 
+To approximate an expert control law with a neural network $\pi_\theta(x)$, the parameters $\theta$ are updated 
+via gradient-based optimization \citeSec{2.5}{kollmannsbergerDeepLearningComputational2021}. 
+The goal is to find an optimal parameter set $\theta^*$ that minimizes a scalar loss function $\loss$.
+
+
+\paragraph{Dataset and Primary Loss Function.}
+The training process relies on an offline dataset $\mathcal{D} = \left\{ (x_i, y_i) \right\}_{i=1}^M$ containing $M$ 
+input-target pairs sampled across the domain. For continuous regression tasks, the prediction discrepancy is commonly 
+measured using the Mean Squared Error (MSE) evaluated over a mini-batch $\mathcal{B} \subset \mathcal{D}$:
 \begin{equation}
     \label{eq:mse-loss}
-    \mathcal{L}= \frac{1}{m} \sum_{i=1}^m \left\| \hat{y}_i - y_i^* \right\|^2_2.
+    \mathcal{L}_{\mathrm{MSE}} = \frac{1}{|\mathcal{B}|} \sum_{(x, y) \in \mathcal{B}} \left\| 
+        f_\theta(x) - y 
+    \right\|_2^2,
 \end{equation}
+where $x$ and $y$ denote the system state and the corresponding target value, respectively.
 
-\todo[inline]{dataset, mse, backprop, adam, mini batch, loss augmentation}
+
+\paragraph{Loss Augmentation and Regularization.}
+In supervised learning, relying solely on empirical error minimization over a finite dataset can lead to overfitting 
+and fails to enforce underlying structural or domain-specific constraints. To improve generalization and 
+incorporate prior knowledge directly into the optimization process, the objective is frequently 
+augmented with weight regularization and auxiliary loss terms \citeSec{3.7}{kollmannsbergerDeepLearningComputational2021}:
+\begin{equation}
+    \label{eq:total-loss}
+    \mathcal{L} = 
+        \mathcal{L}_{\mathrm{MSE}} + 
+        \omega_{\mathrm{reg}} \mathcal{L}_{\mathrm{reg}} + 
+        \omega_{\mathrm{aux}} \mathcal{L}_{\mathrm{aux}},
+\end{equation}
+where $\omega_{\mathrm{reg}}, \omega_{\mathrm{aux}} > 0$ serve as weighting hyperparameters balancing prediction error, 
+parameter regularization, and constraint satisfaction.
+
+The regularization term $\mathcal{L}_{\mathrm{reg}}$ constrains the network's parameter space, typically realized as an 
+$L_1$-norm ($\|\theta\|_1$) or $L_2$-norm ($\|\theta\|_2^2$) penalty. 
+While $L_1$-regularization promotes sparsity by strictly forcing insignificant weights to zero, $L_2$-regularization 
+suppresses excessively large parameter magnitudes, smooths the network's mapping, and prevents steep gradients in the
+output space. In practice, these penalties are applied exclusively to the network's weight matrices $W \subset \theta$, 
+leaving bias vectors $b$ unpenalized. \citeSec{3.7.2}{kollmannsbergerDeepLearningComputational2021}.
+
+In addition to regularization penalties, the auxiliary loss $\mathcal{L}_{\mathrm{aux}}$ embeds domain knowledge into the 
+optimization process. Popularized by Physics-Informed Neural Networks (PINNs), it directly penalizes violations of 
+explicit rules, such as differential equations or Lyapunov conditions \citeSec{5}{kollmannsbergerDeepLearningComputational2021}, 
+\cite{yangLyapunovstableNeuralControl2024}. Enforcing these properties during training helps the network learn the 
+desired solutions.
+
+
+\paragraph{Gradient Computation via Backpropagation.}
+For updating the network parameters $\theta$ using gradient-based optimization, 
+the partial derivatives of the loss $\mathcal{L}$ with respect to all weight matrices $W^{(l)}$ and 
+bias vectors $b^{(l)}$ must be evaluated. The backpropagation algorithm calculates these gradients efficiently 
+by first performing the forward pass \eqref{eq:nn-forward} to store intermediate activation states. 
+Then, a backward pass is executed, which recursively applies the chain rule 
+\citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
+
+During the backward pass, the algorithm computes the sensitivity of the loss with respect to the pre-activations, 
+defined as the error signal $\delta^{(l)} = \frac{\partial \mathcal{L}}{\partial z^{(l)}}$. 
+Starting at the output layer $L$, the error signal is initialized as:
+\begin{equation}
+    \delta^{(L)} = \frac{\partial \mathcal{L}}{\partial a^{(L)}} \odot \frac{\partial a^{(L)}}{\partial z^{(L)}},
+\end{equation}
+where $\odot$ represents the element-wise (Hadamard) product. 
+Propagating the error backward for $l = L-1, \dots, 1$ via the chain rule yields the recursive relation:
+\begin{equation}
+    \label{eq:backprop-recursive-fraction}
+    \delta^{(l)} = \left( (W^{(l+1)})^T \delta^{(l+1)} \right) \odot \frac{\partial a^{(l)}}{\partial z^{(l)}}
+\end{equation}
+Finally, the required parameter gradients are obtained by combining the error signal $\delta^{(l)}$ 
+with the stored activations $a^{(l-1)}$ from the forward pass:
+\begin{equation}
+    \frac{\partial \mathcal{L}}{\partial W^{(l)}} = \delta^{(l)} \left(a^{(l-1)}\right)^T, \quad 
+    \frac{\partial \mathcal{L}}{\partial b^{(l)}} = \delta^{(l)}.
+\end{equation}
+By reusing the intermediate error signals $\delta^{(l)}$, backpropagation avoids redundant derivative 
+calculations and evaluates all parameter gradients in linear time $\mathcal{O}(|\theta|)$ 
+relative to the model size, thereby acting as an efficient dynamic programming method over 
+the computational graph \citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
+\todo[inline]{optimizer adam}
