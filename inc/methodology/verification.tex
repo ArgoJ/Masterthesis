@@ -3,61 +3,43 @@
 
 This section adapts the search algorithm for the maximal certifiable sublevel set $\mathcal{V}_\rho$ 
 proposed in \cite{yangLyapunovstableNeuralControl2024}. 
-However, iteration limits for scaling and bisection are integrated into \cref{alg:search-and-bisect} 
-to reduce computational overhead during evaluation.
-\todo[inline]{change $\Phi(\rho)$ to a more general formulation that evaluates the whole set of x bounds.}
+Specifically, for a given target level $\rho > 0$, formal verification aims to certify that all states within 
+the candidate region $\mathcal{V}_\rho := \{ x \in \mathcal{B}_C \mid V_\theta(x) \le \rho \}$ satisfy controlled 
+regional invariance and exponential decay:
+\begin{equation}
+    \label{eq:lyapunov-certified-property}
+    V_\theta(x) \le \rho \implies 
+    \begin{cases} 
+        x^+ \in \mathcal{B}_C, \\ 
+        V_\theta(x^+) \le (1 - \kappa) V_\theta(x),
+    \end{cases}
+\end{equation}
+where $\kappa \in (0, 1)$ specifies the targeted convergence rate and $x^+ = f(x, \pi_\theta(x))$ denotes the discrete one-step state transition.
 
-\begin{algorithm}[htpb]
-    \caption{Certified Value Search via Scaling and Bisection}
-    \label{alg:search-and-bisect}
-    \SetAlgoLined
-    \KwIn{$\rho_0, \rho_{\min}$, evaluator $\Phi$, scale $s > 1$, tol $\varepsilon$, limits $N_{\text{scale}}, N_{\text{bisect}}$}
-    \KwOut{Max certified value $\rho^*$}
-
-    \BlankLine
-    $\rho \leftarrow \max(\rho_0, \rho_{\min})$\;
-
-    \BlankLine
-    \tcp{Phase 1: Scaling}
-    \eIf{$\Phi(\rho)$}{
-        \For{$k \leftarrow 1$ \KwTo $N_{\text{scale}}$}{
-            \If{$\neg \Phi(\rho)$}{\textbf{break}\;}
-            $\rho_{\text{lo}} \leftarrow \rho;\quad \rho \leftarrow \rho \cdot s$\;
-        }
-        $\rho_{\text{up}} \leftarrow \rho$\;
-    }{
-        \For{$k \leftarrow 1$ \KwTo $N_{\text{scale}}$}{
-            \If{$\Phi(\rho) \lor \rho = \rho_{\min}$}{\textbf{break}\;}
-            $\rho_{\text{up}} \leftarrow \rho;\quad \rho \leftarrow \max(\rho_{\min}, \rho / s)$\;
-        }
-        \If{$\neg \Phi(\rho)$}{\KwRet $0$\ \tcp*{No valid value $\ge \rho_{\min}$}}
-        $\rho_{\text{lo}} \leftarrow \rho$\;
-    }
-
-    \BlankLine
-    \tcp{Phase 2: Bisection}
-    \For{$k \leftarrow 1$ \KwTo $N_{\text{bisect}}$}{
-        \If{$\rho_{\text{up}} - \rho_{\text{lo}} \le \varepsilon$}{\textbf{break}\;}
-        $\rho_{\text{mid}} \leftarrow \frac{1}{2}(\rho_{\text{lo}} + \rho_{\text{up}})$\;
-        \eIf{$\Phi(\rho_{\text{mid}})$}{
-            $\rho_{\text{lo}} \leftarrow \rho_{\text{mid}}$\;
-        }{
-            $\rho_{\text{up}} \leftarrow \rho_{\text{mid}}$\;
-        }
-    }
-
-    \BlankLine
-    \KwRet $\rho_{\text{lo}}$\;
-\end{algorithm}
-
-To formally certify the Lyapunov candidate, the $\alpha\beta$-CROWN verifier evaluates a 
-logical formulation $\Phi(x; \rho)$ over a bounded certification domain 
+Before evaluating the stability conditions, the equilibrium $x^*$ must be explicitly excluded from the bounded 
+certification domain 
 $\mathcal{B}_C := \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \bar{x}_C \} \subseteq \mathcal{B}_V$. 
-The goal is to verify that all states in $\mathcal{V}_\rho \cap \mathcal{B}_C$ satisfy the required stability conditions.
-This implication is rewritten into a disjunctive form that is directly supported by the verifier: 
-a state must either lie outside $\mathcal{V}_\rho$ or satisfy all stability conditions.
+By construction, $V_\theta(x^*) = 0$ and $x^+ = x^*$ hold at the equilibrium, 
+causing the strict positivity and strict decrease conditions to evaluate to false at this exact point. 
+Since these conditions are only required to hold for $x \neq x^*$, and positive definiteness is structurally 
+enforced by the network architecture, formal verification is instead performed over the punctured evaluation domain 
+$\mathcal{B}_{\mathrm{eval}} := \mathcal{B}_C \setminus \mathcal{B}_{\mathrm{hole}}$, where 
+$\mathcal{B}_{\mathrm{hole}}$ denotes a small hyper-rectangular region centered at $x^*$. 
+For the solver to handle the punctured certification domain, $\mathcal{B}_{\mathrm{eval}}$ is split into multiple subregions, 
+as shown in \cref{fig:hole-exclusion}.
 
-The individual logical terms from which this specification is composed are defined as follows:
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/methods/hole_exclusion.tex}
+    \caption{2D Hole exclusion example with $\mathcal{B}_{\mathrm{hole}} := \left\{ x \in \mathbb{R}^2 \;\middle\vert{}\; \lVert x \rVert_\infty < 0.25 \right\}$.}
+    \label{fig:hole-exclusion}
+\end{figure}
+
+To certify property \eqref{eq:lyapunov-certified-property} over $\mathcal{B}_{\mathrm{eval}}$ using 
+$\alpha\beta$-CROWN \cite{wang2021beta,xuFastCompleteEnabling2021}, 
+the implication is rewritten into a disjunctive formulation supported by the verifier: 
+a state must either lie outside $\mathcal{V}_\rho$ or satisfy all stability conditions inside 
+$\mathcal{B}_{\mathrm{eval}}$. The individual logical terms are defined as follows:
 \begin{subequations}\label{eq:certification-specification}
     \begin{align}
         \Phi_{\mathrm{sub}}
@@ -70,16 +52,13 @@ The individual logical terms from which this specification is composed are defin
             &\equiv \underline{x}_C \le x^+ \le \bar{x}_C,
             \label{eq:invariance-certification}\\
         \Phi_{\mathrm{dec}}
-            &\equiv (1 - \kappa) V_\theta(x) - V_\theta(x^+) > 0,
+            &\equiv (1 - \kappa) V_\theta(x) > V_\theta(x^+).
             \label{eq:decrease-certification}
     \end{align}
 \end{subequations}
-where $x^+ = f(x, \pi_\theta(x))$ denotes the discrete one-step state transition. Here, \eqref{eq:outside-certification} 
-determines whether $x$ lies outside the target sublevel set $\mathcal{V}_\rho$. For states within $\mathcal{V}_\rho$, 
-\eqref{eq:positive-certification} enforces strict positive definiteness away from $x^*$, \eqref{eq:invariance-certification} 
-guarantees forward invariance within $\mathcal{B}_C$, and \eqref{eq:decrease-certification} ensures the strict Lyapunov decrease property.
-
-Finally, combining the sublevel exclusion with the joint stability conditions yields the total specification evaluated by the verifier:
+Here, \eqref{eq:outside-certification} excludes states outside the target sublevel set, while 
+\eqref{eq:positive-certification,eq:invariance-certification,eq:decrease-certification} explicitly enforce positive definiteness, 
+state constraint invariance, and exponential decrease. Combining these terms yields the overall state-wise specification:
 \begin{equation}
     \label{eq:total-certification-formulation}
     \Phi(x; \rho) \equiv \Phi_{\mathrm{sub}} \lor \left( 
@@ -89,19 +68,53 @@ Finally, combining the sublevel exclusion with the joint stability conditions yi
     \right).
 \end{equation}
 
+To determine whether a candidate level $\rho$ is valid across the entire continuous evaluation domain, 
+the global verification condition $\Psi(\rho)$ evaluates whether $\Phi(x; \rho)$ holds for all states:
+\begin{equation}
+    \label{eq:domain-certification}
+    Psi(\rho) \equiv \forall x \in \mathcal{B}_{\mathrm{eval}} : \Phi(x; \rho).
+\end{equation}
+The verifier queries $\Psi(\rho)$ within the scaling and bisection procedure outlined in \cref{alg:search-and-bisect}.
 
-The equilibrium $x^*$ must be excluded from the certification domain $\mathcal{B}_C$. 
-By construction, $V_\theta(x^*) = 0$ and $x^+ = x^*$ hold at the equilibrium, 
-causing the strict positivity ($\Phi_{\mathrm{pos}}$) and strict decrease ($\Phi_{\mathrm{dec}}$) 
-conditions to evaluate to false at $x^*$. Since these conditions hold only for $x \neq x^*$ 
-and positive definiteness is enforced by construction, formal verification is performed over 
-the punctured domain $\mathcal{B}_C \setminus \mathcal{B}_{\mathrm{hole}}$. 
-Here, $\mathcal{B}_{\mathrm{hole}}$ denotes a small hyper-rectangular region centered at $x^*$. 
-The punctured certification domain is thus split into multiple subregions, as shown in \cref{fig:hole-exclusion}.
+\begin{algorithm}[htpb]
+    \caption{Certified Value Search via Scaling and Bisection}
+    \label{alg:search-and-bisect}
+    \SetAlgoLined
+    \KwIn{$\rho_0, \rho_{\min}$, evaluator $\Psi$, scale $s > 1$, tol $\varepsilon$, limits $N_{\text{scale}}, N_{\text{bisect}}$}
+    \KwOut{Max certified value $\rho^*$}
 
-\begin{figure}[htbp]
-    \centering
-    \input{tikz/methods/hole_exclusion.tex}
-    \caption{2D Hole exclusion example with $\mathcal{B}_{\mathrm{hole}} := \left\{ x \in \mathbb{R}^2 \;\middle\vert{}\; \lVert x \rVert_\infty < 0.25 \right\}$.}
-    \label{fig:hole-exclusion}
-\end{figure}
+    \BlankLine
+    $\rho \leftarrow \max(\rho_0, \rho_{\min})$\;
+
+    \BlankLine
+    \tcp{Phase 1: Scaling}
+    \eIf{$\Psi(\rho)$}{
+        \For{$k \leftarrow 1$ \KwTo $N_{\text{scale}}$}{
+            \If{$\neg \Psi(\rho)$}{\textbf{break}\;}
+            $\rho_{\text{lo}} \leftarrow \rho;\quad \rho \leftarrow \rho \cdot s$\;
+        }
+        $\rho_{\text{up}} \leftarrow \rho$\;
+    }{
+        \For{$k \leftarrow 1$ \KwTo $N_{\text{scale}}$}{
+            \If{$\Psi(\rho) \lor \rho = \rho_{\min}$}{\textbf{break}\;}
+            $\rho_{\text{up}} \leftarrow \rho;\quad \rho \leftarrow \max(\rho_{\min}, \rho / s)$\;
+        }
+        \If{$\neg \Psi(\rho)$}{\KwRet $0$\ \tcp*{No valid value $\ge \rho_{\min}$}}
+        $\rho_{\text{lo}} \leftarrow \rho$\;
+    }
+
+    \BlankLine
+    \tcp{Phase 2: Bisection}
+    \For{$k \leftarrow 1$ \KwTo $N_{\text{bisect}}$}{
+        \If{$\rho_{\text{up}} - \rho_{\text{lo}} \le \varepsilon$}{\textbf{break}\;}
+        $\rho_{\text{mid}} \leftarrow \frac{1}{2}(\rho_{\text{lo}} + \rho_{\text{up}})$\;
+        \eIf{$\Psi(\rho_{\text{mid}})$}{
+            $\rho_{\text{lo}} \leftarrow \rho_{\text{mid}}$\;
+        }{
+            $\rho_{\text{up}} \leftarrow \rho_{\text{mid}}$\;
+        }
+    }
+
+    \BlankLine
+    \KwRet $\rho_{\text{lo}}$\;
+\end{algorithm}

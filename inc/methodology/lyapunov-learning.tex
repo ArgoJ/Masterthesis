@@ -241,7 +241,7 @@ to the output of the original imitation controller $\pi$, which is based on the 
 A quasi-Monte Carlo batch $\mathcal{B}_{\mathrm{pol}} \subset \mathcal{X}_V$ is sampled using a 
 low-discrepancy Sobol sequence \cite{joeConstructingSobolSequences2008}. 
 To prevent overfitting to a static set of states, this batch also is resampled from $\mathcal{X}_V$ 
-after a specified number of optimization steps. 
+with a given probability each optimization step. 
 The normalized deviation between the learned policy and the imitation controller over this batch is formulated as
 \begin{equation}
     \label{eq:policy-scaling-loss}
@@ -381,11 +381,37 @@ across different batches, the $\rho$ value actually used for gating is updated u
 \end{equation}
 where $\beta \in [0, 1)$ is the decay rate.
 
-For the ease of simplification, the complete training flow is visualized in \cref{fig:train-flow}.
+
+\subsection{Overall Training Procedure}
+\label{subsec:training-procedure}
+
+The complete falsification-guided training procedure is illustrated in
+\cref{fig:train-flow}. It consists of an outer loop for data generation and an
+inner loop for network optimization.
+
+At the beginning of each outer epoch, boundary samples $\mathcal{B}_{\partial}$ are used to estimate 
+the current sublevel bound $\rho$, and the ROA shell batch $\mathcal{B}_{\mathrm{ROA}}$ is redrawn. 
+Based on the updated estimation of $\rho$, the active LiRPA regions are selected and PGD-based falsification 
+is performed within the corresponding sublevel set. The resulting counterexamples are added to $\mathcal{C}$, 
+after which the explorative state pool $\mathcal{S}$ is resampled. 
+
+The inner loop is executed $K_{\mathrm{steps}}$ times per outer epoch. At each step,  
+a mini-batch $\mathcal{B}_{\rho}$ is sampled from $\mathcal{S} \cup \mathcal{C}$ and 
+evaluated together with the active LiRPA regions, the ROA shell batch, and Sobol batches
+$\mathcal{B}_V$ and $\mathcal{B}_{\mathrm{pol}}$. 
+Their corresponding loss terms are combined into $\loss_{\mathrm{total}}$, which is minimized by
+backpropagation with respect to the trainable network parameters. 
+Repeating this procedure over $N_{\mathrm{outer}}$ epochs progressively reduces
+Lyapunov-condition violations and enlarges the estimated certified region of
+attraction.
 
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/train_flow.tex}
-    \caption{Training flow visualization.}
+    \caption[Falsification-guided training flow]{
+        Overview of the falsification-guided training framework. 
+        The architecture is divided into an outer epoch-level loop responsible for state space exploration, 
+        boundary estimation, and adversarial mining, and an inner step-level loop that optimizes 
+        the network parameters based on the generated sample pools.}
     \label{fig:train-flow}
 \end{figure}

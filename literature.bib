@@ -121,6 +121,18 @@
   file = {C:\Users\josua\Zotero\storage\DL796EID\DL_in_CL_kollmannsberger.pdf}
 }
 
+@inproceedings{kotha2023provably,
+  title = {Provably Bounding Neural Network Preimages},
+  booktitle = {Advances in Neural Information Processing Systems},
+  author = {Kotha, Suhas and Brix, Christopher and Kolter, J. Zico and Dvijotham, Krishnamurthy and Zhang, Huan},
+  editor = {Oh, A. and Neumann, T. and Globerson, A. and Saenko, K. and Hardt, M. and Levine, S.},
+  date = {2023},
+  volume = {36},
+  pages = {80270--80290},
+  publisher = {Curran Associates, Inc.},
+  url = {httpsproceedings.neurips.ccpaper_filespaper2023filefe061ec0ae03c5cf5b5323a2b9121bfd-Paper-Conference.pdf}
+}
+
 @online{liBridgingControlNeural2026,
   title = {Bridging {{Control}} with {{Neural Network Verifier}} Alpha-Beta-{{CROWN}}: {{A Tutorial}}},
   shorttitle = {Bridging {{Control}} with {{Neural Network Verifier}} Alpha-Beta-{{CROWN}}},
@@ -151,6 +163,23 @@
   langid = {english},
   pagetotal = {623},
   file = {C:\Users\josua\Zotero\storage\73QFQQEE\Rawlings et al. - 2020 - Model predictive control theory, computation and design.pdf}
+}
+
+@article{salman2019convex,
+  title = {A Convex Relaxation Barrier to Tight Robustness Verification of Neural Networks},
+  author = {Salman, Hadi and Yang, Greg and Zhang, Huan and Hsieh, Cho-Jui and Zhang, Pengchuan},
+  date = {2019},
+  journaltitle = {Advances in Neural Information Processing Systems},
+  shortjournal = {Adv. Neural Inf. Process. Syst.},
+  volume = {32},
+  pages = {9835--9846}
+}
+
+@inproceedings{shi2024genbab,
+  title = {Neural Network Verification with Branch-and-Bound for General Nonlinearities},
+  booktitle = {International Conference on Tools and Algorithms for the Construction and Analysis of Systems},
+  author = {Shi, Zhouxing and Jin, Qirui and Kolter, Zico and Jana, Suman and Hsieh, Cho-Jui and Zhang, Huan},
+  date = {2025}
 }
 
 @online{szegedyIntriguingPropertiesNeural2014,
@@ -185,19 +214,33 @@
   file = {C\:\\Users\\josua\\Zotero\\storage\\WPYKKTUR\\Tjeng et al. - 2019 - Evaluating Robustness of Neural Networks with Mixed Integer Programming.pdf;C\:\\Users\\josua\\Zotero\\storage\\SQ5MEQ88\\1711.html}
 }
 
-@online{xuFastCompleteEnabling2021,
+@article{wang2021beta,
+  title = {Beta-{{CROWN Efficient}} Bound Propagation with per-Neuron Split Constraints for Complete and Incomplete Neural Network Verification},
+  author = {Wang, Shiqi and Zhang, Huan and Xu, Kaidi and Lin, Xue and Jana, Suman and Hsieh, Cho-Jui and Kolter, J Zico},
+  date = {2021},
+  journaltitle = {Advances in Neural Information Processing Systems},
+  shortjournal = {Adv. Neural Inf. Process. Syst.},
+  volume = {34}
+}
+
+@article{xu2020automatic,
+  title = {Automatic Perturbation Analysis for Scalable Certified Robustness and Beyond},
+  author = {Xu, Kaidi and Shi, Zhouxing and Zhang, Huan and Wang, Yihan and Chang, Kai-Wei and Huang, Minlie and Kailkhura, Bhavya and Lin, Xue and Hsieh, Cho-Jui},
+  date = {2020},
+  journaltitle = {Advances in Neural Information Processing Systems},
+  shortjournal = {Adv. Neural Inf. Process. Syst.},
+  volume = {33}
+}
+
+@inproceedings{xuFastCompleteEnabling2021,
   title = {Fast and {{Complete}}: {{Enabling Complete Neural Network Verification}} with {{Rapid}} and {{Massively Parallel Incomplete Verifiers}}},
   shorttitle = {Fast and {{Complete}}},
+  booktitle = {International {{Conference}} on {{Learning Representations}}},
   author = {Xu, Kaidi and Zhang, Huan and Wang, Shiqi and Wang, Yihan and Jana, Suman and Lin, Xue and Hsieh, Cho-Jui},
-  date = {2021-03-16},
-  eprint = {2011.13824},
-  eprinttype = {arXiv},
-  eprintclass = {cs.AI},
-  doi = {10.48550/arXiv.2011.13824},
-  url = {http://arxiv.org/abs/2011.13824},
+  date = {2021},
+  url = {https://openreview.net/forum?id=nVZtXBI6LNn},
   urldate = {2026-06-24},
   abstract = {Formal verification of neural networks (NNs) is a challenging and important problem. Existing efficient complete solvers typically require the branch-and-bound (BaB) process, which splits the problem domain into sub-domains and solves each sub-domain using faster but weaker incomplete verifiers, such as Linear Programming (LP) on linearly relaxed sub-domains. In this paper, we propose to use the backward mode linear relaxation based perturbation analysis (LiRPA) to replace LP during the BaB process, which can be efficiently implemented on the typical machine learning accelerators such as GPUs and TPUs. However, unlike LP, LiRPA when applied naively can produce much weaker bounds and even cannot check certain conflicts of sub-domains during splitting, making the entire procedure incomplete after BaB. To address these challenges, we apply a fast gradient based bound tightening procedure combined with batch splits and the design of minimal usage of LP bound procedure, enabling us to effectively use LiRPA on the accelerator hardware for the challenging complete NN verification problem and significantly outperform LP-based approaches. On a single GPU, we demonstrate an order of magnitude speedup compared to existing LP-based approaches.},
-  pubstate = {prepublished},
   keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning},
   file = {C\:\\Users\\josua\\Zotero\\storage\\S23NTXCE\\Xu et al. - 2021 - Fast and Complete Enabling Complete Neural Network Verification with Rapid and Massively Parallel I.pdf;C\:\\Users\\josua\\Zotero\\storage\\QY8AHNA9\\2011.html}
 }
@@ -217,4 +260,46 @@
   pubstate = {prepublished},
   keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning,Computer Science - Robotics,Electrical Engineering and Systems Science - Systems and Control,Mathematics - Optimization and Control},
   file = {C\:\\Users\\josua\\Zotero\\storage\\4725JAKC\\Yang et al. - 2024 - Lyapunov-stable Neural Control for State and Output Feedback A Novel Formulation.pdf;C\:\\Users\\josua\\Zotero\\storage\\9GF2N8GQ\\2404.html}
+}
+
+@article{zhang2018efficient,
+  title = {Efficient Neural Network Robustness Certification with General Activation Functions},
+  author = {Zhang, Huan and Weng, Tsui-Wei and Chen, Pin-Yu and Hsieh, Cho-Jui and Daniel, Luca},
+  date = {2018},
+  journaltitle = {Advances in Neural Information Processing Systems},
+  shortjournal = {Adv. Neural Inf. Process. Syst.},
+  volume = {31},
+  pages = {4939--4948},
+  url = {httpsarxiv.orgpdf1811.00866.pdf}
+}
+
+@article{zhang2022general,
+  title = {General Cutting Planes for Bound-Propagation-Based Neural Network Verification},
+  author = {Zhang, Huan and Wang, Shiqi and Xu, Kaidi and Li, Linyi and Li, Bo and Jana, Suman and Hsieh, Cho-Jui and Kolter, J Zico},
+  date = {2022},
+  journaltitle = {Advances in Neural Information Processing Systems},
+  shortjournal = {Adv. Neural Inf. Process. Syst.}
+}
+
+@inproceedings{zhang22babattack,
+  title = {A Branch and Bound Framework for Stronger Adversarial Attacks of {{ReLU}} Networks},
+  booktitle = {Proceedings of the 39th International Conference on Machine Learning},
+  author = {Zhang, Huan and Wang, Shiqi and Xu, Kaidi and Wang, Yihan and Jana, Suman and Hsieh, Cho-Jui and Kolter, Zico},
+  date = {2022},
+  volume = {162},
+  pages = {26591--26604}
+}
+
+@inproceedings{zhou2024scalable,
+  title = {Scalable Neural Network Verification with Branch-and-Bound Inferred Cutting Planes},
+  booktitle = {The Thirty-Eighth Annual Conference on Neural Information Processing Systems},
+  author = {Zhou, Duo and Brix, Christopher and Hanasusanto, Grani A and Zhang, Huan},
+  date = {2024}
+}
+
+@inproceedings{zhou2025clip,
+  title = {Clip-and-Verify Linear Constraint-Driven Domain Clipping for Accelerating Neural Network Verification},
+  booktitle = {The Thirty-Ninth Annual Conference on Neural Information Processing Systems},
+  author = {Zhou, Duo and Chavez, Jorge and Chen, Hesun and Hanasusanto, Grani A and Zhang, Huan},
+  date = {2025}
 }

@@ -1,7 +1,10 @@
-This section specifies the data generation process, 
-the neural policy architecture, and the training objective used to approximate the 
-model predictive control (MPC) expert. Specifically, the MPC controller 
-introduced in \cref{subsec:mpc-problem} serves as the expert policy 
-generating the required state-input pairs. The neural policy is subsequently trained to 
-reproduce the expert control actions over the considered state domain.
-\todo[inline]{add lyapunov learning stuff}
+This chapter presents the methodology for learning and certifying a neural approximation of the MPC controller. 
+The MPC policy introduced in \cref{subsec:mpc-problem} serves as an expert, generating state-input pairs 
+for supervised policy training. As described in \cref{sec:imitation-learning}, 
+this allows the neural policy to reproduce the expert control actions over the considered state domain. 
+Subsequently, a neural Lyapunov candidate is learned to enable the stability certification of the controller. 
+In the co-training setting, the policy parameters may additionally be refined, while the Lyapunov architecture 
+and training objective enforce the stability conditions detailed in \cref{sec:lyapunov-learning}.
+Finally, to formally prove that the learned controller satisfies these guarantees across the 
+continuous state space, the networks are subjected to formal verification using $\alpha,\beta$-CROWN, 
+as presented in \cref{sec:formal-verification}.

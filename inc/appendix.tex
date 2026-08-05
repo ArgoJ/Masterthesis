@@ -1,2 +1,13 @@
 \chapter{Appendix}
 \label{cha:appendix}
+
+\subsection{Imitation Learning}
+Note:
+If the MPC problem
+becomes infeasible at any time during one trajectory, all training pairs
+associated with that trajectory are discarded.
+
+To reduce the overrepresentations of regions with high sampling rates, near-duplicate
+state-action pairs are removed during preprocessing. The concatenated
+state-action vectors are normalized and mapped onto an adaptive voxel grid.
+For each occupied voxel, at most one representative pair is retained.

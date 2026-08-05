@@ -4,34 +4,46 @@
 
 \clist_new:N \l_smartcite_post_clist
 \clist_new:N \l_smartcite_keys_clist
-\tl_new:N \l_smartcite_call_tl
+\bool_new:N \l_smartcite_parens_bool
 
-\NewDocumentCommand{\smartCite}{m m m}{
+% #1: Optionaler Bool [true/false] für Klammern um die Nummer (Standard: false)
+% #2: Präfix (z. B. "Eq.", "Sec.")
+% #3: Nummern/Seiten (z. B. "1.18, 5.23")
+% #4: Bib-Keys (z. B. "key2, key3")
+\NewDocumentCommand{\smartCite}{O{false} m m m}{
   % Clear and populate lists
-  \clist_set:Nn \l_smartcite_post_clist {#2}
-  \clist_set:Nn \l_smartcite_keys_clist {#3}
+  \clist_set:Nn \l_smartcite_post_clist {#3}
+  \clist_set:Nn \l_smartcite_keys_clist {#4}
   
-  % Build the token list: starting with \autocites
-  \tl_set:Nn \l_smartcite_call_tl { \autocites }
+  % Check ob Klammern gesetzt werden sollen
+  \str_if_eq:nnTF {#1} {true}
+    { \bool_set_true:N \l_smartcite_parens_bool }
+    { \bool_set_false:N \l_smartcite_parens_bool }
   
   \int_step_inline:nn { \clist_count:N \l_smartcite_keys_clist }
     {
+      % Trennkomma + Leerzeichen zwischen den Zitaten
+      \int_compare:nT { ##1 > 1 } { ,~ }
+      
       \clist_pop:NN \l_smartcite_post_clist \l_tmpa_item
       \clist_pop:NN \l_smartcite_keys_clist \l_tmpb_item
       
       \tl_if_empty:NTF \l_tmpa_item
         { 
-          \tl_put_right:Nn \l_smartcite_call_tl { {} }
-          \tl_put_right:Nx \l_smartcite_call_tl { { \exp_not:V \l_tmpb_item } }
+          \autocite{\l_tmpb_item}
         }
         { 
-          \tl_put_right:Nx \l_smartcite_call_tl { [ #1 ~ \exp_not:V \l_tmpa_item ] }
-          \tl_put_right:Nx \l_smartcite_call_tl { { \exp_not:V \l_tmpb_item } }
+          \bool_if:NTF \l_smartcite_parens_bool
+            {
+              % Mit Klammern: [2, Eq. (1.18)]
+              \autocite[#2\nobreakspace (\l_tmpa_item)]{\l_tmpb_item}
+            }
+            {
+              % Ohne Klammern: [1, Sec. 3.1]
+              \autocite[#2\nobreakspace \l_tmpa_item]{\l_tmpb_item}
+            }
         }
     }
-  
-  % Execute the constructed \autocites command
-  \tl_use:N \l_smartcite_call_tl
 }
 
 \ExplSyntaxOff
@@ -41,6 +53,6 @@
 \newcommand{\citeDef}[2]{\smartCite{Def.}{#1}{#2}}
 \newcommand{\citeAsm}[2]{\smartCite{Assumption}{#1}{#2}}
 \newcommand{\citeThm}[2]{\smartCite{Theorem}{#1}{#2}}
-\newcommand{\citeEq}[2]{\smartCite{Eq.}{#1}{#2}}
 \newcommand{\citeRem}[2]{\smartCite{Remark}{#1}{#2}}
 \newcommand{\citeFig}[2]{\smartCite{Fig.}{#1}{#2}}
+\newcommand{\citeEq}[2]{\smartCite[true]{Eq.}{#1}{#2}}
