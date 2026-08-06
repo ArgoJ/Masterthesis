@@ -14,7 +14,8 @@ regional invariance and exponential decay:
         V_\theta(x^+) \le (1 - \kappa) V_\theta(x),
     \end{cases}
 \end{equation}
-where $\kappa \in (0, 1)$ specifies the targeted convergence rate and $x^+ = f(x, \pi_\theta(x))$ denotes the discrete one-step state transition.
+where $\kappa \in (0, 1)$ specifies the targeted convergence rate and $x^+ = f(x, \pi_\theta(x))$ denotes the discrete 
+one-step state transition.
 
 Before evaluating the stability conditions, the equilibrium $x^*$ must be explicitly excluded from the bounded 
 certification domain 
@@ -74,21 +75,24 @@ the global verification condition $\Psi(\rho)$ evaluates whether $\Phi(x; \rho)$
     \label{eq:domain-certification}
     \Psi(\rho) \equiv \forall x \in \mathcal{B}_{\mathrm{eval}} : \Phi(x; \rho).
 \end{equation}
-\todo[inline]{explain algorithm}
 
-
-% The verifier evaluates $\Psi(\rho)$ as part of the scaling and bisection procedure outlined in \cref{alg:search-and-bisect}.
-% The search operates in two distinct phases: 
-% first, a scaling phase} exponentially expands or contracts $\rho$ by a factor $s > 1$ to bracket the valid sublevel boundary $[\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}]$. 
-% Second, a bisection phase} narrows this interval until the gap falls below the specified tolerance $\varepsilon$. 
-% Compared to the original formulation in \cite{yangLyapunovstableNeuralControl2024}, explicit iteration limits $N_{\mathrm{scale}}$ and $N_{\mathrm{bisect}}$ are integrated into both phases. 
-% This caps the maximum number of $\alpha\beta$-CROWN calls, effectively preventing excessive computational overhead on difficult verification problems.
+The $\alpha\beta$-CROWN verifier evaluates $\Psi(\rho)$ iteratively within the scaling and bisection procedure 
+outlined in \cref{alg:search-and-bisect}.
+The search operates in two distinct phases: 
+First, a scaling phase exponentially expands or contracts $\rho$ by a factor $s > 1$ to bracket the valid sublevel set 
+boundary within an interval $[\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}]$.
+Second, a bisection phase narrows this interval until the gap falls below a tolerance $\varepsilon$. 
+Upon termination, the lower bound yields the maximum certified value $\rho^* \approx \rho_{\mathrm{lo}}$.
+Compared to the proposed formulation in \cite{yangLyapunovstableNeuralControl2024}, 
+explicit iteration limits $N_{\mathrm{scale}}$ and $N_{\mathrm{bisect}}$ are integrated into both phases. 
+This caps the maximum number of verifier calls, effectively preventing excessive computational 
+overhead on difficult verification problems.
 
 \begin{algorithm}[htpb]
     \caption{Certified Value Search via Scaling and Bisection}
     \label{alg:search-and-bisect}
     \SetAlgoLined
-    \KwIn{$\rho_0, \rho_{\min}$, evaluator $\Psi$, scale $s > 1$, tol $\varepsilon$, limits $N_{\text{scale}}, N_{\text{bisect}}$}
+    \KwIn{$\rho_0, \rho_{\min}$, evaluator $\Psi$, scale $s > 1$, tol $\varepsilon$, limits $N_{\mathrm{scale}}, N_{\mathrm{bisect}}$}
     \KwOut{Max certified value $\rho^*$}
 
     \BlankLine
@@ -97,32 +101,32 @@ the global verification condition $\Psi(\rho)$ evaluates whether $\Phi(x; \rho)$
     \BlankLine
     \tcp{Phase 1: Scaling}
     \eIf{$\Psi(\rho)$}{
-        \For{$k \leftarrow 1$ \KwTo $N_{\text{scale}}$}{
+        \For{$k \leftarrow 1$ \KwTo $N_{\mathrm{scale}}$}{
             \If{$\neg \Psi(\rho)$}{\textbf{break}\;}
-            $\rho_{\text{lo}} \leftarrow \rho;\quad \rho \leftarrow \rho \cdot s$\;
+            $\rho_{\mathrm{lo}} \leftarrow \rho;\quad \rho \leftarrow \rho \cdot s$\;
         }
-        $\rho_{\text{up}} \leftarrow \rho$\;
+        $\rho_{\mathrm{up}} \leftarrow \rho$\;
     }{
-        \For{$k \leftarrow 1$ \KwTo $N_{\text{scale}}$}{
+        \For{$k \leftarrow 1$ \KwTo $N_{\mathrm{scale}}$}{
             \If{$\Psi(\rho) \lor \rho = \rho_{\min}$}{\textbf{break}\;}
-            $\rho_{\text{up}} \leftarrow \rho;\quad \rho \leftarrow \max(\rho_{\min}, \rho / s)$\;
+            $\rho_{\mathrm{up}} \leftarrow \rho;\quad \rho \leftarrow \max(\rho_{\min}, \rho / s)$\;
         }
         \If{$\neg \Psi(\rho)$}{\KwRet $0$\ \tcp*{No valid value $\ge \rho_{\min}$}}
-        $\rho_{\text{lo}} \leftarrow \rho$\;
+        $\rho_{\mathrm{lo}} \leftarrow \rho$\;
     }
 
     \BlankLine
     \tcp{Phase 2: Bisection}
-    \For{$k \leftarrow 1$ \KwTo $N_{\text{bisect}}$}{
-        \If{$\rho_{\text{up}} - \rho_{\text{lo}} \le \varepsilon$}{\textbf{break}\;}
-        $\rho_{\text{mid}} \leftarrow \frac{1}{2}(\rho_{\text{lo}} + \rho_{\text{up}})$\;
-        \eIf{$\Psi(\rho_{\text{mid}})$}{
-            $\rho_{\text{lo}} \leftarrow \rho_{\text{mid}}$\;
+    \For{$k \leftarrow 1$ \KwTo $N_{\mathrm{bisect}}$}{
+        \If{$\rho_{\mathrm{up}} - \rho_{\mathrm{lo}} \le \varepsilon$}{\textbf{break}\;}
+        $\rho_{\mathrm{mid}} \leftarrow \frac{1}{2}(\rho_{\mathrm{lo}} + \rho_{\mathrm{up}})$\;
+        \eIf{$\Psi(\rho_{\mathrm{mid}})$}{
+            $\rho_{\mathrm{lo}} \leftarrow \rho_{\mathrm{mid}}$\;
         }{
-            $\rho_{\text{up}} \leftarrow \rho_{\text{mid}}$\;
+            $\rho_{\mathrm{up}} \leftarrow \rho_{\mathrm{mid}}$\;
         }
     }
 
     \BlankLine
-    \KwRet $\rho_{\text{lo}}$\;
+    \KwRet $\rho_{\mathrm{lo}}$\;
 \end{algorithm}

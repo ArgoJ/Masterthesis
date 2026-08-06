@@ -282,6 +282,14 @@
         at x mid={boundary_sampling.east}{boundary_batch.west}{0.05cm}
     ] {$\mathcal{B}_{\partial}$};
 
+    \draw[dataarrow=purple] (boundary_batch.south) |- (rho_estimation.east);
+    \node[
+        font=\tiny,
+        text=purple!90!black,
+        anchor=south,
+        at x mid={boundary_batch.south}{rho_estimation.east}{0.05cm}
+    ] {$\mathcal{B}_{\partial}$};
+
     \draw[dataarrow=amber!90!black] (mining.east) -- (counterexample_pool.west);
     \node[
         font=\tiny,

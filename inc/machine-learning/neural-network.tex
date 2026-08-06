@@ -235,9 +235,10 @@ Adam is summarized in \cref{alg:adam-optimizer}.
     \KwOut{Optimized parameters $\theta$}
 
     \BlankLine
-    Initialize $1^{\text{st}}$ moment vector $m_0 \leftarrow 0$\;
-    Initialize $2^{\text{nd}}$ moment vector $v_0 \leftarrow 0$\;
-    Initialize timestep $t \leftarrow 0$\;
+    \tcp{Initializations}
+    $m_0 \leftarrow 0$\;
+    $v_0 \leftarrow 0$\;
+    $t \leftarrow 0$\;
 
     \BlankLine
     \While{$\theta$ not converged}{
