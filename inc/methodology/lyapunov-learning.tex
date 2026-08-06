@@ -378,7 +378,7 @@ Finally, to ensure numerical stability and prevent irregular jumps in the loss l
 across different batches, the $\rho$ value actually used for gating is updated using an exponential moving average (EMA):
 \begin{equation}
     \label{eq:rho-ema}
-    \rho = \beta \rho + (1 - \beta) \tilde{\rho},
+    \rho \leftarrow \beta \rho + (1 - \beta) \tilde{\rho},
 \end{equation}
 where $\beta \in [0, 1)$ is the decay rate.
 

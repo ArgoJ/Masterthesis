@@ -1,2 +1,55 @@
-\section{Adversarial Training and Falsification}
-\label{sec:adv-fals}
+\section{Adversarial Examples and Projected Gradient Methods}
+\label{sec:adversarial-examples}
+
+\subsection{Adversarial Examples}
+\label{subsec:adversarial-examples}
+
+\begin{equation}
+    \max_{\delta}
+    \quad
+    \mathcal{J}(\theta, x + \delta, y)
+    \qquad
+    \text{s.t.}
+    \quad
+    \|\delta\|_p \leq \varepsilon,
+    \quad
+    x + \delta \in \mathcal{X}.
+\end{equation}
+
+\subsection{Projected Gradient Descent}
+\label{subsec:pgd}
+
+Projected Gradient Descent (PGD) is an iterative gradient-based method for
+constructing adversarial examples. Starting from the original input
+$x_{\mathrm{adv}} := x$, each iteration modifies the current candidate in a
+direction that increases a differentiable objective $\mathcal{J}$:
+\begin{equation}
+    \label{eq:pgd-update}
+    x_{\mathrm{adv}}
+    \leftarrow
+    \Pi_{\mathcal{C}_{\varepsilon}(x)}
+    \left(
+        x_{\mathrm{adv}}
+        +
+        \alpha
+        \operatorname{sign}
+        \left(
+            \nabla_{x_{\mathrm{adv}}}
+            \mathcal{J}(\theta, x_{\mathrm{adv}}, y)
+        \right)
+    \right),
+\end{equation}
+where $\alpha > 0$ denotes the step size and
+\begin{equation}
+    \mathcal{C}_{\varepsilon}(x)
+    =
+    \left\{
+        z
+        \;\middle|\;
+        \|z-x\|_\infty \leq \varepsilon
+    \right\}
+\end{equation}
+defines the admissible $\ell_\infty$-bounded perturbation set.
+
+\subsection{Implications for Neural Control and Verification}
+\label{subsec:adversarial-verification}
