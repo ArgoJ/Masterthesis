@@ -19,7 +19,7 @@ is defined recursively for layers $l = 1, \dots, L$:
     \qquad \forall l = 1, \dots, L,
 \end{equation}
 where $a^{(0)} := x$ is the input, $z^{(l)}$ is the pre-activation vector of layer $l$, 
-and $a^{(L)} := \hat{y}$ is the network prediction. 
+and $a^{(L)} := \pi_\theta(x) = \hat{y}$ is the network prediction. 
 The matrix $W^{(l)}$ and vector $b^{(l)}$ denote the weights and biases of layer $l$, respectively, 
 while $\sigma^{(l)}(\cdot)$ represents a non-linear activation function applied element-wise to 
 the pre-activation vector $z^{(l)}$ \citeSec{3.2}{kollmannsbergerDeepLearningComputational2021}. 
@@ -67,20 +67,29 @@ illustrates a representative architecture.
 
 To approximate an expert control law with a neural network $\pi_\theta(x)$, the parameters $\theta$ are updated 
 via gradient-based optimization \citeSec{2.5}{kollmannsbergerDeepLearningComputational2021}. 
-The goal is to find an optimal parameter set $\theta^*$ that minimizes a scalar loss function $\loss$.
+The objective is to find parameters $\theta^\star$ that minimize the empirical
+training objective:
+\begin{equation}
+    \label{eq:training-objective}
+    \theta^\star \in \arg\min_{\theta} \mathcal{L}(\mathcal{D}; \theta).
+\end{equation}
 
 
 \paragraph{Dataset and Primary Loss Function.}
 The training process relies on an offline dataset $\mathcal{D} = \left\{ (x_i, y_i) \right\}_{i=1}^M$ containing $M$ 
-input-target pairs sampled across the domain. For continuous regression tasks, the prediction discrepancy is commonly 
-measured using the Mean Squared Error (MSE) evaluated over a mini-batch $\mathcal{B} \subset \mathcal{D}$:
+input-target pairs sampled across the domain. For continuous regression tasks, a common loss term is the 
+mean squared error (MSE) evaluated over the training dataset:
 \begin{equation}
     \label{eq:mse-loss}
-    \mathcal{L}_{\mathrm{MSE}} = \frac{1}{|\mathcal{B}|} \sum_{(x, y) \in \mathcal{B}} \left\| 
-        f_\theta(x) - y 
-    \right\|_2^2,
+    \mathcal{L}_{\mathrm{MSE}}(\mathcal{D}; \theta)
+    =
+    \frac{1}{M}
+    \sum_{(x,y) \in \mathcal{D}}
+    \left\|
+        \pi_\theta(x) - y
+    \right\|_2^2.
 \end{equation}
-where $x$ and $y$ denote the system state and the corresponding target value, respectively.
+Here, $x$ denotes a system state and $y$ denotes the corresponding target value.
 
 
 \paragraph{Loss Augmentation and Regularization.}
@@ -90,19 +99,19 @@ incorporate prior knowledge directly into the optimization process, the objectiv
 augmented with weight regularization and auxiliary loss terms \citeSec{3.7}{kollmannsbergerDeepLearningComputational2021}:
 \begin{equation}
     \label{eq:total-loss}
-    \mathcal{L} = 
-        \mathcal{L}_{\mathrm{MSE}} + 
-        \omega_{\mathrm{reg}} \mathcal{L}_{\mathrm{reg}} + 
-        \omega_{\mathrm{aux}} \mathcal{L}_{\mathrm{aux}},
+    \mathcal{L}(\mathcal{D}; \theta) =
+        \mathcal{L}_{\mathrm{MSE}}(\mathcal{D}; \theta)
+        + \omega_{\mathrm{reg}} \mathcal{L}_{\mathrm{reg}}(\theta)
+        + \omega_{\mathrm{aux}} \mathcal{L}_{\mathrm{aux}}(\mathcal{D}; \theta).
 \end{equation}
-where $\omega_{\mathrm{reg}}, \omega_{\mathrm{aux}} > 0$ serve as weighting hyperparameters balancing prediction error, 
+where $\omega_{\mathrm{reg}}, \omega_{\mathrm{aux}} \geq 0$ serve as weighting hyperparameters balancing prediction error, 
 parameter regularization, and constraint satisfaction.
 
 The regularization term $\mathcal{L}_{\mathrm{reg}}$ constrains the network's parameter space, typically realized as an 
 $L_1$-norm ($\|\theta\|_1$) or $L_2$-norm ($\|\theta\|_2^2$) penalty. 
-While $L_1$-regularization promotes sparsity by strictly forcing insignificant weights to zero, $L_2$-regularization 
-suppresses excessively large parameter magnitudes, smooths the network's mapping, and prevents steep gradients in the
-output space. In practice, these penalties are applied exclusively to the network's weight matrices $W \subset \theta$, 
+While $L_1$-regularization promotes sparse parameter representations, $L_2$-regularization 
+penalizes large parameter magnitudes and can improve numerical stability and generalization. 
+In practice, these penalties are applied exclusively to the network's weight matrices $W \subset \theta$, 
 leaving bias vectors $b$ unpenalized. \citeSec{3.7.2}{kollmannsbergerDeepLearningComputational2021}.
 
 In addition to regularization penalties, the auxiliary loss $\mathcal{L}_{\mathrm{aux}}$ embeds domain knowledge into the 
@@ -114,32 +123,141 @@ desired solutions.
 
 \paragraph{Gradient Computation via Backpropagation.}
 For updating the network parameters $\theta$ using gradient-based optimization, 
-the partial derivatives of the loss $\mathcal{L}$ with respect to all weight matrices $W^{(l)}$ and 
-bias vectors $b^{(l)}$ must be evaluated. The backpropagation algorithm calculates these gradients efficiently 
-by first performing the forward pass \eqref{eq:nn-forward} to store intermediate activation states. 
-Then, a backward pass is executed, which recursively applies the chain rule 
-\citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
+the partial derivatives of the loss $\mathcal{L}(\mathcal{D}, \theta)$ with respect 
+to all weight matrices $W^{(l)}$ and bias vectors $b^{(l)}$ must be evaluated. 
+Backpropagation efficiently computes chain-rule derivatives of loss components that depend on
+the parameters through the network output by combining a forward pass \eqref{eq:nn-forward} 
+with a backward pass \citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
 
 During the backward pass, the algorithm computes the sensitivity of the loss with respect to the pre-activations, 
 defined as the error signal $\delta^{(l)} = \frac{\partial \mathcal{L}}{\partial z^{(l)}}$. 
-Starting at the output layer $L$, the error signal is initialized as:
+At the output layer $L$, this signal is initialized as:
 \begin{equation}
     \delta^{(L)} = \frac{\partial \mathcal{L}}{\partial a^{(L)}} \odot \frac{\partial a^{(L)}}{\partial z^{(L)}},
 \end{equation}
 where $\odot$ represents the element-wise (Hadamard) product. 
-Propagating the error backward for $l = L-1, \dots, 1$ via the chain rule yields the recursive relation:
+Propagating the error backward for $l = L-1, \dots, 1$ yields the recursive relation:
 \begin{equation}
     \label{eq:backprop-recursive-fraction}
     \delta^{(l)} = \left( (W^{(l+1)})^T \delta^{(l+1)} \right) \odot \frac{\partial a^{(l)}}{\partial z^{(l)}}
 \end{equation}
-Finally, the required parameter gradients are obtained by combining the error signal $\delta^{(l)}$ 
-with the stored activations $a^{(l-1)}$ from the forward pass:
+Combining these error signals with stored activations $a^{(l-1)}$ yields the network-dependent gradients 
+of the output-dependent loss terms. Adding the explicit derivative of the parameter regularization term 
+$\mathcal{L}_{\mathrm{reg}}$ completes the total gradient evaluation:
 \begin{equation}
-    \frac{\partial \mathcal{L}}{\partial W^{(l)}} = \delta^{(l)} \left(a^{(l-1)}\right)^T, \quad 
+    \frac{\partial \mathcal{L}}{\partial W^{(l)}} = \delta^{(l)} \left(a^{(l-1)}\right)^T + 
+        \omega_{\mathrm{reg}} \frac{\partial \mathcal{L}_{\mathrm{reg}}}{\partial W^{(l)}}, \quad 
     \frac{\partial \mathcal{L}}{\partial b^{(l)}} = \delta^{(l)}.
 \end{equation}
-By reusing the intermediate error signals $\delta^{(l)}$, backpropagation avoids redundant derivative 
-calculations and evaluates all parameter gradients in linear time $\mathcal{O}(|\theta|)$ 
-relative to the model size, thereby acting as an efficient dynamic programming method over 
-the computational graph \citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
-\todo[inline]{optimizer adam}
+By reusing intermediate activations and error signals, backpropagation avoids redundant derivative 
+calculations and computes parameter gradients with computational cost of the same order as a forward 
+evaluation of the network \citeSec{3.4,2.3}{kollmannsbergerDeepLearningComputational2021,aggarwalNeuralNetworksDeep2023}.
+
+
+\paragraph{Optimization via Mini-Batch Gradient Descent.}
+While full-batch gradient descent evaluates the loss gradient over the entire dataset $\mathcal{D}$, 
+this can become computationally expensive and impractical for large dataset sizes $M$. 
+Conversely, single-sample stochastic gradient descent (SGD) results in high variance of the parameter updates, 
+leading to erratic optimization trajectories. Mini-batch gradient descent balances this trade-off by dividing the 
+dataset into smaller subsets $\mathcal{B} \subset \mathcal{D}$ of size $B = |\mathcal{B}|$. For a mini-batch, 
+the loss $\mathcal{L}(\mathcal{B}; \theta)$ is evaluated analogously to \cref{eq:total-loss}, 
+with $\mathcal{D}$ replaced by $\mathcal{B}$ in all data-dependent loss terms. 
+The mini-batch gradient $\mathbf{g}$ typically has lower variance than the gradient obtained from a single sample, 
+while mini-batch processing enables efficient parallelization on modern GPU hardware.
+During training, the parameters $\theta$ are iteratively updated along the negative gradient direction scaled by a 
+learning rate $\alpha > 0$. This update loop is executed for a total of $E \in \mathbb{N}$ epochs (full passes through the dataset), 
+as detailed in \cref{alg:mini-batch-sgd} \citeSec{2.6.1,2.6}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
+
+\begin{algorithm}[htpb]
+    \caption{Mini-Batch Stochastic Gradient Descent}
+    \label{alg:mini-batch-sgd}
+    \SetAlgoLined
+    \KwIn{Dataset $\mathcal{D} = \{(x_i, y_i)\}_{i=1}^M$, learning rate $\alpha$, batch size $B$, max epochs $E$}
+    \KwOut{Optimized parameters $\theta$}
+
+    \BlankLine
+    Initialize network parameters $\theta = \{W^{(l)}, b^{(l)}\}_{l=1}^L$\;
+    \For{\text{epoch} $\leftarrow 1$ \KwTo $E$}{
+        Shuffle dataset $\mathcal{D}$\;
+        Partition $\mathcal{D}$ into mini-batches $\mathcal{B}_1, \dots, \mathcal{B}_K$ of at most $B$ samples\;
+        \ForEach{$\mathcal{B} \in \{\mathcal{B}_1, \dots, \mathcal{B}_K\}$}{
+            Evaluate output predictions 
+                $\hat{y} = \pi_\theta(x) \quad \forall (x,y) \in \mathcal{B}$\;
+            Compute mini-batch gradient: 
+                $\mathbf{g} \leftarrow \nabla_\theta \mathcal{L}(\mathcal{B}; \theta)$\;
+            Update parameters: 
+                $\theta \leftarrow \theta - \alpha \mathbf{g}$\;
+        }
+    }
+    \KwRet $\theta$\;
+\end{algorithm}
+
+
+\paragraph{Adaptive Moment Estimation (Adam).}
+Although mini-batch gradient descent improves stability compared to SGD, its performance depends on 
+a static learning rate $\alpha$. In loss landscapes with ill-conditioned curvature or noisy 
+mini-batch gradients, a fixed learning rate can cause parameter updates to oscillate in steep directions while 
+making slow progress along plateaus \citeSec{4.5.4}{aggarwalNeuralNetworksDeep2023}.
+
+To resolve these limitations, the Adaptive Moment Estimation (Adam) optimizer \cite{kingmaAdamMethodStochastic2017} 
+computes individual, adaptive learning rates for each parameter by tracking exponential moving averages of both past 
+gradients ($1^{\text{st}}$ moment $m_t$) and past squared gradients ($2^{\text{nd}}$ moment $v_t$) 
+\citeSec{4.5.5.2}{aggarwalNeuralNetworksDeep2023}:
+\begin{align}
+    m_t &= \beta_1 m_{t-1} + (1 - \beta_1) \mathbf{g}_t, \label{eq:adam-m}\\
+    v_t &= \beta_2 v_{t-1} + (1 - \beta_2) \mathbf{g}_t^2, \label{eq:adam-v}
+\end{align}
+where $\beta_1, \beta_2 \in [0, 1)$ dictate the exponential decay rates, and $\mathbf{g}_t^2$ denotes the element-wise 
+square of the current mini-batch gradient $\mathbf{g}_t = \nabla_\theta \mathcal{L}(\mathcal{B}_t; \theta_{t-1})$. 
+
+Because $m_0$ and $v_0$ are initialized as zero vectors, both moment estimates are initially biased toward zero. 
+To counteract this initialization bias, dynamic correction factors are applied at each timestep $t$:
+\begin{equation}
+    \label{eq:adam-bias-correction}
+    \hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \qquad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}.
+\end{equation}
+The network parameters are then updated element-wise according to:
+\begin{equation}
+    \label{eq:adam-update}
+    \theta_t = \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon},
+\end{equation}
+where $\epsilon > 0$ is a small constant ensuring numerical stability. Following \cite{kingmaAdamMethodStochastic2017}, 
+standard default hyperparameters are chosen as $\alpha = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$, 
+providing robust convergence across various deep learning architectures. The complete iterative training loop using 
+Adam is summarized in \cref{alg:adam-optimizer}.
+
+\begin{algorithm}[htpb]
+    \caption{Adaptive Moment Estimation (Adam)}
+    \label{alg:adam-optimizer}
+    \SetAlgoLined
+    \KwIn{Dataset $\mathcal{D}$, initial parameters $\theta_0$, step size $\alpha = 0.001$, decay rates $\beta_1 = 0.9, \beta_2 = 0.999$, 
+        stability constant $\epsilon = 10^{-8}$}
+    \KwOut{Optimized parameters $\theta$}
+
+    \BlankLine
+    Initialize $1^{\text{st}}$ moment vector $m_0 \leftarrow 0$\;
+    Initialize $2^{\text{nd}}$ moment vector $v_0 \leftarrow 0$\;
+    Initialize timestep $t \leftarrow 0$\;
+
+    \BlankLine
+    \While{$\theta$ not converged}{
+        $t \leftarrow t + 1$\;
+        Sample mini-batch $\mathcal{B}_t \subset \mathcal{D}$\;
+        Compute mini-batch gradient: $\mathbf{g}_t \leftarrow \nabla_\theta \mathcal{L}(\mathcal{B}_t; \theta_{t-1})$\;
+        
+        \BlankLine
+        \tcp{Update biased moment estimates}
+        $m_t \leftarrow \beta_1 m_{t-1} + (1 - \beta_1) \mathbf{g}_t$\;
+        $v_t \leftarrow \beta_2 v_{t-1} + (1 - \beta_2) \mathbf{g}_t^2$\;
+        
+        \BlankLine
+        \tcp{Compute bias-corrected estimates}
+        $\hat{m}_t \leftarrow m_t / (1 - \beta_1^t)$\;
+        $\hat{v}_t \leftarrow v_t / (1 - \beta_2^t)$\;
+        
+        \BlankLine
+        \tcp{Update parameters}
+        $\theta_t \leftarrow \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$\;
+    }
+    \KwRet $\theta_t$\;
+\end{algorithm}

@@ -72,9 +72,17 @@ To determine whether a candidate level $\rho$ is valid across the entire continu
 the global verification condition $\Psi(\rho)$ evaluates whether $\Phi(x; \rho)$ holds for all states:
 \begin{equation}
     \label{eq:domain-certification}
-    Psi(\rho) \equiv \forall x \in \mathcal{B}_{\mathrm{eval}} : \Phi(x; \rho).
+    \Psi(\rho) \equiv \forall x \in \mathcal{B}_{\mathrm{eval}} : \Phi(x; \rho).
 \end{equation}
-The verifier queries $\Psi(\rho)$ within the scaling and bisection procedure outlined in \cref{alg:search-and-bisect}.
+\todo[inline]{explain algorithm}
+
+
+% The verifier evaluates $\Psi(\rho)$ as part of the scaling and bisection procedure outlined in \cref{alg:search-and-bisect}.
+% The search operates in two distinct phases: 
+% first, a scaling phase} exponentially expands or contracts $\rho$ by a factor $s > 1$ to bracket the valid sublevel boundary $[\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}]$. 
+% Second, a bisection phase} narrows this interval until the gap falls below the specified tolerance $\varepsilon$. 
+% Compared to the original formulation in \cite{yangLyapunovstableNeuralControl2024}, explicit iteration limits $N_{\mathrm{scale}}$ and $N_{\mathrm{bisect}}$ are integrated into both phases. 
+% This caps the maximum number of $\alpha\beta$-CROWN calls, effectively preventing excessive computational overhead on difficult verification problems.
 
 \begin{algorithm}[htpb]
     \caption{Certified Value Search via Scaling and Bisection}

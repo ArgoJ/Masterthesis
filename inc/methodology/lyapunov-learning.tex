@@ -4,6 +4,7 @@ To establish formal stability guarantees for learned controllers,
 a neural Lyapunov candidate is trained alongside the policy.
 A falsification-guided framework is used to find stability violations and 
 therefore make the Lyapunov candidate a valid certificate for stability.
+\todo[inline]{lyapunov and imitation policy cotraining}
 
 
 
@@ -404,6 +405,8 @@ backpropagation with respect to the trainable network parameters.
 Repeating this procedure over $N_{\mathrm{outer}}$ epochs progressively reduces
 Lyapunov-condition violations and enlarges the estimated certified region of
 attraction.
+
+\todo[inline]{arrow from boundary batch to rho}
 
 \begin{figure}[htbp]
     \centering
