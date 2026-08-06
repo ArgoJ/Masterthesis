@@ -64,11 +64,17 @@ $z^{(l)}$ & Layer pre-activation vector \\
 $W^{(l)}$ & Layer weight matrix \\
 $b^{(l)}$ & Layer bias vector \\
 $\sigma^{(l)}(\cdot)$ & Non-linear activation function \\
+$\tanh(\cdot)$ & Hyperbolic tangent activation function \\
+$[z]_+$ & Rectified linear unit (ReLU) activation \\
+$\hat{y}$ & Network prediction vector \\
+$y$ & Target output vector \\
 $\theta$ & Trainable network parameters \\
 $\theta^*$ & Optimal network parameters \\
 $\mathcal{D}$ & Training dataset \\
 $M$ & Training data size \\
 $\mathcal{B}$ & Mini-batch \\
+$B$ & Mini-batch size \\
+$\mathcal{L}$ & Total training loss function \\
 $\mathcal{L}_{\mathrm{MSE}}$ & Mean squared error loss \\
 $\mathcal{L}_{\mathrm{reg}}$ & Regularization loss \\
 $\mathcal{L}_{\mathrm{aux}}$ & Auxiliary loss \\
@@ -76,6 +82,17 @@ $\omega_{\mathrm{reg}}$ & Regularization weight \\
 $\omega_{\mathrm{aux}}$ & Auxiliary weight \\
 $\delta^{(l)}$ & Loss sensitivity per layer \\
 $\delta^{(L)}$ & Loss sensitivity at last layer \\
+$\odot$ & Element-wise (Hadamard) product \\
+$\mathbf{g}$ & Mini-batch loss gradient \\
+$\alpha$ & Learning rate \\
+$E$ & Total epoch count \\
+$t$ & Optimization timestep index \\
+$m_t$ & Biased first moment estimate \\
+$v_t$ & Biased second moment estimate \\
+$\hat{m}_t$ & Bias-corrected first moment estimate \\
+$\hat{v}_t$ & Bias-corrected second moment estimate \\
+$\beta_1, \beta_2$ & Moment exponential decay rates \\
+$\epsilon$ & Optimizer numerical stability constant \\
 \midrule
 
 % --- Imitation Learning ---
