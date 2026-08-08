@@ -10,17 +10,19 @@ to bypass the computational overhead of online model predictive control (MPC) ev
 Multi-layer perceptrons (MLPs) are fully connected feed-forward networks that map an input 
 through $L-1$ hidden layers to an output layer 
 \citeSec{1.4,3.1}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
-For a state input $x$, forward propagation to the network prediction $\hat{y}$ 
-is defined recursively for layers $l = 1, \dots, L$:
+Let $n_l \in \mathbb{N}$ denote the number of neurons in layer $l \in \{0, \dots, L\}$, where $n_0$ represents 
+the input dimension and $n_L$ the output dimension.
+For an input vector $x \in \mathbb{R}^{n_0}$, forward propagation is defined recursively for layers $l = 1, \dots, L$:
 \begin{equation}
     \label{eq:nn-forward}
     a^{(l)} = \sigma^{(l)}\!\left( z^{(l)} \right) \quad 
     \text{with} \quad z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)}, 
     \qquad \forall l = 1, \dots, L,
 \end{equation}
-where $a^{(0)} := x$ is the input, $z^{(l)}$ is the pre-activation vector of layer $l$, 
-and $a^{(L)} := \pi_\theta(x) = \hat{y}$ is the network prediction. 
-The matrix $W^{(l)}$ and vector $b^{(l)}$ denote the weights and biases of layer $l$, respectively, 
+where $a^{(0)} := x$ is the network input, $z^{(l)} \in \mathbb{R}^{n_l}$ 
+is the pre-activation vector of layer $l$, and $a^{(L)} := \hat{y} \in \mathbb{R}^{n_L}$ 
+is the final network prediction. The matrix $W^{(l)} \in \mathbb{R}^{n_l \times n_{l-1}}$ 
+and vector $b^{(l)} \in \mathbb{R}^{n_l}$ denote the weight matrix and bias vector of layer $l$, respectively, 
 while $\sigma^{(l)}(\cdot)$ represents a non-linear activation function applied element-wise to 
 the pre-activation vector $z^{(l)}$ \citeSec{3.2}{kollmannsbergerDeepLearningComputational2021}. 
 Without these non-linearities, the layers would simply be reduced to a single linear transformation, 

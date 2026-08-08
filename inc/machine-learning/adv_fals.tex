@@ -1,55 +1,77 @@
 \section{Adversarial Examples and Projected Gradient Methods}
 \label{sec:adversarial-examples}
+Deep neural networks are known to be vulnerable to small, intentionally crafted perturbations that drastically 
+affect model outputs or maximize loss metrics \cite{szegedyIntriguingPropertiesNeural2014,goodfellowExplainingHarnessingAdversarial2015}. 
+This vulnerability arises from the fundamental difference between average-case and worst-case generalization: 
+While adversarial samples are extremely rare when sampling the input space randomly, they appear in large numbers along certain, 
+gradient-guided directions \citeSec{12.4}{aggarwalNeuralNetworksDeep2023}. 
+By performing gradient ascent directly on the inputs subject to a bounded $\ell_p$-norm constraint 
+$\|\delta\|_p \le \varepsilon$, the approach explicitly targets areas of severe performance degradation. 
+In the context of neural control, these adversarial search strategies are adapted from deceptive attacks to serve as 
+empirical falsification tools, providing a computationally efficient approach to detect violations of safety or 
+stability in a worst-case scenario prior to formal verification \cite{yangLyapunovstableNeuralControl2024}.
 
-\subsection{Adversarial Examples}
-\label{subsec:adversarial-examples}
-
+In supervised learning, the generation of adversarial examples can be formulated as a constrained optimization problem 
+\cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}. 
+Given a trained model parameterized by $\theta$, a clean input $x \in \mathcal{X}$, 
+and its ground-truth target $y$, a white-box adversary searches for an optimal perturbation vector $\delta$ 
+that maximizes the model's loss function $\mathcal{L}(x + \delta, y; \theta)$ \cite{madryDeepLearningModels2019}:
 \begin{equation}
+    \label{eq:adversarial-problem}
     \max_{\delta}
     \quad
-    \mathcal{J}(\theta, x + \delta, y)
+    \mathcal{L}(x + \delta, y; \theta)
     \qquad
     \text{s.t.}
     \quad
     \|\delta\|_p \leq \varepsilon,
-    \quad
-    x + \delta \in \mathcal{X}.
 \end{equation}
+where $\varepsilon > 0$ denotes the maximum perturbation magnitude constrained by an $\ell_p$-norm, 
+typically chosen as $p \in \{1, 2, \infty\}$ \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}.
+
 
 \subsection{Projected Gradient Descent}
 \label{subsec:pgd}
+To solve the inner loss-maximization problem \eqref{eq:adversarial-problem}, the Fast Gradient Sign Method (FGSM) 
+\cite{goodfellowExplainingHarnessingAdversarial2015} provides a fast, linear one-step approximation by taking a 
+single step along the sign of the loss gradient. However, single-step attacks often fail to find the worst-case loss in complex, 
+highly non-convex loss landscapes \cite{madryDeepLearningModels2019}.
 
-Projected Gradient Descent (PGD) is an iterative gradient-based method for
-constructing adversarial examples. Starting from the original input
-$x_{\mathrm{adv}} := x$, each iteration modifies the current candidate in a
-direction that increases a differentiable objective $\mathcal{J}$:
+Projected Gradient Descent (PGD) extends FGSM into an iterative multi-step gradient ascent scheme \cite{madryDeepLearningModels2019}. 
+For an $\ell_\infty$-norm constraint, the admissible perturbation set $\mathcal{C}_{\varepsilon}(x)$ forms a 
+hyper-rectangular box centered at $x$:
+\begin{equation}
+    \mathcal{C}_{\varepsilon}(x)
+    =
+    \left\{
+        z 
+        \;\mid\;
+        \|z - x\|_p \leq \varepsilon
+    \right\}.
+\end{equation}
+Starting from an initial candidate $x_{\mathrm{adv}} := x$, each step updates the adversarial sample along the gradient direction:
 \begin{equation}
     \label{eq:pgd-update}
-    x_{\mathrm{adv}}
+    x_{\mathrm{adv}}^+
     \leftarrow
     \Pi_{\mathcal{C}_{\varepsilon}(x)}
     \left(
         x_{\mathrm{adv}}
         +
-        \alpha
-        \operatorname{sign}
+        \alpha \operatorname{sign}
         \left(
             \nabla_{x_{\mathrm{adv}}}
-            \mathcal{J}(\theta, x_{\mathrm{adv}}, y)
+            \mathcal{L}\left(x_{\mathrm{adv}}, y; \theta\right)
         \right)
     \right),
 \end{equation}
-where $\alpha > 0$ denotes the step size and
-\begin{equation}
-    \mathcal{C}_{\varepsilon}(x)
-    =
-    \left\{
-        z
-        \;\middle|\;
-        \|z-x\|_\infty \leq \varepsilon
-    \right\}
-\end{equation}
-defines the admissible $\ell_\infty$-bounded perturbation set.
+where $\alpha > 0$ denotes the step size and $\Pi_{\mathcal{C}_{\varepsilon}(x)}(\cdot)$ projects the 
+updated sample back onto the constraint set \cite{madryDeepLearningModels2019}. 
+Due to the $\ell_\infty$-box structure, this projection simplifies to an element-wise clipping 
+operation to the interval $[x - \varepsilon, x + \varepsilon]$, ensuring that $x_{\mathrm{adv}}^+$ 
+strictly satisfies the state constraints at every iteration
 
-\subsection{Implications for Neural Control and Verification}
-\label{subsec:adversarial-verification}
+
+
+\subsection{Adaptation to Neural Lyapunov Control}
+\label{subsec:pgd-lyapunov-control}
