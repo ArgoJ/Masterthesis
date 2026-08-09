@@ -110,8 +110,8 @@ where $\omega_{\mathrm{reg}}, \omega_{\mathrm{aux}} \geq 0$ serve as weighting h
 parameter regularization, and constraint satisfaction.
 
 The regularization term $\mathcal{L}_{\mathrm{reg}}$ constrains the network's parameter space, typically realized as an 
-$L_1$-norm ($\|\theta\|_1$) or $L_2$-norm ($\|\theta\|_2^2$) penalty. 
-While $L_1$-regularization promotes sparse parameter representations, $L_2$-regularization 
+$\ell_1$-norm ($\|\theta\|_1$) or $\ell_2$-norm ($\|\theta\|_2^2$) penalty. 
+While $\ell_1$-regularization promotes sparse parameter representations, $\ell_2$-regularization 
 penalizes large parameter magnitudes and can improve numerical stability and generalization. 
 In practice, these penalties are applied exclusively to the network's weight matrices $W \subset \theta$, 
 leaving bias vectors $b$ unpenalized. \citeSec{3.7.2}{kollmannsbergerDeepLearningComputational2021}.

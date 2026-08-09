@@ -3,75 +3,105 @@
 Deep neural networks are known to be vulnerable to small, intentionally crafted perturbations that drastically 
 affect model outputs or maximize loss metrics \cite{szegedyIntriguingPropertiesNeural2014,goodfellowExplainingHarnessingAdversarial2015}. 
 This vulnerability arises from the fundamental difference between average-case and worst-case generalization: 
-While adversarial samples are extremely rare when sampling the input space randomly, they appear in large numbers along certain, 
-gradient-guided directions \citeSec{12.4}{aggarwalNeuralNetworksDeep2023}. 
+Random sampling may fail to reliably expose inputs associated with large loss values, 
+whereas gradient-guided optimization explicitly searches for such directions \citeSec{12.4}{aggarwalNeuralNetworksDeep2023}. 
 By performing gradient ascent directly on the inputs subject to a bounded $\ell_p$-norm constraint 
-$\|\delta\|_p \le \varepsilon$, the approach explicitly targets areas of severe performance degradation. 
+$\|\delta\|_p \le \varepsilon_\delta$, the approach explicitly targets areas of severe performance degradation. 
 In the context of neural control, these adversarial search strategies are adapted from deceptive attacks to serve as 
 empirical falsification tools, providing a computationally efficient approach to detect violations of safety or 
 stability in a worst-case scenario prior to formal verification \cite{yangLyapunovstableNeuralControl2024}.
 
 In supervised learning, the generation of adversarial examples can be formulated as a constrained optimization problem 
 \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}. 
-Given a trained model parameterized by $\theta$, a clean input $x \in \mathcal{X}$, 
-and its ground-truth target $y$, a white-box adversary searches for an optimal perturbation vector $\delta$ 
-that maximizes the model's loss function $\mathcal{L}(x + \delta, y; \theta)$ \cite{madryDeepLearningModels2019}:
+Given a trained model parameterized by $\theta$, a clean input $x \in \mathbb{R}^{n_0}$, 
+and its ground-truth target $y \in \mathbb{R}^{n_L}$, a white-box adversary searches for an optimal perturbation vector 
+$\delta \in \mathbb{R}^{n_0}$ that maximizes the model's loss function $\mathcal{J}(x + \delta, y; \theta)$ 
+\cite{madryDeepLearningModels2019}:
 \begin{equation}
     \label{eq:adversarial-problem}
     \max_{\delta}
     \quad
-    \mathcal{L}(x + \delta, y; \theta)
+    \mathcal{J}(x + \delta, y; \theta)
     \qquad
     \text{s.t.}
     \quad
-    \|\delta\|_p \leq \varepsilon,
+    \|\delta\|_p \leq \varepsilon_\delta,
 \end{equation}
-where $\varepsilon > 0$ denotes the maximum perturbation magnitude constrained by an $\ell_p$-norm, 
-typically chosen as $p \in \{1, 2, \infty\}$ \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}.
+where $\varepsilon_\delta > 0$ denotes the maximum perturbation magnitude constrained by an $\ell_p$-norm, 
+typically chosen as $p \in \{2, \infty\}$ \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}.
+In practical applications, the perturbed input may additionally be clipped to
+the valid input range.
+
 
 
 \subsection{Projected Gradient Descent}
 \label{subsec:pgd}
-To solve the inner loss-maximization problem \eqref{eq:adversarial-problem}, the Fast Gradient Sign Method (FGSM) 
+To solve the loss maximization problem \eqref{eq:adversarial-problem}, the Fast Gradient Sign Method (FGSM) 
 \cite{goodfellowExplainingHarnessingAdversarial2015} provides a fast, linear one-step approximation by taking a 
-single step along the sign of the loss gradient. However, single-step attacks often fail to find the worst-case loss in complex, 
-highly non-convex loss landscapes \cite{madryDeepLearningModels2019}.
+single step along the sign of the loss gradient. However, in highly non-convex loss landscapes, 
+one-step attacks may yield weaker loss-maximizing candidates than iterative attacks \cite{madryDeepLearningModels2019}.
 
-Projected Gradient Descent (PGD) extends FGSM into an iterative multi-step gradient ascent scheme \cite{madryDeepLearningModels2019}. 
-For an $\ell_\infty$-norm constraint, the admissible perturbation set $\mathcal{C}_{\varepsilon}(x)$ forms a 
-hyper-rectangular box centered at $x$:
+Projected Gradient Descent (PGD) extends FGSM into an iterative multi-step gradient ascent scheme. 
+Following the robust optimization framework proposed by Madry \cite{madryDeepLearningModels2019}, 
+$\mathcal{P}$ denotes the set of allowed perturbations. 
+For an $\ell_\infty$-norm constraint, $\mathcal{P}$ forms a hyper-rectangular box centered at the origin:
 \begin{equation}
-    \mathcal{C}_{\varepsilon}(x)
-    =
-    \left\{
-        z 
-        \;\mid\;
-        \|z - x\|_p \leq \varepsilon
+    \label{eq:perturbation-set}
+    \mathcal{P} = \left\{
+        \delta \in \mathbb{R}^{n_0}
+        \,\mid\,
+        \|\delta\|_\infty \leq \varepsilon_\delta
     \right\}.
 \end{equation}
-Starting from an initial candidate $x_{\mathrm{adv}} := x$, each step updates the adversarial sample along the gradient direction:
+Instead of initializing the search at the clean input $x$, the initial candidate $x_{\mathrm{adv}}^{(0)}$ is sampled uniformly 
+from the admissible region $x + \mathcal{P}$ to prevent the optimization from getting stuck in suboptimal local maxima 
+\cite{madryDeepLearningModels2019}. At each step $j \in \{0, \dots, I-1\}$, the adversarial sample is updated along the gradient direction:
 \begin{equation}
-    \label{eq:pgd-update}
-    x_{\mathrm{adv}}^+
-    \leftarrow
-    \Pi_{\mathcal{C}_{\varepsilon}(x)}
-    \left(
-        x_{\mathrm{adv}}
-        +
-        \alpha \operatorname{sign}
-        \left(
-            \nabla_{x_{\mathrm{adv}}}
-            \mathcal{L}\left(x_{\mathrm{adv}}, y; \theta\right)
-        \right)
-    \right),
+    \label{eq:adversarial-update}
+    x_{\mathrm{adv}}^{(j+1)}\leftarrow 
+        \Pi_{x + \mathcal{P}} \left(
+            x_{\mathrm{adv}}^{(j)} + \alpha_{\mathrm{PGD}} \operatorname{sign} \left(
+                \nabla_{x_{\mathrm{adv}}^{(j)}} \mathcal{J} \left(
+                    x_{\mathrm{adv}}^{(j)}, y; \theta
+                \right)
+            \right)
+        \right),
 \end{equation}
-where $\alpha > 0$ denotes the step size and $\Pi_{\mathcal{C}_{\varepsilon}(x)}(\cdot)$ projects the 
-updated sample back onto the constraint set \cite{madryDeepLearningModels2019}. 
-Due to the $\ell_\infty$-box structure, this projection simplifies to an element-wise clipping 
-operation to the interval $[x - \varepsilon, x + \varepsilon]$, ensuring that $x_{\mathrm{adv}}^+$ 
-strictly satisfies the state constraints at every iteration
+where $\alpha_{\mathrm{PGD}} > 0$ denotes the step size and $I \in \mathbb{N}$ represents the total number of iterations. 
+Furthermore, $\Pi_{x + \mathcal{P}}(\cdot)$ projects the updated sample back onto the constraint set 
+\cite{madryDeepLearningModels2019}. Due to the $\ell_\infty$-box structure, this projection simplifies to an element-wise clipping operation 
+to the interval $[x - \varepsilon_\delta, x + \varepsilon_\delta]$, ensuring that $x_{\mathrm{adv}}^{(j+1)}$ satisfies the prescribed perturbation 
+constraint at every iteration.
 
 
 
 \subsection{Adaptation to Neural Lyapunov Control}
 \label{subsec:pgd-lyapunov-control}
+
+When transitioning from conventional adversarial attacks to neural Lyapunov control, the adversary's objective fundamentally changes. 
+Rather than deceiving a classifier, the goal becomes identifying counterexample states $x_{\mathrm{adv}}$ 
+that violate control-theoretic guarantees, such as Lyapunov decrease and stability \eqref{eq:asymptotic-lyapunov-stability}, 
+or domain invariance \eqref{eq:positive-invariance} \cite{yangLyapunovstableNeuralControl2024}.
+
+Instead of maximizing a classification loss \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}, 
+the gradient-based search is repurposed to actively identify states associated with large violations of the Lyapunov conditions.
+Adapting the robust optimization paradigm \cite{madryDeepLearningModels2019} to deterministic control, 
+learning a Lyapunov candidate and controller can be framed as a saddle-point problem:
+\begin{equation}
+    \label{eq:lyapunov-min-max}
+    \min_{\theta} 
+    \quad 
+    \max_{x_{\mathrm{adv}} \in \mathcal{X}} 
+    \quad 
+    \mathcal{J}(x_{\mathrm{adv}}, y; \theta),
+\end{equation}
+where the inner maximization searches for high-violation candidate states within the training domain $\mathcal{X}$, 
+and $\mathcal{J}(x_{\mathrm{adv}}, y; \theta)$ represents the continuous Lyapunov violation loss. 
+Conversely, the outer minimization updates the network parameters $\theta$ to resolve these 
+violations \cite{madryDeepLearningModels2019}.
+
+Since uniform sampling may fail to discover violations in high-dimensional spaces \citeSec{12.4}{aggarwalNeuralNetworksDeep2023}, 
+gradient-guided ascent along $\nabla_{x} \mathcal{J}$ can focus the search on candidate states associated with large 
+Lyapunov condition violations. In this context, PGD serves as an adversarial training mechanism, 
+iteratively feeding high-violation candidate states back into the optimization to reinforce Lyapunov stability margins 
+\cite{madryDeepLearningModels2019,yangLyapunovstableNeuralControl2024}.

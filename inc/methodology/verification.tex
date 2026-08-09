@@ -83,7 +83,7 @@ First, a scaling phase exponentially expands or contracts $\rho$ by a factor $s 
 boundary within an interval $[\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}]$.
 Second, a bisection phase narrows this interval until the gap falls below a tolerance $\varepsilon$. 
 Upon termination, the lower bound yields the maximum certified value $\rho^* \approx \rho_{\mathrm{lo}}$.
-Compared to the proposed formulation in \cite{yangLyapunovstableNeuralControl2024}, 
+Compared to the proposed formulation by Yang in \cite{yangLyapunovstableNeuralControl2024}, 
 explicit iteration limits $N_{\mathrm{scale}}$ and $N_{\mathrm{bisect}}$ are integrated into both phases. 
 This caps the maximum number of verifier calls, effectively preventing excessive computational 
 overhead on difficult verification problems.

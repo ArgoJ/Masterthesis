@@ -18,9 +18,9 @@ the Lyapunov candidate $V_\theta(x)$ is parameterized to be positive definite by
     V_{\theta}(x) = \left| g_{\theta}(x) - g_{\theta}(x^*) \right| 
         + \left\|  (\varepsilon I + R_\theta^\top R_\theta) (x - x^*)  \right\|_1,
 \end{equation}
-where $g_{\theta} : \mathbb{R}^n \to \mathbb{R}$ is a neural network, $x \in \mathbb{R}^n$ is the current state, 
-$x^* \in \mathbb{R}^n$ is the equilibrium, $\varepsilon > 0$ is a small regularization constant, 
-and $R_\theta \in \mathbb{R}^{n \times n}$ is a learnable matrix. 
+where $g_{\theta} : \mathbb{R}^{n_x} \to \mathbb{R}$ is a neural network, $x \in \mathbb{R}^{n_x}$ is the current state, 
+$x^* \in \mathbb{R}^{n_x}$ is the equilibrium, $\varepsilon > 0$ is a small regularization constant, 
+and $R_\theta \in \mathbb{R}^{n_x \times n_x}$ is a learnable matrix. 
 While the first term is only positive semi-definite and may vanish away from the equilibrium, 
 the second term guarantees strict positive definiteness $\forall x \in \mathcal{X} \setminus \{x^*\}$, 
 as the matrix $(\varepsilon I + R_\theta^\top R_\theta)$ is strictly 
@@ -279,29 +279,38 @@ hyperparameters that balance the relative importance of the individual loss comp
 \subsection{Falsification-Guided Training}
 \label{subsec:fals-guided-training}
 Relying solely on uniform state sampling is not sufficient to reliably detect violations of the Lyapunov condition, 
-especially in higher-dimensional state spaces \cite{counterexampleRef}. To overcome this problem, falsification-guided training 
-actively searches for adversarial counterexamples and incorporates them into the training distribution.
-This is made possible by an adversarial replay buffer that reconciles the exploration of the 
+especially in higher-dimensional state spaces \cite{yangLyapunovstableNeuralControl2024}. To overcome this problem, falsification-guided training 
+actively searches for adversarial counterexamples and incorporates them into the training distribution as described in 
+\cref{subsec:pgd-lyapunov-control}. This is made possible by an adversarial replay buffer that reconciles the exploration of the 
 estimated attractor region with the targeted exploitation of known error modes.
 
 
 \paragraph{PGD Falsification} is utilized to identify counterexamples that violate the Lyapunov 
 conditions and iteratively inject them into the counterexample pool $\mathcal{C}$. 
-Specifically, an $L_\infty$-Projected Gradient Descent (PGD) is employed 
-to find adversarial states $x_{\text{adv}} \in \mathcal{X}_V$ 
+Specifically, an $\ell_\infty$-Projected Gradient Descent (PGD) is employed 
+to search for adversarial states $x_{\mathrm{adv}} \in \mathcal{X}_V$ 
 that maximize the condition violation defined in \eqref{eq:combined-condition-violation} 
 and \eqref{eq:rho-gate}. The per-sample PGD objective is defined as
 \begin{equation}
     \label{eq:pgd-objective}
-    J_{\text{PGD}} = -w_{\rho} \loss_{\text{cond}}.
+    \mathcal{J}(x; \theta) = w_{\rho}(x) \loss_{\text{cond}}(x).
 \end{equation}
 The adversarial search is initialized using the explorative pool $\mathcal{S}$, 
 with up to $25\%$ of the batch supplemented by existing counterexamples to encourage local refinement.
-The algorithm minimizes $J_{\text{PGD}}$ by iteratively updating the input states along 
-the sign of their local gradient with a constant step size $\alpha$,
-followed by a projection back onto the training bounds $\mathcal{X}_V$. 
+Starting from an initial candidate $x_{\mathrm{adv}}^{(0)}$, the algorithm maximizes $\mathcal{J}$ 
+by iteratively updating candidate states along the sign of their loss gradient:
+\begin{equation}
+    \label{eq:pgd-update-lyapunov}
+    x_{\mathrm{adv}}^{(j+1)} \leftarrow \Pi_{\mathcal{X}_V} \left(
+        x_{\mathrm{adv}}^{(j)} + \alpha_{\mathrm{PGD}} \operatorname{sign} \left(
+            \nabla_{x_{\mathrm{adv}}^{(j)}} \mathcal{J}\left(x_{\mathrm{adv}}^{(j)}; \theta\right)
+        \right)
+    \right),
+\end{equation}
+where $\alpha_{\mathrm{PGD}} > 0$ denotes the step size and $\Pi_{\mathcal{X}_V}(\cdot)$ projects the updated 
+sample back onto the training domain bounds $\mathcal{X}_V$. 
 To retain the strongest violations and mitigate the effects of overshooting, the state yielding the 
-minimum objective value across all $K$ iterations is preserved for each candidate. 
+maximum objective value across all $I$ iterations is preserved for each candidate. 
 Ultimately, only states strictly within $\mathcal{V}_\rho$ that exceed the violation tolerance 
 and lie outside the origin exclusion region are retained as counterexamples.
 
@@ -378,9 +387,9 @@ Finally, to ensure numerical stability and prevent irregular jumps in the loss l
 across different batches, the $\rho$ value actually used for gating is updated using an exponential moving average (EMA):
 \begin{equation}
     \label{eq:rho-ema}
-    \rho \leftarrow \beta \rho + (1 - \beta) \tilde{\rho},
+    \rho \leftarrow \upsilon \rho + (1 - \upsilon) \tilde{\rho},
 \end{equation}
-where $\beta \in [0, 1)$ is the decay rate.
+where $\upsilon \in [0, 1)$ is the EMA decay rate.
 
 
 \subsection{Overall Training Procedure}

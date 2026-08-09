@@ -54,11 +54,14 @@ $\alpha_N$ & Relaxed Lyapunov decrease factor \\
 $\mathcal{X}_N$ & Feasible initial state set \\
 \midrule
 
-% --- Neural Networks ---
-\multicolumn{2}{@{}l}{\textit{Neural Network}} \\
+% --- Machine Learning ---
+\multicolumn{2}{@{}l}{\textit{Machine Learning}} \\
 \midrule
 $L$ & Total layer count \\
 $l$ & Layer index \\
+$n_l$ & Layer $l$ neuron count \\
+$n_0$ & Input layer dimension \\
+$n_L$ & Output layer dimension \\
 $a^{(l)}$ & Layer activation vector \\
 $z^{(l)}$ & Layer pre-activation vector \\
 $W^{(l)}$ & Layer weight matrix \\
@@ -93,6 +96,17 @@ $\hat{m}_t$ & Bias-corrected first moment estimate \\
 $\hat{v}_t$ & Bias-corrected second moment estimate \\
 $\beta_1, \beta_2$ & Moment exponential decay rates \\
 $\epsilon$ & Optimizer numerical stability constant \\
+$x_{\mathrm{adv}}^{(j)}$ & Adversarial candidate state at PGD step $j$ \\
+$j$ & PGD iteration index \\
+$I$ & Maximum PGD iteration count \\
+$\alpha_{\mathrm{PGD}}$ & PGD step size \\
+$\delta$ & Adversarial perturbation vector \\
+$\varepsilon_\delta$ & Maximum perturbation magnitude \\
+$p$ & Norm order \\
+$\mathcal{P}$ & Admissible perturbation set \\
+$\mathcal{J}(x, y; \theta)$ & Adversarial loss function \\
+$\Pi_{x + \mathcal{P}}(\cdot)$ & Projection operator onto perturbation set \\
+$\operatorname{sign}(\cdot)$ & Signum function \\
 \midrule
 
 % --- Imitation Learning ---
@@ -181,7 +195,7 @@ $\tau_{\max}$ & Maximum lifespan \\
 $m$ & Sublevel margin \\
 $\gamma$ & Overestimation factor \\
 $\tilde{\rho}$ & Estimated ROA boundary minimum \\
-$\beta$ & EMA decay rate \\
+$\upsilon$ & EMA decay rate \\
 $N_{\mathrm{outer}}$ & Outer epoch count \\
 $K_{\mathrm{steps}}$ & Inner mini-batch optimization steps per epoch \\
 $N_{\mathrm{cex}}$ & Counterexample mining step interval \\

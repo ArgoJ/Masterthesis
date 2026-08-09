@@ -58,18 +58,16 @@
   pagetotal = {1}
 }
 
-@online{goodfellowExplainingHarnessingAdversarial2015,
+@inproceedings{goodfellowExplainingHarnessingAdversarial2015,
   title = {Explaining and {{Harnessing Adversarial Examples}}},
+  booktitle = {3rd {{International Conference}} on {{Learning Representations}}},
   author = {Goodfellow, Ian J. and Shlens, Jonathon and Szegedy, Christian},
-  date = {2015-03-20},
-  eprint = {1412.6572},
-  eprinttype = {arXiv},
-  eprintclass = {stat.ML},
-  doi = {10.48550/arXiv.1412.6572},
+  date = {2015},
+  location = {San Diego, CA, USA},
   url = {http://arxiv.org/abs/1412.6572},
   urldate = {2026-06-24},
   abstract = {Several machine learning models, including neural networks, consistently misclassify adversarial examples---inputs formed by applying small but intentionally worst-case perturbations to examples from the dataset, such that the perturbed input results in the model outputting an incorrect answer with high confidence. Early attempts at explaining this phenomenon focused on nonlinearity and overfitting. We argue instead that the primary cause of neural networks' vulnerability to adversarial perturbation is their linear nature. This explanation is supported by new quantitative results while giving the first explanation of the most intriguing fact about them: their generalization across architectures and training sets. Moreover, this view yields a simple and fast method of generating adversarial examples. Using this approach to provide examples for adversarial training, we reduce the test set error of a maxout network on the MNIST dataset.},
-  pubstate = {prepublished},
+  eventtitle = {{{ICLR}} 2015},
   keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
   file = {C\:\\Users\\josua\\Zotero\\storage\\EIBUJZUL\\Goodfellow et al. - 2015 - Explaining and Harnessing Adversarial Examples.pdf;C\:\\Users\\josua\\Zotero\\storage\\V75CVPQE\\1412.html}
 }
@@ -114,10 +112,12 @@
   eprint = {1412.6980},
   eprinttype = {arXiv},
   eprintclass = {cs.LG},
+  publisher = {ICLR 2015},
+  location = {San Diego, CA, USA},
   url = {http://arxiv.org/abs/1412.6980},
   urldate = {2026-08-06},
   abstract = {We introduce Adam, an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments. The method is straightforward to implement, is computationally efficient, has little memory requirements, is invariant to diagonal rescaling of the gradients, and is well suited for problems that are large in terms of data and/or parameters. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. We also analyze the theoretical convergence properties of the algorithm and provide a regret bound on the convergence rate that is comparable to the best known results under the online convex optimization framework. Empirical results demonstrate that Adam works well in practice and compares favorably to other stochastic optimization methods. Finally, we discuss AdaMax, a variant of Adam based on the infinity norm.},
-  eventtitle = {International {{Conference}} on {{Learning Representations}}},
+  eventtitle = {3rd {{International Conference}} on {{Learning Representations}}},
   keywords = {Computer Science - Machine Learning},
   file = {C\:\\Users\\josua\\Zotero\\storage\\TUEJESRC\\Kingma und Ba - 2015 - Adam A Method for Stochastic Optimization.pdf;C\:\\Users\\josua\\Zotero\\storage\\B5RIB6PD\\1412.html}
 }
@@ -146,7 +146,9 @@
   volume = {36},
   pages = {80270--80290},
   publisher = {Curran Associates, Inc.},
-  url = {httpsproceedings.neurips.ccpaper_filespaper2023filefe061ec0ae03c5cf5b5323a2b9121bfd-Paper-Conference.pdf}
+  location = {7th Conference on Neural Information Processing Systems},
+  url = {http://papers.nips.cc/paper\_files/paper/2023/hash/fe061ec0ae03c5cf5b5323a2b9121bfd-Abstract-Conference.html},
+  eventtitle = {{{NeurIPS}} 2023}
 }
 
 @online{liBridgingControlNeural2026,
@@ -166,20 +168,19 @@
   file = {C\:\\Users\\josua\\Zotero\\storage\\R5AYSJFT\\Li et al. - 2026 - Bridging Control with Neural Network Verifier alpha-beta-CROWN A Tutorial.pdf;C\:\\Users\\josua\\Zotero\\storage\\EBMM7F3H\\2605.html}
 }
 
-@online{madryDeepLearningModels2019,
+@inproceedings{madryDeepLearningModels2019,
   title = {Towards {{Deep Learning Models Resistant}} to {{Adversarial Attacks}}},
+  booktitle = {6th {{International Conference}} on {{Learning Representations}}},
   author = {Madry, Aleksander and Makelov, Aleksandar and Schmidt, Ludwig and Tsipras, Dimitris and Vladu, Adrian},
-  date = {2019-09-04},
-  eprint = {1706.06083},
-  eprinttype = {arXiv},
-  eprintclass = {stat.ML},
-  doi = {10.48550/arXiv.1706.06083},
-  url = {http://arxiv.org/abs/1706.06083},
+  date = {2018},
+  publisher = {OpenReview.net},
+  location = {Vancouver, Canada},
+  url = {https://openreview.net/forum?id=rJzIBfZAb},
   urldate = {2026-08-06},
   abstract = {Recent work has demonstrated that deep neural networks are vulnerable to adversarial examples---inputs that are almost indistinguishable from natural data and yet classified incorrectly by the network. In fact, some of the latest findings suggest that the existence of adversarial attacks may be an inherent weakness of deep learning models. To address this problem, we study the adversarial robustness of neural networks through the lens of robust optimization. This approach provides us with a broad and unifying view on much of the prior work on this topic. Its principled nature also enables us to identify methods for both training and attacking neural networks that are reliable and, in a certain sense, universal. In particular, they specify a concrete security guarantee that would protect against any adversary. These methods let us train networks with significantly improved resistance to a wide range of adversarial attacks. They also suggest the notion of security against a first-order adversary as a natural and broad security guarantee. We believe that robustness against such well-defined classes of adversaries is an important stepping stone towards fully resistant deep learning models. Code and pre-trained models are available at https://github.com/MadryLab/mnist\_challenge and https://github.com/MadryLab/cifar10\_challenge.},
-  pubstate = {prepublished},
+  eventtitle = {{{ICLP}} 2018},
   keywords = {Computer Science - Machine Learning,Computer Science - Neural and Evolutionary Computing,Statistics - Machine Learning},
-  file = {C\:\\Users\\josua\\Zotero\\storage\\LRAN5LZU\\Madry et al. - 2019 - Towards Deep Learning Models Resistant to Adversarial Attacks.pdf;C\:\\Users\\josua\\Zotero\\storage\\G8NJI8GJ\\1706.html}
+  file = {C\:\\Users\\josua\\Zotero\\storage\\LRAN5LZU\\Madry et al. - 2018 - Towards Deep Learning Models Resistant to Adversarial Attacks.pdf;C\:\\Users\\josua\\Zotero\\storage\\G8NJI8GJ\\1706.html}
 }
 
 @book{rawlingsModelPredictiveControl2020,
@@ -197,158 +198,217 @@
   file = {C:\Users\josua\Zotero\storage\73QFQQEE\Rawlings et al. - 2020 - Model predictive control theory, computation and design.pdf}
 }
 
-@article{salman2019convex,
+@inproceedings{salman2019convex,
   title = {A Convex Relaxation Barrier to Tight Robustness Verification of Neural Networks},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
   author = {Salman, Hadi and Yang, Greg and Zhang, Huan and Hsieh, Cho-Jui and Zhang, Pengchuan},
   date = {2019},
-  journaltitle = {Advances in Neural Information Processing Systems},
-  shortjournal = {Adv. Neural Inf. Process. Syst.},
   volume = {32},
-  pages = {9835--9846}
+  pages = {9832--9842},
+  location = {Vancouver, BC, Canada},
+  url = {https://proceedings.neurips.cc/paper/2019/hash/246a3c5544feb054f3ea718f61adfa16-Abstract.html},
+  eventtitle = {{{NeurIPS}} 2019}
 }
 
-@inproceedings{shi2024genbab,
-  title = {Neural Network Verification with Branch-and-Bound for General Nonlinearities},
-  booktitle = {International Conference on Tools and Algorithms for the Construction and Analysis of Systems},
+@incollection{shiNeuralNetworkVerification2025a,
+  title = {Neural {{Network Verification}} with {{Branch-and-Bound}} for {{General Nonlinearities}}},
+  booktitle = {Tools and {{Algorithms}} for the {{Construction}} and {{Analysis}} of {{Systems}}},
   author = {Shi, Zhouxing and Jin, Qirui and Kolter, Zico and Jana, Suman and Hsieh, Cho-Jui and Zhang, Huan},
-  date = {2025}
+  editor = {Gurfinkel, Arie and Heule, Marijn},
+  date = {2025},
+  volume = {15696},
+  pages = {315--335},
+  publisher = {Springer Nature Switzerland},
+  location = {Cham},
+  doi = {10.1007/978-3-031-90643-5_17},
+  url = {https://link.springer.com/10.1007/978-3-031-90643-5_17},
+  urldate = {2026-08-09},
+  abstract = {Abstract                            Branch-and-bound (BaB) is among the most effective techniques for neural network (NN) verification. However, existing works on BaB for NN verification have mostly focused on NNs with piecewise linear activations, especially ReLU networks. In this paper, we develop a general framework, named GenBaB, to conduct BaB on general nonlinearities to verify NNs with general architectures, based on linear bound propagation for NN verification. To decide which neuron to branch, we design a new branching heuristic which leverages linear bounds as shortcuts to efficiently estimate the potential improvement after branching. To decide nontrivial branching points for general nonlinear functions, we propose to pre-optimize branching points, which can be efficiently leveraged during verification with a lookup table. We demonstrate the effectiveness of our GenBaB on verifying a wide range of NNs, including NNs with activation functions such as Sigmoid, Tanh, Sine and GeLU, as well as NNs involving multi-dimensional nonlinear operations such as multiplications in LSTMs and Vision Transformers. Our framework also allows the verification of general nonlinear computation graphs and enables verification applications beyond simple NNs, particularly for AC Optimal Power Flow (ACOPF). GenBaB is part of the latest                                                   \$\$\textbackslash alpha ,\textbackslash!\textbackslash beta \$\$                                                               α                       ,                                              β                                                                                       -CROWN                                                   \$\$\textasciicircum 6\$\$                                                                                      6                                                                                       (               https://github.com/Verified-Intelligence/alpha-beta-CROWN               ), the winner of the 4th and the 5th International Verification of Neural Networks Competition (VNN-COMP 2023 and 2024). Code for reproducing the experiments is available at               https://github.com/shizhouxing/GenBaB               . Appendices can be found at               http://arxiv.org/abs/2405.21063               .},
+  isbn = {978-3-031-90642-8 978-3-031-90643-5},
+  langid = {english},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\3E2Q79H6\\Shi et al. - 2025 - Neural Network Verification with Branch-and-Bound for General Nonlinearities.pdf;C\:\\Users\\josua\\Zotero\\storage\\YYFVZVXI\\Shi et al. - 2025 - Neural Network Verification with Branch-and-Bound for General Nonlinearities.pdf;C\:\\Users\\josua\\Zotero\\storage\\6P6VURXI\\2405.html}
 }
 
-@online{szegedyIntriguingPropertiesNeural2014,
+@inproceedings{szegedyIntriguingPropertiesNeural2014,
   title = {Intriguing Properties of Neural Networks},
+  booktitle = {2nd {{International Conference}} on {{Learning Representations}}},
   author = {Szegedy, Christian and Zaremba, Wojciech and Sutskever, Ilya and Bruna, Joan and Erhan, Dumitru and Goodfellow, Ian and Fergus, Rob},
-  date = {2014-02-19},
+  date = {2014},
   eprint = {1312.6199},
   eprinttype = {arXiv},
   eprintclass = {cs.CV},
-  doi = {10.48550/arXiv.1312.6199},
+  publisher = {OpenReview.net},
+  location = {Banff, AB, Canada},
   url = {http://arxiv.org/abs/1312.6199},
   urldate = {2026-06-24},
   abstract = {Deep neural networks are highly expressive models that have recently achieved state of the art performance on speech and visual recognition tasks. While their expressiveness is the reason they succeed, it also causes them to learn uninterpretable solutions that could have counter-intuitive properties. In this paper we report two such properties. First, we find that there is no distinction between individual high level units and random linear combinations of high level units, according to various methods of unit analysis. It suggests that it is the space, rather than the individual units, that contains of the semantic information in the high layers of neural networks. Second, we find that deep neural networks learn input-output mappings that are fairly discontinuous to a significant extend. We can cause the network to misclassify an image by applying a certain imperceptible perturbation, which is found by maximizing the network's prediction error. In addition, the specific nature of these perturbations is not a random artifact of learning: the same perturbation can cause a different network, that was trained on a different subset of the dataset, to misclassify the same input.},
-  pubstate = {prepublished},
+  eventtitle = {{{ICLP}} 2014},
   keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Computer Science - Neural and Evolutionary Computing},
   file = {C\:\\Users\\josua\\Zotero\\storage\\8U2BVNTQ\\Szegedy et al. - 2014 - Intriguing properties of neural networks.pdf;C\:\\Users\\josua\\Zotero\\storage\\JQJUTCE4\\1312.html}
 }
 
-@online{tjengEvaluatingRobustnessNeural2019,
+@inproceedings{tjengEvaluatingRobustnessNeural2019,
   title = {Evaluating {{Robustness}} of {{Neural Networks}} with {{Mixed Integer Programming}}},
-  author = {Tjeng, Vincent and Xiao, Kai and Tedrake, Russ},
-  date = {2019-02-18},
-  eprint = {1711.07356},
-  eprinttype = {arXiv},
-  eprintclass = {cs.LG},
-  doi = {10.48550/arXiv.1711.07356},
-  url = {http://arxiv.org/abs/1711.07356},
-  urldate = {2026-06-24},
-  abstract = {Neural networks have demonstrated considerable success on a wide variety of real-world problems. However, networks trained only to optimize for training accuracy can often be fooled by adversarial examples - slightly perturbed inputs that are misclassified with high confidence. Verification of networks enables us to gauge their vulnerability to such adversarial examples. We formulate verification of piecewise-linear neural networks as a mixed integer program. On a representative task of finding minimum adversarial distortions, our verifier is two to three orders of magnitude quicker than the state-of-the-art. We achieve this computational speedup via tight formulations for non-linearities, as well as a novel presolve algorithm that makes full use of all information available. The computational speedup allows us to verify properties on convolutional networks with an order of magnitude more ReLUs than networks previously verified by any complete verifier. In particular, we determine for the first time the exact adversarial accuracy of an MNIST classifier to perturbations with bounded \$l\_\textbackslash infty\$ norm \$ε=0.1\$: for this classifier, we find an adversarial example for 4.38\% of samples, and a certificate of robustness (to perturbations with bounded norm) for the remainder. Across all robust training procedures and network architectures considered, we are able to certify more samples than the state-of-the-art and find more adversarial examples than a strong first-order attack.},
-  pubstate = {prepublished},
+  booktitle = {7th {{International Conference}} on {{Learning Representations}}},
+  author = {Tjeng, Vincent and Xiao, Kai Yuanqing and Tedrake, Russ},
+  date = {2019},
+  publisher = {OpenReview.net},
+  location = {New Orleans, LA, USA},
+  url = {https://openreview.net/forum?id=HyGIdiRqtm},
+  urldate = {2026-08-09},
+  eventtitle = {{{ICLR}} 2019},
   keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Cryptography and Security,Computer Science - Machine Learning},
   file = {C\:\\Users\\josua\\Zotero\\storage\\WPYKKTUR\\Tjeng et al. - 2019 - Evaluating Robustness of Neural Networks with Mixed Integer Programming.pdf;C\:\\Users\\josua\\Zotero\\storage\\SQ5MEQ88\\1711.html}
 }
 
-@article{wang2021beta,
+@inproceedings{wang2021beta,
   title = {Beta-{{CROWN Efficient}} Bound Propagation with per-Neuron Split Constraints for Complete and Incomplete Neural Network Verification},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
   author = {Wang, Shiqi and Zhang, Huan and Xu, Kaidi and Lin, Xue and Jana, Suman and Hsieh, Cho-Jui and Kolter, J Zico},
   date = {2021},
-  journaltitle = {Advances in Neural Information Processing Systems},
-  shortjournal = {Adv. Neural Inf. Process. Syst.},
-  volume = {34}
+  volume = {34},
+  pages = {29909--29921},
+  publisher = {Curran Associates, Inc.},
+  url = {https://proceedings.neurips.cc/paper/2021/hash/fac7fead96dafceaf80c1daffeae82a4-Abstract.html},
+  eventtitle = {{{NeurIPS}} 2021}
 }
 
-@article{xu2020automatic,
+@inproceedings{xu2020automatic,
   title = {Automatic Perturbation Analysis for Scalable Certified Robustness and Beyond},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
   author = {Xu, Kaidi and Shi, Zhouxing and Zhang, Huan and Wang, Yihan and Chang, Kai-Wei and Huang, Minlie and Kailkhura, Bhavya and Lin, Xue and Hsieh, Cho-Jui},
   date = {2020},
-  journaltitle = {Advances in Neural Information Processing Systems},
-  shortjournal = {Adv. Neural Inf. Process. Syst.},
-  volume = {33}
+  volume = {33},
+  location = {virtual},
+  url = {https://proceedings.neurips.cc/paper/2020/hash/0cbc5671ae26f67871cb914d81ef8fc1-Abstract.html},
+  eventtitle = {{{NeurIPS}} 2020}
 }
 
 @inproceedings{xuFastCompleteEnabling2021,
   title = {Fast and {{Complete}}: {{Enabling Complete Neural Network Verification}} with {{Rapid}} and {{Massively Parallel Incomplete Verifiers}}},
   shorttitle = {Fast and {{Complete}}},
-  booktitle = {International {{Conference}} on {{Learning Representations}}},
+  booktitle = {9th {{International Conference}} on {{Learning Representations}}},
   author = {Xu, Kaidi and Zhang, Huan and Wang, Shiqi and Wang, Yihan and Jana, Suman and Lin, Xue and Hsieh, Cho-Jui},
   date = {2021},
+  publisher = {OpenReview.net},
+  location = {Austria},
   url = {https://openreview.net/forum?id=nVZtXBI6LNn},
-  urldate = {2026-06-24},
-  abstract = {Formal verification of neural networks (NNs) is a challenging and important problem. Existing efficient complete solvers typically require the branch-and-bound (BaB) process, which splits the problem domain into sub-domains and solves each sub-domain using faster but weaker incomplete verifiers, such as Linear Programming (LP) on linearly relaxed sub-domains. In this paper, we propose to use the backward mode linear relaxation based perturbation analysis (LiRPA) to replace LP during the BaB process, which can be efficiently implemented on the typical machine learning accelerators such as GPUs and TPUs. However, unlike LP, LiRPA when applied naively can produce much weaker bounds and even cannot check certain conflicts of sub-domains during splitting, making the entire procedure incomplete after BaB. To address these challenges, we apply a fast gradient based bound tightening procedure combined with batch splits and the design of minimal usage of LP bound procedure, enabling us to effectively use LiRPA on the accelerator hardware for the challenging complete NN verification problem and significantly outperform LP-based approaches. On a single GPU, we demonstrate an order of magnitude speedup compared to existing LP-based approaches.},
+  urldate = {2026-08-09},
+  eventtitle = {{{ICLR}} 2021},
   keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning},
-  file = {C\:\\Users\\josua\\Zotero\\storage\\S23NTXCE\\Xu et al. - 2021 - Fast and Complete Enabling Complete Neural Network Verification with Rapid and Massively Parallel I.pdf;C\:\\Users\\josua\\Zotero\\storage\\QY8AHNA9\\2011.html}
+  file = {C\:\\Users\\josua\\Zotero\\storage\\3ABU9T4Z\\Xu et al. - 2021 - Fast and Complete Enabling Complete Neural Network Verification with Rapid and Massively Parallel I.pdf;C\:\\Users\\josua\\Zotero\\storage\\4PMCCL9U\\2011.html}
 }
 
-@online{yangLyapunovstableNeuralControl2024,
+@inproceedings{yangLyapunovstableNeuralControl2024,
   title = {Lyapunov-Stable {{Neural Control}} for {{State}} and {{Output Feedback}}: {{A Novel Formulation}}},
   shorttitle = {Lyapunov-Stable {{Neural Control}} for {{State}} and {{Output Feedback}}},
+  booktitle = {Proceedings of the 41st {{International Conference}} on {{Machine Learning}}},
   author = {Yang, Lujie and Dai, Hongkai and Shi, Zhouxing and Hsieh, Cho-Jui and Tedrake, Russ and Zhang, Huan},
-  date = {2024-06-05},
-  eprint = {2404.07956},
-  eprinttype = {arXiv},
-  eprintclass = {cs.LG},
-  doi = {10.48550/arXiv.2404.07956},
-  url = {http://arxiv.org/abs/2404.07956},
-  urldate = {2026-06-24},
-  abstract = {Learning-based neural network (NN) control policies have shown impressive empirical performance in a wide range of tasks in robotics and control. However, formal (Lyapunov) stability guarantees over the region-of-attraction (ROA) for NN controllers with nonlinear dynamical systems are challenging to obtain, and most existing approaches rely on expensive solvers such as sums-of-squares (SOS), mixed-integer programming (MIP), or satisfiability modulo theories (SMT). In this paper, we demonstrate a new framework for learning NN controllers together with Lyapunov certificates using fast empirical falsification and strategic regularizations. We propose a novel formulation that defines a larger verifiable region-of-attraction (ROA) than shown in the literature, and refines the conventional restrictive constraints on Lyapunov derivatives to focus only on certifiable ROAs. The Lyapunov condition is rigorously verified post-hoc using branch-and-bound with scalable linear bound propagation-based NN verification techniques. The approach is efficient and flexible, and the full training and verification procedure is accelerated on GPUs without relying on expensive solvers for SOS, MIP, nor SMT. The flexibility and efficiency of our framework allow us to demonstrate Lyapunov-stable output feedback control with synthesized NN-based controllers and NN-based observers with formal stability guarantees, for the first time in literature. Source code at https://github.com/Verified-Intelligence/Lyapunov\_Stable\_NN\_Controllers},
-  pubstate = {prepublished},
+  date = {2024},
+  pages = {56033--56046},
+  publisher = {PMLR 235},
+  location = {Vienna, Austria},
+  issn = {2640-3498},
+  url = {https://proceedings.mlr.press/v235/yang24f.html},
+  urldate = {2026-08-09},
+  abstract = {Learning-based neural-network (NN) control policies have shown impressive empirical performance in a wide range of tasks in robotics and control. However, formal (Lyapunov) stability guarantees over the region-of-attraction (ROA) for NN controllers with nonlinear dynamical systems are challenging to obtain, and most existing approaches rely on expensive solvers for sums-of-squares (SOS), mixed-integer programming (MIP), or satisfiability modulo theories (SMT). In this paper, we demonstrate a new framework for learning NN controllers together with Lyapunov certificates using fast empirical falsification and strategic regularizations. We propose a novel formulation that defines a larger verifiable region-of-attraction (ROA) than shown in the literature, and refines the conventional restrictive constraints on Lyapunov derivatives to focus only on certifiable ROAs. The Lyapunov condition is rigorously verified post-hoc using branch-and-bound with scalable linear bound propagation-based NN verification techniques. The approach is efficient and flexible, and the full training and verification procedure is accelerated on GPUs without relying on expensive solvers for SOS, MIP, nor SMT. The flexibility and efficiency of our framework allow us to demonstrate Lyapunov-stable output feedback control with synthesized NN-based controllers and NN-based observers with formal stability guarantees, for the first time in literature.},
+  eventtitle = {{{ICML}} 2024},
+  langid = {english},
   keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning,Computer Science - Robotics,Electrical Engineering and Systems Science - Systems and Control,Mathematics - Optimization and Control},
   file = {C\:\\Users\\josua\\Zotero\\storage\\4725JAKC\\Yang et al. - 2024 - Lyapunov-stable Neural Control for State and Output Feedback A Novel Formulation.pdf;C\:\\Users\\josua\\Zotero\\storage\\9GF2N8GQ\\2404.html}
 }
 
-@online{yuanAdversarialExamplesAttacks2018,
+@article{yuanAdversarialExamplesAttacks2019,
   title = {Adversarial {{Examples}}: {{Attacks}} and {{Defenses}} for {{Deep Learning}}},
   shorttitle = {Adversarial {{Examples}}},
   author = {Yuan, Xiaoyong and He, Pan and Zhu, Qile and Li, Xiaolin},
-  date = {2018-07-07},
-  eprint = {1712.07107},
-  eprinttype = {arXiv},
-  eprintclass = {cs.LG},
-  doi = {10.48550/arXiv.1712.07107},
-  url = {http://arxiv.org/abs/1712.07107},
-  urldate = {2026-08-08},
-  abstract = {With rapid progress and significant successes in a wide spectrum of applications, deep learning is being applied in many safety-critical environments. However, deep neural networks have been recently found vulnerable to well-designed input samples, called adversarial examples. Adversarial examples are imperceptible to human but can easily fool deep neural networks in the testing/deploying stage. The vulnerability to adversarial examples becomes one of the major risks for applying deep neural networks in safety-critical environments. Therefore, attacks and defenses on adversarial examples draw great attention. In this paper, we review recent findings on adversarial examples for deep neural networks, summarize the methods for generating adversarial examples, and propose a taxonomy of these methods. Under the taxonomy, applications for adversarial examples are investigated. We further elaborate on countermeasures for adversarial examples and explore the challenges and the potential solutions.},
-  pubstate = {prepublished},
+  date = {2019-09},
+  journaltitle = {IEEE Transactions on Neural Networks and Learning Systems},
+  shortjournal = {IEEE Trans. Neural Netw. Learn. Syst.},
+  volume = {30},
+  number = {9},
+  pages = {2805--2824},
+  publisher = {arXiv},
+  issn = {2162-237X, 2162-2388},
+  doi = {10.1109/TNNLS.2018.2886017},
+  url = {https://ieeexplore.ieee.org/document/8611298/},
+  urldate = {2026-08-09},
   keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Cryptography and Security,Computer Science - Machine Learning,Statistics - Machine Learning},
   file = {C\:\\Users\\josua\\Zotero\\storage\\VLFN8EVY\\Yuan et al. - 2018 - Adversarial Examples Attacks and Defenses for Deep Learning.pdf;C\:\\Users\\josua\\Zotero\\storage\\VP472KDY\\1712.html}
 }
 
-@article{zhang2018efficient,
-  title = {Efficient Neural Network Robustness Certification with General Activation Functions},
-  author = {Zhang, Huan and Weng, Tsui-Wei and Chen, Pin-Yu and Hsieh, Cho-Jui and Daniel, Luca},
-  date = {2018},
-  journaltitle = {Advances in Neural Information Processing Systems},
-  shortjournal = {Adv. Neural Inf. Process. Syst.},
-  volume = {31},
-  pages = {4939--4948},
-  url = {httpsarxiv.orgpdf1811.00866.pdf}
-}
-
-@article{zhang2022general,
-  title = {General Cutting Planes for Bound-Propagation-Based Neural Network Verification},
-  author = {Zhang, Huan and Wang, Shiqi and Xu, Kaidi and Li, Linyi and Li, Bo and Jana, Suman and Hsieh, Cho-Jui and Kolter, J Zico},
-  date = {2022},
-  journaltitle = {Advances in Neural Information Processing Systems},
-  shortjournal = {Adv. Neural Inf. Process. Syst.}
-}
-
 @inproceedings{zhang22babattack,
   title = {A Branch and Bound Framework for Stronger Adversarial Attacks of {{ReLU}} Networks},
-  booktitle = {Proceedings of the 39th International Conference on Machine Learning},
+  booktitle = {Proceedings of the 39th {{International Conference}} on {{Machine Learning}}},
   author = {Zhang, Huan and Wang, Shiqi and Xu, Kaidi and Wang, Yihan and Jana, Suman and Hsieh, Cho-Jui and Kolter, Zico},
   date = {2022},
+  series = {Proceedings of {{Machine Learning Research}}},
   volume = {162},
-  pages = {26591--26604}
+  pages = {26591--26604},
+  publisher = {PMLR},
+  location = {Baltimore, Maryland, USA},
+  issn = {2640-3498},
+  url = {https://proceedings.mlr.press/v162/zhang22ae.html},
+  abstract = {Strong adversarial attacks are important for evaluating the true robustness of deep neural networks. Most existing attacks search in the input space, e.g., using gradient descent, and may miss adversarial examples due to non-convexity. In this work, we systematically search adversarial examples in the activation space of ReLU networks to tackle hard instances where none of the existing adversarial attacks succeed. Unfortunately, searching the activation space typically relies on generic mixed integer programming (MIP) solvers and is limited to small networks and easy problem instances. To improve scalability and practicability, we use branch and bound (BaB) with specialized GPU-based bound propagation methods, and propose a top-down beam-search approach to quickly identify the subspace that may contain adversarial examples. Moreover, we build an adversarial candidates pool using cheap attacks to further assist the search in activation space via diving techniques and a bottom-up large neighborhood search. Our adversarial attack framework, BaB-Attack, opens up a new opportunity for designing novel adversarial attacks not limited to searching the input space, and enables us to borrow techniques from integer programming theory and neural network verification. In experiments, we can successfully generate adversarial examples when existing attacks on input space fail. Compared to off-the-shelf MIP solver based attacks that requires significant computations, we outperform in both success rates and efficiency.},
+  eventtitle = {{{ICML}} 2022}
+}
+
+@inproceedings{zhangEfficientNeuralNetwork2018,
+  title = {Efficient {{Neural Network Robustness Certification}} with {{General Activation Functions}}},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
+  author = {Zhang, Huan and Weng, Tsui-Wei and Chen, Pin-Yu and Hsieh, Cho-Jui and Daniel, Luca},
+  date = {2018},
+  volume = {31},
+  publisher = {Curran Associates, Inc.},
+  url = {https://proceedings.neurips.cc/paper/2018/hash/d04863f100d59b3eb688a11f95b0ae60-Abstract.html},
+  urldate = {2026-08-09},
+  abstract = {Finding minimum distortion of adversarial examples and thus certifying robustness in neural networks classifiers is known to be a challenging problem. Nevertheless, recently it has been shown to be possible to give a non-trivial certified lower bound of minimum distortion, and some recent progress has been made towards this direction by exploiting the piece-wise linear nature of ReLU activations. However, a generic robustness certification for \textbackslash textit\{general\} activation functions still remains largely unexplored. To address this issue, in this paper we introduce CROWN, a general framework to certify robustness of neural networks with general activation functions. The novelty in our algorithm consists of bounding a given activation function with linear and quadratic functions, hence allowing it to tackle general activation functions including but not limited to the four popular choices: ReLU, tanh, sigmoid and arctan. In addition, we facilitate the search for a tighter certified lower bound by \textbackslash textit\{adaptively\} selecting appropriate surrogates for each neuron activation. Experimental results show that CROWN on ReLU networks can notably improve the certified lower bounds compared to the current state-of-the-art algorithm Fast-Lin, while having comparable computational efficiency. Furthermore, CROWN also demonstrates its effectiveness and flexibility on networks with general activation functions, including tanh, sigmoid and arctan.},
+  keywords = {Computer Science - Cryptography and Security,Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\NR2X6HKC\\Zhang et al. - 2018 - Efficient Neural Network Robustness Certification with General Activation Functions.pdf;C\:\\Users\\josua\\Zotero\\storage\\RK7N2PNZ\\1811.html}
+}
+
+@inproceedings{zhangGeneralCuttingPlanes2022a,
+  title = {General {{Cutting Planes}} for {{Bound-Propagation-Based Neural Network Verification}}},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
+  author = {Zhang, Huan and Wang, Shiqi and Xu, Kaidi and Li, Linyi and Li, Bo and Jana, Suman and Hsieh, Cho-Jui and Kolter, J. Zico},
+  date = {2022},
+  volume = {35},
+  pages = {1656--1670},
+  publisher = {Curran Associates, Inc.},
+  doi = {10.52202/068431-0121},
+  url = {https://proceedings.neurips.cc//paper_files/paper/2022/hash/0b06c8673ebb453e5e468f7743d8f54e-Abstract-Conference.html},
+  urldate = {2026-08-09},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Cryptography and Security,Computer Science - Machine Learning,Mathematics - Optimization and Control,Statistics - Machine Learning},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\CTCJ6L22\\Zhang et al. - 2022 - General Cutting Planes for Bound-Propagation-Based Neural Network Verification.pdf;C\:\\Users\\josua\\Zotero\\storage\\VGCYR9U6\\2208.html}
 }
 
 @inproceedings{zhou2024scalable,
   title = {Scalable Neural Network Verification with Branch-and-Bound Inferred Cutting Planes},
-  booktitle = {The Thirty-Eighth Annual Conference on Neural Information Processing Systems},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
   author = {Zhou, Duo and Brix, Christopher and Hanasusanto, Grani A and Zhang, Huan},
-  date = {2024}
+  date = {2024},
+  volume = {37},
+  pages = {29324--29353},
+  publisher = {Curran Associates, Inc.},
+  location = {Vancouver, Canada},
+  doi = {10.52202/079017-0923},
+  url = {https://proceedings.neurips.cc/paper_files/paper/2024/file/33d93e4dc57453e7667b20f62e7c0681-Paper-Conference.pdf},
+  eventtitle = {8th {{Conference}} on {{Neural Information Processing Systems}}}
 }
 
-@inproceedings{zhou2025clip,
-  title = {Clip-and-Verify Linear Constraint-Driven Domain Clipping for Accelerating Neural Network Verification},
-  booktitle = {The Thirty-Ninth Annual Conference on Neural Information Processing Systems},
-  author = {Zhou, Duo and Chavez, Jorge and Chen, Hesun and Hanasusanto, Grani A and Zhang, Huan},
-  date = {2025}
+@inproceedings{zhouClipandVerifyLinearConstraintDriven2025,
+  title = {Clip-and-{{Verify}}: {{Linear Constraint-Driven Domain Clipping}} for {{Accelerating Neural Network Verification}}},
+  shorttitle = {Clip-and-{{Verify}}},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
+  author = {Zhou, Duo and Chavez, Jorge and Chen, Hesun and Hanasusanto, Grani A. and Zhang, Huan},
+  date = {2025},
+  volume = {38},
+  pages = {174849--174895},
+  publisher = {Curran Associates, Inc.},
+  doi = {10.52202/085713-5815},
+  url = {https://proceedings.neurips.cc//paper_files/paper/2025/hash/ffa977364ab7046c803da0e04dbb2832-Abstract-Conference.html},
+  urldate = {2026-08-09},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Cryptography and Security,Computer Science - Machine Learning,Mathematics - Optimization and Control},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\AJ2YI4GP\\Zhou et al. - 2025 - Clip-and-Verify Linear Constraint-Driven Domain Clipping for Accelerating Neural Network Verificati.pdf;C\:\\Users\\josua\\Zotero\\storage\\2N7UUVHT\\2512.html}
 }
