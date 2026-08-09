@@ -72,7 +72,7 @@ To balance the optimization scale across different magnitudes of $V_\theta$,
 we normalize this violation to obtain the relative decrease loss:
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
-    \loss_{\text{dec}} = \left[
+    \loss_{\mathrm{dec}} = \left[
         \frac{e_V}{\max(|V_\theta(x)|, \varepsilon_{\text{rel}})}
     \right]_+,
 \end{equation}
@@ -87,7 +87,7 @@ $S_{\text{range}} = \diag(\bar{x}_V - \underline{x}_V)$ is utilized.
 The loss per sample for the next state $x^+_V$ is computed as
 \begin{equation}
     \label{eq:rel-invariance}
-    \loss_{\text{inv}} = \left\| 
+    \loss_{\mathrm{inv}} = \left\| 
         S_{\text{range}}^{-1} \big[ x^+_V - \bar{x}_V \big]_+ 
     \right\|_1 + \left\| 
         S_{\text{range}}^{-1} \big[ \underline{x}_V - x^+_V \big]_+ 
@@ -100,12 +100,12 @@ the relative Lyapunov decrease loss from \eqref{eq:rel-lyapunov-decrease} and
 the relative state invariance loss from \eqref{eq:rel-invariance},
 \begin{equation}
     \label{eq:combined-condition-violation}
-    \loss_{\text{cond}} = 
-        \loss_{\text{dec}} + 
-        \omega_{\text{inv}} \cdot \loss_{\text{inv}},
+    \loss_{\mathrm{cond}} = 
+        \loss_{\mathrm{dec}} + 
+        \omega_{\mathrm{inv}} \cdot \loss_{\mathrm{inv}},
 \end{equation}
-where $\omega_{\text{inv}}$ is a hyperparameter balancing the relative importance of the two loss components.
-However, to apply the $\rho$-gate appropriately, $\loss_{\text{cond}}$ is weighted for each sample using the soft sublevel weight
+where $\omega_{\mathrm{inv}}$ is a hyperparameter balancing the relative importance of the two loss components.
+However, to apply the $\rho$-gate appropriately, $\loss_{\mathrm{cond}}$ is weighted for each sample using the soft sublevel weight
 \begin{equation}
     \label{eq:rho-gate}
     w_{\rho} = \sigma \left(
@@ -119,8 +119,8 @@ $\mathcal{S} \cup \mathcal{C}$ (details in \cref{subsec:fals-guided-training}),
 the weighted mean of the combined condition loss results in the final loss formulation:
 \begin{equation}
     \label{eq:rho-gated-condition-loss}
-    \loss_{\rho\text{-gated}} = \frac{
-        \sum_{\mathcal{B}_{\rho}} w_{\rho} \loss_{\text{cond}}
+    \loss_{\rho\mathrm{-gated}} = \frac{
+        \sum_{\mathcal{B}_{\rho}} w_{\rho} \loss_{\mathrm{cond}}
     }{
         \sum_{\mathcal{B}_{\rho}} w_{\rho}
     }.
@@ -131,7 +131,7 @@ this final gated loss, is summarized in \cref{fig:rho-gated-loss}.
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/rho_gated_loss.tex}
-    \caption{Combined gated condition loss $\loss_{\rho\text{-gated}}$}
+    \caption{Combined gated condition loss $\loss_{\rho\mathrm{-gated}}$}
     \label{fig:rho-gated-loss}
 \end{figure}
 
@@ -145,7 +145,7 @@ The loss is then evaluated over these candidates
 using \cite{yangLyapunovstableNeuralControl2024} 
 \begin{equation}
     \label{eq:roa-loss}
-    \loss_{\text{ROA}} = \frac{1}{|\mathcal{B}_{\text{ROA}}|} \sum_{x \in \mathcal{B}_{\text{ROA}}} \ln \left(
+    \loss_{\mathrm{ROA}} = \frac{1}{|\mathcal{B}_{\text{ROA}}|} \sum_{x \in \mathcal{B}_{\text{ROA}}} \ln \left(
         \left[
             \frac{V_\theta(x)}{\rho} - 1
         \right]_+ + 1
@@ -268,10 +268,10 @@ based on the initial $R_{\theta,0}$ matrix.
 summing all previously defined weighted components, given by 
 \begin{equation}
     \label{eq:combined-loss}
-    \loss_{\text{total}} = \sum_{m}
+    \loss_{\mathrm{total}} = \sum_{m}
         \omega_m \loss_m
 \end{equation}
-where the weights $\omega_m > 0$, with $m \in \{ \rho\text{-gated},\;\text{ROA},\;\text{L},\;V,\;\text{pol},\;R \}$ are 
+where the weights $\omega_m > 0$, with $m \in \{ \rho\mathrm{-gated},\;\mathrm{ROA},\;\mathrm{L},\;V,\;\mathrm{pol},\;R \}$ are 
 hyperparameters that balance the relative importance of the individual loss components. 
 
 
@@ -293,7 +293,7 @@ that maximize the condition violation defined in \eqref{eq:combined-condition-vi
 and \eqref{eq:rho-gate}. The per-sample PGD objective is defined as
 \begin{equation}
     \label{eq:pgd-objective}
-    \mathcal{J}(x; \theta) = w_{\rho}(x) \loss_{\text{cond}}(x).
+    \mathcal{J}(x; \theta) = w_{\rho}(x) \loss_{\mathrm{cond}}(x).
 \end{equation}
 The adversarial search is initialized using the explorative pool $\mathcal{S}$, 
 with up to $25\%$ of the batch supplemented by existing counterexamples to encourage local refinement.
@@ -315,7 +315,7 @@ Ultimately, only states strictly within $\mathcal{V}_\rho$ that exceed the viola
 and lie outside the origin exclusion region are retained as counterexamples.
 
 
-\paragraph{Adversarial Replay Buffer} manages the sample distribution for the $\rho$-gated condition loss $\loss_{\rho\text{-gated}}$. 
+\paragraph{Adversarial Replay Buffer} manages the sample distribution for the $\rho$-gated condition loss $\loss_{\rho\mathrm{-gated}}$. 
 It maintains two distinct state pools: an explorative pool $\mathcal{S}$ and a counterexample pool $\mathcal{C}$. 
 
 As outlined in \cref{alg:state-pool-resample}, the explorative state pool $\mathcal{S}$ is repopulated 

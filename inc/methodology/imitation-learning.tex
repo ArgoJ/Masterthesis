@@ -68,7 +68,7 @@ For a mini-batch $\mathcal{B}_\pi \subset \mathcal{D}_\pi$ of size
 $M_\pi = |\mathcal{B}_\pi|$, the behavioral cloning loss is defined as
 \begin{equation}
     \label{eq:state-weighted-loss}
-    \mathcal{L}_{\mathrm{BC}} = \frac{1}{M_\pi n_u} 
+    \loss_{\mathrm{BC}} = \frac{1}{M_\pi n_u} 
     \sum_{(x, u) \in \mathcal{B}_\pi} w_x(x) \left\| 
         S_u^{-1} \big( \pi_\theta(x) - u \big) 
     \right\|_2^2.
@@ -83,7 +83,7 @@ the neural policy as $x^+ = f(x,\pi_\theta(x))$.
 Using the element-wise ReLU function defined in \eqref{eq:relu}, the loss is defined as
 \begin{equation}
     \label{eq:dynamics-aware-loss}
-    \mathcal{L}_f = \frac{1}{M_\pi n_x} \sum_{x \in \mathcal{B}_\pi} \left( 
+    \loss_f = \frac{1}{M_\pi n_x} \sum_{x \in \mathcal{B}_\pi} \left( 
         \left\| 
             \big[ x^+ - \overline{x}_\pi \big]_+ 
         \right\|_1 + \left\| 
@@ -101,7 +101,7 @@ Scaling each term by its respective weight, $\omega_{\mathrm{BC}}$ and $\omega_f
 yields the overall policy loss:
 \begin{equation}
     \label{eq:combined-policy-loss}
-    \mathcal{L}_\pi = 
-        \omega_{\mathrm{BC}} \mathcal{L}_{\mathrm{BC}} + 
-        \omega_f \mathcal{L}_f.
+    \loss_\pi = 
+        \omega_{\mathrm{BC}} \loss_{\mathrm{BC}} + 
+        \omega_f \loss_f.
 \end{equation}

@@ -73,7 +73,7 @@ The objective is to find parameters $\theta^\star$ that minimize the empirical
 training objective:
 \begin{equation}
     \label{eq:training-objective}
-    \theta^\star \in \arg\min_{\theta} \mathcal{L}(\mathcal{D}; \theta).
+    \theta^\star \in \arg\min_{\theta} \loss(\mathcal{D}; \theta).
 \end{equation}
 
 
@@ -83,7 +83,7 @@ input-target pairs sampled across the domain. For continuous regression tasks, a
 mean squared error (MSE) evaluated over the training dataset:
 \begin{equation}
     \label{eq:mse-loss}
-    \mathcal{L}_{\mathrm{MSE}}(\mathcal{D}; \theta)
+    \loss_{\mathrm{MSE}}(\mathcal{D}; \theta)
     =
     \frac{1}{M}
     \sum_{(x,y) \in \mathcal{D}}
@@ -101,22 +101,22 @@ incorporate prior knowledge directly into the optimization process, the objectiv
 augmented with weight regularization and auxiliary loss terms \citeSec{3.7}{kollmannsbergerDeepLearningComputational2021}:
 \begin{equation}
     \label{eq:total-loss}
-    \mathcal{L}(\mathcal{D}; \theta) =
-        \mathcal{L}_{\mathrm{MSE}}(\mathcal{D}; \theta)
-        + \omega_{\mathrm{reg}} \mathcal{L}_{\mathrm{reg}}(\theta)
-        + \omega_{\mathrm{aux}} \mathcal{L}_{\mathrm{aux}}(\mathcal{D}; \theta).
+    \loss(\mathcal{D}; \theta) =
+        \loss_{\mathrm{MSE}}(\mathcal{D}; \theta)
+        + \omega_{\mathrm{reg}} \loss_{\mathrm{reg}}(\theta)
+        + \omega_{\mathrm{aux}} \loss_{\mathrm{aux}}(\mathcal{D}; \theta).
 \end{equation}
 where $\omega_{\mathrm{reg}}, \omega_{\mathrm{aux}} \geq 0$ serve as weighting hyperparameters balancing prediction error, 
 parameter regularization, and constraint satisfaction.
 
-The regularization term $\mathcal{L}_{\mathrm{reg}}$ constrains the network's parameter space, typically realized as an 
+The regularization term $\loss_{\mathrm{reg}}$ constrains the network's parameter space, typically realized as an 
 $\ell_1$-norm ($\|\theta\|_1$) or $\ell_2$-norm ($\|\theta\|_2^2$) penalty. 
 While $\ell_1$-regularization promotes sparse parameter representations, $\ell_2$-regularization 
 penalizes large parameter magnitudes and can improve numerical stability and generalization. 
 In practice, these penalties are applied exclusively to the network's weight matrices $W \subset \theta$, 
 leaving bias vectors $b$ unpenalized. \citeSec{3.7.2}{kollmannsbergerDeepLearningComputational2021}.
 
-In addition to regularization penalties, the auxiliary loss $\mathcal{L}_{\mathrm{aux}}$ embeds domain knowledge into the 
+In addition to regularization penalties, the auxiliary loss $\loss_{\mathrm{aux}}$ embeds domain knowledge into the 
 optimization process. Popularized by Physics-Informed Neural Networks (PINNs), it directly penalizes violations of 
 explicit rules, such as differential equations or Lyapunov conditions \citeSec{5}{kollmannsbergerDeepLearningComputational2021}, 
 \cite{yangLyapunovstableNeuralControl2024}. Enforcing these properties during training helps the network learn the 
@@ -125,17 +125,17 @@ desired solutions.
 
 \paragraph{Gradient Computation via Backpropagation.}
 For updating the network parameters $\theta$ using gradient-based optimization, 
-the partial derivatives of the loss $\mathcal{L}(\mathcal{D}, \theta)$ with respect 
+the partial derivatives of the loss $\loss(\mathcal{D}, \theta)$ with respect 
 to all weight matrices $W^{(l)}$ and bias vectors $b^{(l)}$ must be evaluated. 
 Backpropagation efficiently computes chain-rule derivatives of loss components that depend on
 the parameters through the network output by combining a forward pass \eqref{eq:nn-forward} 
 with a backward pass \citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
 
 During the backward pass, the algorithm computes the sensitivity of the loss with respect to the pre-activations, 
-defined as the error signal $\delta^{(l)} = \frac{\partial \mathcal{L}}{\partial z^{(l)}}$. 
+defined as the error signal $\delta^{(l)} = \frac{\partial \loss}{\partial z^{(l)}}$. 
 At the output layer $L$, this signal is initialized as:
 \begin{equation}
-    \delta^{(L)} = \frac{\partial \mathcal{L}}{\partial a^{(L)}} \odot \frac{\partial a^{(L)}}{\partial z^{(L)}},
+    \delta^{(L)} = \frac{\partial \loss}{\partial a^{(L)}} \odot \frac{\partial a^{(L)}}{\partial z^{(L)}},
 \end{equation}
 where $\odot$ represents the element-wise (Hadamard) product. 
 Propagating the error backward for $l = L-1, \dots, 1$ yields the recursive relation:
@@ -145,11 +145,11 @@ Propagating the error backward for $l = L-1, \dots, 1$ yields the recursive rela
 \end{equation}
 Combining these error signals with stored activations $a^{(l-1)}$ yields the network-dependent gradients 
 of the output-dependent loss terms. Adding the explicit derivative of the parameter regularization term 
-$\mathcal{L}_{\mathrm{reg}}$ completes the total gradient evaluation:
+$\loss_{\mathrm{reg}}$ completes the total gradient evaluation:
 \begin{equation}
-    \frac{\partial \mathcal{L}}{\partial W^{(l)}} = \delta^{(l)} \left(a^{(l-1)}\right)^T + 
-        \omega_{\mathrm{reg}} \frac{\partial \mathcal{L}_{\mathrm{reg}}}{\partial W^{(l)}}, \quad 
-    \frac{\partial \mathcal{L}}{\partial b^{(l)}} = \delta^{(l)}.
+    \frac{\partial \loss}{\partial W^{(l)}} = \delta^{(l)} \left(a^{(l-1)}\right)^T + 
+        \omega_{\mathrm{reg}} \frac{\partial \loss_{\mathrm{reg}}}{\partial W^{(l)}}, \quad 
+    \frac{\partial \loss}{\partial b^{(l)}} = \delta^{(l)}.
 \end{equation}
 By reusing intermediate activations and error signals, backpropagation avoids redundant derivative 
 calculations and computes parameter gradients with computational cost of the same order as a forward 
@@ -162,7 +162,7 @@ this can become computationally expensive and impractical for large dataset size
 Conversely, single-sample stochastic gradient descent (SGD) results in high variance of the parameter updates, 
 leading to erratic optimization trajectories. Mini-batch gradient descent balances this trade-off by dividing the 
 dataset into smaller subsets $\mathcal{B} \subset \mathcal{D}$ of size $B = |\mathcal{B}|$. For a mini-batch, 
-the loss $\mathcal{L}(\mathcal{B}; \theta)$ is evaluated analogously to \cref{eq:total-loss}, 
+the loss $\loss(\mathcal{B}; \theta)$ is evaluated analogously to \cref{eq:total-loss}, 
 with $\mathcal{D}$ replaced by $\mathcal{B}$ in all data-dependent loss terms. 
 The mini-batch gradient $\mathbf{g}$ typically has lower variance than the gradient obtained from a single sample, 
 while mini-batch processing enables efficient parallelization on modern GPU hardware.
@@ -186,7 +186,7 @@ as detailed in \cref{alg:mini-batch-sgd} \citeSec{2.6.1,2.6}{aggarwalNeuralNetwo
             Evaluate output predictions 
                 $\hat{y} = \pi_\theta(x) \quad \forall (x,y) \in \mathcal{B}$\;
             Compute mini-batch gradient: 
-                $\mathbf{g} \leftarrow \nabla_\theta \mathcal{L}(\mathcal{B}; \theta)$\;
+                $\mathbf{g} \leftarrow \nabla_\theta \loss(\mathcal{B}; \theta)$\;
             Update parameters: 
                 $\theta \leftarrow \theta - \alpha \mathbf{g}$\;
         }
@@ -210,7 +210,7 @@ gradients ($1^{\text{st}}$ moment $m_t$) and past squared gradients ($2^{\text{n
     v_t &= \beta_2 v_{t-1} + (1 - \beta_2) \mathbf{g}_t^2, \label{eq:adam-v}
 \end{align}
 where $\beta_1, \beta_2 \in [0, 1)$ dictate the exponential decay rates, and $\mathbf{g}_t^2$ denotes the element-wise 
-square of the current mini-batch gradient $\mathbf{g}_t = \nabla_\theta \mathcal{L}(\mathcal{B}_t; \theta_{t-1})$. 
+square of the current mini-batch gradient $\mathbf{g}_t = \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$. 
 
 Because $m_0$ and $v_0$ are initialized as zero vectors, both moment estimates are initially biased toward zero. 
 To counteract this initialization bias, dynamic correction factors are applied at each timestep $t$:
@@ -246,7 +246,7 @@ Adam is summarized in \cref{alg:adam-optimizer}.
     \While{$\theta$ not converged}{
         $t \leftarrow t + 1$\;
         Sample mini-batch $\mathcal{B}_t \subset \mathcal{D}$\;
-        Compute mini-batch gradient: $\mathbf{g}_t \leftarrow \nabla_\theta \mathcal{L}(\mathcal{B}_t; \theta_{t-1})$\;
+        Compute mini-batch gradient: $\mathbf{g}_t \leftarrow \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$\;
         
         \BlankLine
         \tcp{Update biased moment estimates}
