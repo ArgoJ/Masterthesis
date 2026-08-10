@@ -164,7 +164,7 @@ leading to erratic optimization trajectories. Mini-batch gradient descent balanc
 dataset into smaller subsets $\mathcal{B} \subset \mathcal{D}$ of size $B = |\mathcal{B}|$. For a mini-batch, 
 the loss $\loss(\mathcal{B}; \theta)$ is evaluated analogously to \cref{eq:total-loss}, 
 with $\mathcal{D}$ replaced by $\mathcal{B}$ in all data-dependent loss terms. 
-The mini-batch gradient $\mathbf{g}$ typically has lower variance than the gradient obtained from a single sample, 
+The mini-batch gradient $g$ typically has lower variance than the gradient obtained from a single sample, 
 while mini-batch processing enables efficient parallelization on modern GPU hardware.
 During training, the parameters $\theta$ are iteratively updated along the negative gradient direction scaled by a 
 learning rate $\alpha > 0$. This update loop is executed for a total of $E \in \mathbb{N}$ epochs (full passes through the dataset), 
@@ -174,28 +174,25 @@ as detailed in \cref{alg:mini-batch-sgd} \citeSec{2.6.1,2.6}{aggarwalNeuralNetwo
     \caption{Mini-Batch Stochastic Gradient Descent}
     \label{alg:mini-batch-sgd}
     \SetAlgoLined
-    \KwIn{Dataset $\mathcal{D} = \{(x_i, y_i)\}_{i=1}^M$, learning rate $\alpha$, batch size $B$, max epochs $E$}
+    \KwIn{Dataset $\mathcal{D} = \{(x_i, y_i)\}_{i=1}^M$, learning rate $\alpha$, 
+        batch size $B$, max epochs $E$, initial parameters $\theta_0$}
     \KwOut{Optimized parameters $\theta$}
 
     \BlankLine
-    Initialize network parameters $\theta = \{W^{(l)}, b^{(l)}\}_{l=1}^L$\;
+    $\theta \leftarrow \theta_0$\;
     \For{\text{epoch} $\leftarrow 1$ \KwTo $E$}{
-        Shuffle dataset $\mathcal{D}$\;
-        Partition $\mathcal{D}$ into mini-batches $\mathcal{B}_1, \dots, \mathcal{B}_K$ of at most $B$ samples\;
+        Sample random partition $\{\mathcal{B}_1, \dots, \mathcal{B}_K\}$ of $\mathcal{D}$ such that $|\mathcal{B}_k| \leq B$\;
         \ForEach{$\mathcal{B} \in \{\mathcal{B}_1, \dots, \mathcal{B}_K\}$}{
-            Evaluate output predictions 
-                $\hat{y} = \pi_\theta(x) \quad \forall (x,y) \in \mathcal{B}$\;
-            Compute mini-batch gradient: 
-                $\mathbf{g} \leftarrow \nabla_\theta \loss(\mathcal{B}; \theta)$\;
-            Update parameters: 
-                $\theta \leftarrow \theta - \alpha \mathbf{g}$\;
+            $\hat{y} = \pi_\theta(x) \quad \forall (x,y) \in \mathcal{B}$\;
+            $g \leftarrow \nabla_\theta \loss(\mathcal{B}; \theta)$\;
+            $\theta \leftarrow \theta - \alpha g$\;
         }
     }
     \KwRet $\theta$\;
 \end{algorithm}
 
 
-\paragraph{Adaptive Moment Estimation (Adam).}
+\paragraph{Adaptive Moment Estimation.}
 Although mini-batch gradient descent improves stability compared to SGD, its performance depends on 
 a static learning rate $\alpha$. In loss landscapes with ill-conditioned curvature or noisy 
 mini-batch gradients, a fixed learning rate can cause parameter updates to oscillate in steep directions while 
@@ -203,14 +200,14 @@ making slow progress along plateaus \citeSec{4.5.4}{aggarwalNeuralNetworksDeep20
 
 To resolve these limitations, the Adaptive Moment Estimation (Adam) optimizer \cite{kingmaAdamMethodStochastic2017} 
 computes individual, adaptive learning rates for each parameter by tracking exponential moving averages of both past 
-gradients ($1^{\text{st}}$ moment $m_t$) and past squared gradients ($2^{\text{nd}}$ moment $v_t$) 
+gradients $m_t$ and past squared gradients $v_t$ 
 \citeSec{4.5.5.2}{aggarwalNeuralNetworksDeep2023}:
 \begin{align}
-    m_t &= \beta_1 m_{t-1} + (1 - \beta_1) \mathbf{g}_t, \label{eq:adam-m}\\
-    v_t &= \beta_2 v_{t-1} + (1 - \beta_2) \mathbf{g}_t^2, \label{eq:adam-v}
+    m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t, \label{eq:adam-m}\\
+    v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2, \label{eq:adam-v}
 \end{align}
-where $\beta_1, \beta_2 \in [0, 1)$ dictate the exponential decay rates, and $\mathbf{g}_t^2$ denotes the element-wise 
-square of the current mini-batch gradient $\mathbf{g}_t = \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$. 
+where $\beta_1, \beta_2 \in [0, 1)$ dictate the exponential decay rates, and $g_t^2$ denotes the element-wise 
+square of the current mini-batch gradient $g_t = \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$. 
 
 Because $m_0$ and $v_0$ are initialized as zero vectors, both moment estimates are initially biased toward zero. 
 To counteract this initialization bias, dynamic correction factors are applied at each timestep $t$:
@@ -246,12 +243,12 @@ Adam is summarized in \cref{alg:adam-optimizer}.
     \While{$\theta$ not converged}{
         $t \leftarrow t + 1$\;
         Sample mini-batch $\mathcal{B}_t \subset \mathcal{D}$\;
-        Compute mini-batch gradient: $\mathbf{g}_t \leftarrow \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$\;
+        Compute mini-batch gradient: $g_t \leftarrow \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$\;
         
         \BlankLine
         \tcp{Update biased moment estimates}
-        $m_t \leftarrow \beta_1 m_{t-1} + (1 - \beta_1) \mathbf{g}_t$\;
-        $v_t \leftarrow \beta_2 v_{t-1} + (1 - \beta_2) \mathbf{g}_t^2$\;
+        $m_t \leftarrow \beta_1 m_{t-1} + (1 - \beta_1) g_t$\;
+        $v_t \leftarrow \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$\;
         
         \BlankLine
         \tcp{Compute bias-corrected estimates}
