@@ -62,6 +62,19 @@ and local Lyapunov decrease of the terminal cost:
 
 Conditions \eqref{eq:term-state-constraint} and \eqref{eq:term-input-constraint} ensure that terminal states and their corresponding 
 local control actions remain strictly within the admissible state and input bounds $\mathcal{X}$ and $\mathcal{U}$. 
+% To guarantee positive invariance \eqref{eq:term-positive-invariance} and construct an admissible terminal set, $\mathcal{X}_f$ is 
+% generally defined as a sub-level set of the terminal cost function $V_f$ \citeSec{2.5.5}{rawlingsModelPredictiveControl2020}:
+% \begin{equation}
+%     \label{eq:terminal-sublevel-set}
+%     \mathcal{X}_f = \mathcal{V}_\rho := \left\{ x \in \mathbb{R}^{n_x} \;\middle|\; V_f(x) \le \rho \right\},
+% \end{equation}
+% parameterized by the level bound $\rho > 0$. Due to the local Lyapunov decrease condition \eqref{eq:term-cost-decrease}, 
+% the cost function $V_f(x)$ strictly decreases along local closed-loop trajectories $f(x, \pi_f(x))$. Consequently, trajectories 
+% originating within $\mathcal{V}_\rho$ cannot cross the boundary $V_f(x) = \rho$ outwards, rendering the sub-level set 
+% $\mathcal{V}_\rho$ inherently positively invariant \citeSec{5.3}{gruneNonlinearModelPredictive2017}. 
+% Furthermore, positive invariance allows the terminal state of a feasible solution at horizon $N$ to be extended by the local 
+% control action $\pi_f(x_N^*)$, yielding a feasible candidate trajectory for the subsequent sampling step $k+1$ and thereby 
+% establishing recursive feasibility \citeSec{2.4.2}{rawlingsModelPredictiveControl2020, gruneNonlinearModelPredictive2017}.
 Positive invariance in \eqref{eq:term-positive-invariance} ensures that every state in 
 $\mathcal{X}_f$ remains in $\mathcal{X}_f$ under the local controller $\pi_f(x)$ \citeDef{2.9}{rawlingsModelPredictiveControl2020}. 
 This property is essential for establishing recursive feasibility, as it allows the terminal state of a feasible solution at horizon $N$ 
@@ -78,21 +91,15 @@ safe state space $\mathcal{X}$, the terminal constraint enforces $x_N \in \mathc
 guaranteeing a seamless transition into the local invariant region where the local 
 Lyapunov decrease \eqref{eq:term-cost-decrease} holds \citeThm{2.19}{rawlingsModelPredictiveControl2020}.
 
-For nonlinear systems, the terminal set $\mathcal{X}_f$ is typically computed using linearized system dynamics around the equilibrium point 
-$(x, u) = (\mathbf{0}, \mathbf{0})$, yielding the linear discrete-time model:
+For nonlinear systems, the terminal ingredients are typically designed by linearizing the system dynamics around 
+the equilibrium point $(x, u) = (\mathbf{0}, \mathbf{0})$, yielding the linearized discrete-time model:
 \begin{equation}
     \label{eq:linearized-system}
     x_{k+1} = A x_k + B u_k.
 \end{equation}
-A widely used choice for these terminal ingredients is then derived from the Linear-Quadratic Regulator (LQR) 
-\citeEq{1.18,5.24}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}. 
-Here, the local control law $\pi(x_k)$ is chosen as a linear state-feedback policy $\pi(x_k) = -K x_k$, where the optimal LQR gain $K$ is given by
-\begin{equation}
-    \label{eq:lqr-feedback}
-    K = \left(R + B^\top P B\right)^{-1} B^\top P A.
-\end{equation}
-
-Under the standard stabilizability and detectability assumptions, the matrix
+where $A = \frac{\partial f}{\partial x}(\mathbf{0}, \mathbf{0})$ and $B = \frac{\partial f}{\partial u}(\mathbf{0}, \mathbf{0})$ 
+represent the system Jacobians \citeSec{2.5.5}{rawlingsModelPredictiveControl2020}. 
+Assuming $(A, B)$ is stabilizable and $(A, Q^{1/2})$ is detectable, the matrix
 $P \succ 0$ is obtained as the unique stabilizing solution to the discrete-time
 Algebraic Riccati Equation (DARE) \citeEq{1.18,5.23}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}:
 \begin{equation}
@@ -100,18 +107,26 @@ Algebraic Riccati Equation (DARE) \citeEq{1.18,5.23}{rawlingsModelPredictiveCont
     P = A^\top P A - A^\top P B \left(R + B^\top P B\right)^{-1} B^\top P A + Q.
 \end{equation}
 
+Using $P$, the local linear feedback law $\pi_f(x) = -K x$ is parameterized via the optimal Linear-Quadratic Regulator (LQR) gain 
+\citeEq{1.18,5.24}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}:
+\begin{equation}
+    \label{eq:lqr-feedback}
+    K = \left(R + B^\top P B\right)^{-1} B^\top P A,
+\end{equation}
+and the terminal cost function is specified quadratically as $V_f(x) = x^\top P x$.
+
 This matrix parameterizes the quadratic terminal cost function $V_f(x_N) = x_N^\top P x_N$. 
 Accordingly, the terminal set $\mathcal{X}_f$ is defined in this specific case 
 as an ellipsoidal sub-level set of this cost function 
 \citeSec{2.5.5}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:terminal-ellipse}
-    \mathcal{X}_f := \left\{ x \in \mathbb{R}^{n_x} \ \middle|\ x^\top P x \leq \alpha \right\}.
+    \mathcal{X}_f := \left\{ x \in \mathbb{R}^{n_x} \ \middle|\ x^\top P x \leq \rho \right\}.
 \end{equation}
-Choosing the scaling parameter $\alpha > 0$ sufficiently small guarantees that $\mathcal{X}_f$ 
+Choosing the scaling parameter $\rho > 0$ sufficiently small guarantees that $\mathcal{X}_f$ 
 satisfies both the state and input constraints $\mathcal{X}$ and $\mathcal{U}$ 
 while ensuring that the quadratic Lyapunov decrease dominates higher-order 
-linearization errors of the nonlinear dynamics.
+linearization errors of the underlying nonlinear dynamics.
 
 \begin{figure}[htbp]
     \centering
