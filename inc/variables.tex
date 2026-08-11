@@ -146,8 +146,10 @@ $V_\theta(x)$ & Neural Lyapunov candidate \\
 $\varepsilon$ & Regularization constant \\
 $R_\theta$ & Learnable transformation matrix \\
 $\rho$ & Target Lyapunov sublevel value \\
+$\rho_{\mathrm{max}}$ & Theoretical maximum sublevel bound \\
 $\mathcal{V}_\rho$ & Certified sublevel set \\
 $\mathcal{X}_V$ & Lyapunov training domain \\
+$\partial \mathcal{X}_V$ & Boundary of Lyapunov training domain \\
 $\rho_{\min}$ & Minimum sublevel target bound \\
 $e_V$ & Lyapunov decrease violation \\
 $\kappa$ & Target decrease rate \\
@@ -160,6 +162,8 @@ $w_\rho$ & Soft sublevel gating weight \\
 $s$ & Gate sharpness parameter \\
 $\loss_{\rho\mathrm{-gated}}$ & Soft-gated condition loss \\
 $\mathcal{B}_{\partial}$ & Boundary candidate sample set \\
+$\Pi_{\partial \mathcal{X}_V}$ & Boundary projection operator \\
+$c_j$ & Active boundary limit along dimension $j$ \\
 $\mathcal{B}_{\mathrm{ROA}}$ & ROA shell sample set \\
 $\xi$ & Inner boundary shell factor \\
 $\loss_{\mathrm{ROA}}$ & Region of Attraction expansion loss \\
@@ -178,7 +182,7 @@ $\loss_{\mathrm{pol}}$ & Policy scaling loss \\
 $\ell_{R,0}$ & Initial matrix $R$ Frobenius norm \\
 $\loss_R$ & Matrix $R$ regularization loss \\
 $\loss_{\mathrm{total}}$ & Total combined Lyapunov loss \\
-$\omega_{\mathrm{cond}}$ & Soft-gated condition loss weight \\
+$\omega_{\rho\mathrm{-gated}}$ & Soft-gated condition loss weight \\
 $\omega_{\mathrm{ROA}}$ & Region of Attraction expansion loss weight \\
 $\omega_{\mathrm{L}}$ & LIRPA loss weight \\
 $\omega_V$ & Lyapunov magnitude scaling loss weight \\
