@@ -316,8 +316,7 @@ and lie outside the origin exclusion region are retained as counterexamples.
 
 
 \paragraph{Adversarial Replay Buffer} manages the sample distribution for the $\rho$-gated condition loss $\loss_{\rho\mathrm{-gated}}$. 
-It maintains two distinct state pools: an explorative pool $\mathcal{S}$ and a counterexample pool $\mathcal{C}$. 
-
+It maintains two distinct state pools: an explorative pool $\mathcal{S}$ and a counterexample pool $\mathcal{C}$. \newline
 As outlined in \cref{alg:state-pool-resample}, the explorative state pool $\mathcal{S}$ is repopulated 
 at each outer epoch to balance global exploration with local refinement. 
 First, candidate states $\mathcal{B}_{\mathcal{S}}$ are oversampled uniformly from the training domain $\mathcal{X}_V$. 
@@ -355,24 +354,41 @@ Consequently, the condition loss continuously penalizes recent violations while 
 
 \subsection{\texorpdfstring{$\rho$}{ρ}-Sublevel Estimation}
 \label{subsec:rho-sublevel-estim}
-\todo[inline]{explain why exactly we need it}
-To compute the loss, particularly the $\rho$-gated condition loss in \eqref{eq:rho-gated-condition-loss}, 
-the target level $\rho$ must be continuously estimated during training. 
-Since the goal is to find the largest level set of the Lyapunov candidate $V_\theta(x)$ that lies entirely 
-within the defined training bounds $\mathcal{X}_V$, a level set can only escape the safe region by intersecting its 
-boundary $\partial \mathcal{X}_V$. Therefore, the maximum certifiable $\rho$ is mathematically strictly determined
-by the minimum value of the Lyapunov candidate at its boundary.
-According to the formulation proposed by \cite{yangLyapunovstableNeuralControl2024}, it is sufficient to evaluate $V_\theta(x)$
-only on the boundary $\partial \mathcal{X}_V$ rather than sampling the entire state space. 
-However, since the boundary is a high-dimensional surface and the neural network parameterized in $V_\theta(x)$ 
-forms a highly non-convex landscape, simple uniform sampling on the boundary is insufficient to find the true minimum. 
-Therefore, a Projected Gradient Descent (PGD) approach is employed to actively search for the worst-case boundary points. 
-Starting from uniformly sampled points $\mathcal{B}_{\partial} \sim \mathcal{U}(\partial \mathcal{X}_V)$, 
-PGD iteratively minimizes $V_\theta(x)$ by taking steps along 
-the negative gradient and projecting the updated states strictly back onto the boundary surfaces.
-To actively encourage the region of attraction to expand over the course of the co-training process, 
-the formally certifiable limit is intentionally overestimated, as suggested in \cite{yangLyapunovstableNeuralControl2024}.
-Specifically, a target $\rho$ is computed by applying a growth factor $\gamma > 1$ to the boundary minimum found via PGD:
+To evaluate the $\rho$-gated condition loss in \eqref{eq:rho-gated-condition-loss}, the target sublevel bound $\rho$ 
+must be continuously estimated throughout training as the Lyapunov candidate $V_\theta(x)$ evolves. 
+Since the goal is to identify the largest sublevel set $\mathcal{V}_\rho := \{ x \in \mathcal{X}_V \mid V_\theta(x) \le \rho \}$ 
+that remains within the training domain $\mathcal{X}_V$, the sublevel set reaches the boundary of the domain at 
+its maximum admissible value. 
+Therefore, the theoretical upper bound for $\rho$ is given by the minimum value of $V\theta(x)$ on the boundary:
+\begin{equation}
+    \label{eq:rho-boundary-definition}
+    \rho_{\mathrm{max}} = \min_{x \in \partial \mathcal{X}_V} V_\theta(x).
+\end{equation}
+
+Following the boundary-evaluation principle established by \cite{yangLyapunovstableNeuralControl2024}, evaluating $V_\theta(x)$ 
+along the boundary $\partial \mathcal{X}_V$ is sufficient to estimate $\rho_{\mathrm{max}}$ without searching the entire domain. 
+However, because $\partial \mathcal{X}_V$ can be a high-dimensional surface and $V_\theta(x)$ defines a non-convex landscape, 
+simple uniform sampling on the boundary may fail to identify low-valued boundary points. 
+Therefore, Projected Gradient Descent (PGD) is employed to search for local minima of $V\theta(x)$ along the boundary.
+
+Starting from uniform boundary seeds $\mathcal{B}_{\partial} \sim \mathcal{U}(\partial \mathcal{X}_V)$, 
+PGD \emph{iteratively minimizes} $V_\theta(x)$ along the negative gradient.
+To maintain candidate states on the hyper-rectangular boundary surface $\partial\mathcal{X}_V$, 
+the projection operator $\Pi_{\partial \mathcal{X}_V}$ projects the updated states onto the domain bounds 
+while keeping the active face-defining coordinate fixed at its boundary value. 
+For an unconstrained gradient step $z$ originating from a boundary face along dimension $j$ with active limit 
+$c_j \in \{\underline{x}_j, \overline{x}_j\}$, the projection is defined element-wise for $i = 1, \dots, n_x$ as:
+\begin{equation}
+    \label{eq:boundary-projection}
+    \left[ \Pi_{\partial \mathcal{X}_V}(z) \right]_i = 
+    \begin{cases}
+        c_j, & \text{if } i = j, \\
+        \clamp \left(z_i, \underline{x}_i, \overline{x}_i\right), & \text{if } i \neq j.
+    \end{cases}
+\end{equation}
+
+To encourage the region of attraction to expand during co-training, the estimated boundary minimum is intentionally 
+overestimated by applying a growth factor $\gamma > 1$:
 \begin{equation}
     \label{eq:rho-estimation}
     \tilde{\rho} = \max \left( 
@@ -380,16 +396,17 @@ Specifically, a target $\rho$ is computed by applying a growth factor $\gamma > 
     \right).
 \end{equation}
 
-By targeting a value for $\tilde{\rho}$ that is slightly above the currently safe maximum, the formulation deliberately 
-leads to small violations near the boundary. These violations are then captured by the aforementioned 
-adversarial replay buffer, effectively forcing the optimization to continuously expand the sublevel set outward.
-Finally, to ensure numerical stability and prevent irregular jumps in the loss landscape caused by fluctuating local minima 
-across different batches, the $\rho$ value actually used for gating is updated using an exponential moving average (EMA):
+By targeting a value for $\tilde{\rho}$ slightly above the currently safe maximum, the formulation deliberately 
+leads to small violations near the boundary. These violations are subsequently captured by the adversarial replay buffer, 
+pushing the optimization to expand the sublevel set. 
+Finally, to reduce fluctuations caused by changes in the estimated boundary minimum during training, 
+the gating bound $\rho$ is updated using an exponential moving average (EMA):
 \begin{equation}
     \label{eq:rho-ema}
     \rho \leftarrow \upsilon \rho + (1 - \upsilon) \tilde{\rho},
 \end{equation}
-where $\upsilon \in [0, 1)$ is the EMA decay rate.
+where $\upsilon \in [0, 1)$ denotes the EMA decay rate.
+
 
 
 \subsection{Overall Training Procedure}
@@ -397,14 +414,12 @@ where $\upsilon \in [0, 1)$ is the EMA decay rate.
 
 The complete falsification-guided training procedure is illustrated in
 \cref{fig:train-flow}. It consists of an outer loop for data generation and an
-inner loop for network optimization.
-
+inner loop for network optimization. \newline
 At the beginning of each outer epoch, boundary samples $\mathcal{B}_{\partial}$ are used to estimate 
 the current sublevel bound $\rho$, and the ROA shell batch $\mathcal{B}_{\mathrm{ROA}}$ is redrawn. 
 Based on the updated estimation of $\rho$, the active LiRPA regions are selected and PGD-based falsification 
 is performed within the corresponding sublevel set. The resulting counterexamples are added to $\mathcal{C}$, 
-after which the explorative state pool $\mathcal{S}$ is resampled. 
-
+after which the explorative state pool $\mathcal{S}$ is resampled. \newline
 The inner loop is executed $K_{\mathrm{steps}}$ times per outer epoch. At each step,  
 a mini-batch $\mathcal{B}_{\rho}$ is sampled from $\mathcal{S} \cup \mathcal{C}$ and 
 evaluated together with the active LiRPA regions, the ROA shell batch, and Sobol batches
@@ -415,7 +430,6 @@ Repeating this procedure over $N_{\mathrm{outer}}$ epochs progressively reduces
 Lyapunov-condition violations and enlarges the estimated certified region of
 attraction.
 
-\todo[inline]{arrow from boundary batch to rho}
 
 \begin{figure}[htbp]
     \centering
@@ -427,3 +441,11 @@ attraction.
         the network parameters based on the generated sample pools.}
     \label{fig:train-flow}
 \end{figure}
+
+After completion of the training procedure, the optimized parameters of the policy $\pi_V$ and the Lyapunov candidate $V_\theta$ 
+yield a candidate control-Lyapunov pair. 
+However, while falsification-guided adversarial training seeks to eliminate counterexamples over the trained state domain, 
+it does not guarantee the complete absence of stability violations across the continuous state space. 
+To transition from empirical validation to a formal stability proof, the learned candidate pair $(\pi_V, V_\theta)$ 
+is subsequently subjected to formal neural network verification, as detailed in the following section.
+

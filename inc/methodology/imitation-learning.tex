@@ -39,7 +39,7 @@ and $\clamp(\cdot, \overline{\cdot}, \underline{\cdot})$ acts element-wise to en
 \end{figure}
 
 
-\paragraph{Imitation Objective} consists of a state-weighted behavioral cloning loss 
+\paragraph{Imitation Objective} is a multi-objective loss, which consists of two parts: a state-weighted behavioral cloning loss 
 and a dynamics-aware penalty. 
 To account for different physical units and numerical scales across the state and control vectors, 
 the loss terms are normalized using strictly positive diagonal scaling matrices
@@ -105,3 +105,13 @@ yields the overall policy loss:
         \omega_{\mathrm{BC}} \loss_{\mathrm{BC}} + 
         \omega_f \loss_f.
 \end{equation}
+
+By minimizing $\loss_\pi$, the policy $\pi_\theta$ learns to mimic the expert policy $\pi_0$, 
+while penalizing state constraint violations in $\mathcal{X}_\pi$. 
+In combination with the policy architecture in \eqref{eq:policy-arch}, $\pi_\theta$ satisfies the input constraints 
+$\underline{u} \leq \pi_\theta(x) \leq \overline{u}$ for all states $x \in \mathbb{R}^{n_x}$ and guarantees exact 
+equilibrium control $\pi_\theta(x^*) = u^*$. 
+Additionally, the state-dependent weighting in \eqref{eq:state-weight} prioritizes approximation accuracy 
+near the equilibrium, which is essential for establishing Lyapunov stability.
+Consequently, this imitation learning establishes a highly accurate and safe foundational policy, 
+serving as an initialization for the subsequent Lyapunov co-training and verification process.
