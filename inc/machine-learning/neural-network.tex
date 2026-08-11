@@ -202,10 +202,13 @@ To resolve these limitations, the Adaptive Moment Estimation (Adam) optimizer \c
 computes individual, adaptive learning rates for each parameter by tracking exponential moving averages of both past 
 gradients $m_t$ and past squared gradients $v_t$ 
 \citeSec{4.5.5.2}{aggarwalNeuralNetworksDeep2023}:
-\begin{align}
-    m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t, \label{eq:adam-m}\\
-    v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2, \label{eq:adam-v}
-\end{align}
+\begin{subequations}
+    \begin{align}
+        \label{eq:adam-moments}
+        m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t \\
+        v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2,
+    \end{align}
+\end{subequations}
 where $\beta_1, \beta_2 \in [0, 1)$ dictate the exponential decay rates, and $g_t^2$ denotes the element-wise 
 square of the current mini-batch gradient $g_t = \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$. 
 
