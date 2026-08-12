@@ -1,8 +1,9 @@
 \section{Model Predictive Control and Stability}
 \label{sec:mpc-stability}
 
-This section summarizes the model predictive control (MPC) framework and 
-the conditions required to guarantee closed-loop stability in finite-horizon optimal control setups.
+This section summarizes the model predictive control (MPC) framework as well as
+the conditions that are required to ensure the stability of the control loop in 
+optimal control configurations with a finite time horizon.
 
 
 \subsection{Problem Formulation}
@@ -23,7 +24,7 @@ is solved at each time step $k$ given the current system state $x_k$ \citeSec{2.
     \end{aligned}
 \end{equation}
 Here, $N \in \mathbb{N}$ denotes the prediction horizon, $\ell: \mathcal{X} \times \mathcal{U} \to \mathbb{R}_{\ge 0}$ is the stage cost function, 
-and $V_f: \mathcal{X}_f \to \mathbb{R}_{\ge 0}$ represents the terminal cost function defined over the terminal constraint set 
+and $V_f: \mathcal{X}_f \to \mathbb{R}_{\ge 0}$ represents the terminal cost function, wich is defined over the terminal constraint set 
 $\mathcal{X}_f \subseteq \mathcal{X}$. To distinguish predicted states and inputs from the actual closed-loop state 
 $x_k$ and control input $u_k$, the sequences $\{x_i\}_{i=0}^N$ and $\{u_i\}_{i=0}^{N-1}$ serve as optimization variables 
 local to time step $k$, constrained by the sets $\mathcal{X}$ and $\mathcal{U}$
@@ -42,13 +43,13 @@ and the optimization is repeated at the next sampling instance \citeSec{2.2,3.1}
 \subsection{Terminal Ingredients and their Construction}
 \label{subsec:terminal-set-cost} 
 
-To establish recursive feasibility and closed-loop stability of nominal MPC, the optimal control problem \eqref{eq:mpc-problem} 
+To establish recursive feasibility and closed-loop stability of nominal MPC, the optimal control problem \labelcref{eq:mpc-problem} 
 incorporates three central design ingredients: 
 the terminal constraint set $\mathcal{X}_f \subseteq \mathcal{X}$, an auxiliary local control law $\pi_f: \mathcal{X}_f \to \mathcal{U}$, 
 and the terminal cost function $V_f: \mathcal{X}_f \to \mathbb{R}_{\ge 0}$ 
 \citeAsm{2.14,5.9}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}.
 
-Specifically, these terminal ingredients must satisfy state and input constraint admissibility, positive invariance of the terminal set, 
+Specifically, these terminal ingredients must satisfy state and input constraint, positive invariance of the terminal set, 
 and local Lyapunov decrease of the terminal cost:
 \begin{subequations}
     \label{eq:terminal-conditions}
@@ -60,36 +61,23 @@ and local Lyapunov decrease of the terminal cost:
     \end{align}
 \end{subequations}
 
-Conditions \eqref{eq:term-state-constraint} and \eqref{eq:term-input-constraint} ensure that terminal states and their corresponding 
-local control actions remain strictly within the admissible state and input bounds $\mathcal{X}$ and $\mathcal{U}$. 
-% To guarantee positive invariance \eqref{eq:term-positive-invariance} and construct an admissible terminal set, $\mathcal{X}_f$ is 
-% generally defined as a sub-level set of the terminal cost function $V_f$ \citeSec{2.5.5}{rawlingsModelPredictiveControl2020}:
-% \begin{equation}
-%     \label{eq:terminal-sublevel-set}
-%     \mathcal{X}_f = \mathcal{V}_\rho := \left\{ x \in \mathbb{R}^{n_x} \;\middle|\; V_f(x) \le \rho \right\},
-% \end{equation}
-% parameterized by the level bound $\rho > 0$. Due to the local Lyapunov decrease condition \eqref{eq:term-cost-decrease}, 
-% the cost function $V_f(x)$ strictly decreases along local closed-loop trajectories $f(x, \pi_f(x))$. Consequently, trajectories 
-% originating within $\mathcal{V}_\rho$ cannot cross the boundary $V_f(x) = \rho$ outwards, rendering the sub-level set 
-% $\mathcal{V}_\rho$ inherently positively invariant \citeSec{5.3}{gruneNonlinearModelPredictive2017}. 
-% Furthermore, positive invariance allows the terminal state of a feasible solution at horizon $N$ to be extended by the local 
-% control action $\pi_f(x_N^*)$, yielding a feasible candidate trajectory for the subsequent sampling step $k+1$ and thereby 
-% establishing recursive feasibility \citeSec{2.4.2}{rawlingsModelPredictiveControl2020, gruneNonlinearModelPredictive2017}.
-Positive invariance in \eqref{eq:term-positive-invariance} ensures that every state in 
+The conditions \labelcref{eq:term-state-constraint} and \labelcref{eq:term-input-constraint} ensure that terminal states and their corresponding 
+local control input remain within the admissible state and input bounds $\mathcal{X}$ and $\mathcal{U}$. 
+Additionally, positive invariance in \labelcref{eq:term-positive-invariance} ensures that every state in 
 $\mathcal{X}_f$ remains in $\mathcal{X}_f$ under the local controller $\pi_f(x)$ \citeDef{2.9}{rawlingsModelPredictiveControl2020}. 
-This property is essential for establishing recursive feasibility, as it allows the terminal state of a feasible solution at horizon $N$ 
+This property is crucial for proving recursive feasibility, as it allows the terminal state of a feasible solution at horizon $N$ 
 to be extended by the local control action $\pi_f(x_N^*)$. This yields a feasible candidate trajectory for the subsequent 
-sampling step $k+1$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020, gruneNonlinearModelPredictive2017}.
-The terminal cost decrease condition in \eqref{eq:term-cost-decrease} acts as a local Lyapunov condition within $\mathcal{X}_f$. 
+sampling step $k+1$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
+The terminal cost decrease condition in \labelcref{eq:term-cost-decrease} acts as a local Lyapunov condition within $\mathcal{X}_f$. 
 While positive invariance ensures that the local trajectory remains in $\mathcal{X}_f$, the decrease condition requires 
 the terminal cost $V_f$ to decrease along the local closed-loop trajectory by at least the stage cost $\ell(x,\pi_f(x))$ 
 \citeAsm{5.9}{gruneNonlinearModelPredictive2017}.
 
 The predictive mechanism and the geometric role of the terminal set are illustrated in \cref{fig:terminal-set-comparison}. 
-While intermediate predicted states $x_0, \dots, x_{N-1}$ are merely constrained to the 
-safe state space $\mathcal{X}$, the terminal constraint enforces $x_N \in \mathcal{X}_f$, 
-guaranteeing a seamless transition into the local invariant region where the local 
-Lyapunov decrease \eqref{eq:term-cost-decrease} holds \citeThm{2.19}{rawlingsModelPredictiveControl2020}.
+While intermediate predicted states $x_0, \dots, x_{N-1}$ are required to remain in the 
+safe state space $\mathcal{X}$, the terminal constraint enforces $x_N \in \mathcal{X}_f$, where the local controller 
+satisfies the Lyapunov decrease condition in \labelcref{eq:term-cost-decrease} 
+\citeThm{2.19}{rawlingsModelPredictiveControl2020}.
 
 For nonlinear systems, the terminal ingredients are typically designed by linearizing the system dynamics around 
 the equilibrium point $(x, u) = (\mathbf{0}, \mathbf{0})$, yielding the linearized discrete-time model:
@@ -141,7 +129,7 @@ linearization errors of the underlying nonlinear dynamics.
 
 \todo[inline]{more detail on recursive feasibility, smoother transition to closed loop stability.}
 Under the MPC policy $\pi_0(x_k) := u_0^*(x_k)$, 
-the optimal value function $V_N^*(x_k)$ of \eqref{eq:mpc-problem} serves as a Lyapunov candidate 
+the optimal value function $V_N^*(x_k)$ of \labelcref{eq:mpc-problem} serves as a Lyapunov candidate 
 over the feasible set $\mathcal{X}_N \subseteq \mathcal{X}$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}. 
 Using the terminal ingredients from \cref{subsec:terminal-set-cost}, the recursive
 feasibility at time step $k+1$ is determined by using the remaining inputs of the optimal sequence 

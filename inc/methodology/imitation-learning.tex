@@ -80,7 +80,7 @@ Here, the state-dependent weight $w_x(x)$ prioritizes approximation accuracy nea
 that leave the admissible state set $\mathcal{X}_\pi$.
 For each state $x \in \mathcal{B}_\pi$, the next state is evaluated under 
 the neural policy as $x^+ = f(x,\pi_\theta(x))$. 
-Using the element-wise ReLU function defined in \eqref{eq:relu}, the loss is defined as
+Using the element-wise ReLU function defined in \labelcref{eq:relu}, the loss is defined as
 \begin{equation}
     \label{eq:dynamics-aware-loss}
     \loss_f = \frac{1}{M_\pi n_x} \sum_{x \in \mathcal{B}_\pi} \left( 
@@ -96,7 +96,7 @@ forcing the learned policy to stay inside the admissible set.
 
 
 \paragraph{Total Imitation Loss} is the combination of the state-weighted behavioral cloning 
-and dynamics-aware constraint losses into a single scalar objective. 
+and dynamics-aware constraint losses resulting in a scalar objective. 
 Scaling each term by its respective weight, $\omega_{\mathrm{BC}}$ and $\omega_f$, 
 yields the overall policy loss:
 \begin{equation}
@@ -108,10 +108,10 @@ yields the overall policy loss:
 
 By minimizing $\loss_\pi$, the policy $\pi_\theta$ learns to mimic the expert policy $\pi_0$, 
 while penalizing state constraint violations in $\mathcal{X}_\pi$. 
-In combination with the policy architecture in \eqref{eq:policy-arch}, $\pi_\theta$ satisfies the input constraints 
+In combination with the policy architecture in \labelcref{eq:policy-arch}, $\pi_\theta$ satisfies the input constraints 
 $\underline{u} \leq \pi_\theta(x) \leq \overline{u}$ for all states $x \in \mathbb{R}^{n_x}$ and guarantees exact 
 equilibrium control $\pi_\theta(x^*) = u^*$. 
-Additionally, the state-dependent weighting in \eqref{eq:state-weight} prioritizes approximation accuracy 
-near the equilibrium, which is essential for establishing Lyapunov stability.
-Consequently, this imitation learning establishes a highly accurate and safe foundational policy, 
-serving as an initialization for the subsequent Lyapunov co-training and verification process.
+Additionally, the state-dependent weighting in \labelcref{eq:state-weight} prioritizes approximation accuracy 
+near the equilibrium, which may be beneficial establishing Lyapunov stability.
+Now, this imitation learning pipeline establishes an accurate expert imitation, 
+serving as an initial policy for the subsequent Lyapunov co-training.

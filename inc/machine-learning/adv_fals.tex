@@ -36,7 +36,7 @@ the valid input range.
 
 \subsection{Projected Gradient Descent}
 \label{subsec:pgd}
-To solve the loss maximization problem \eqref{eq:adversarial-problem}, the Fast Gradient Sign Method (FGSM) 
+To solve the loss maximization problem \labelcref{eq:adversarial-problem}, the Fast Gradient Sign Method (FGSM) 
 \cite{goodfellowExplainingHarnessingAdversarial2015} provides a fast, linear one-step approximation by taking a 
 single step along the sign of the loss gradient. However, in highly non-convex loss landscapes, 
 one-step attacks may yield weaker loss-maximizing candidates than iterative attacks \cite{madryDeepLearningModels2019}.
@@ -80,8 +80,8 @@ constraint at every iteration.
 
 When transitioning from conventional adversarial attacks to neural Lyapunov control, the adversary's objective fundamentally changes. 
 Rather than deceiving a classifier, the goal becomes identifying counterexample states $x_{\mathrm{adv}}$ 
-that violate control-theoretic guarantees, such as Lyapunov decrease and stability \eqref{eq:asymptotic-lyapunov-stability}, 
-or domain invariance \eqref{eq:positive-invariance} \cite{yangLyapunovstableNeuralControl2024}.
+that violate control-theoretic guarantees, such as Lyapunov decrease and stability \labelcref{eq:asymptotic-lyapunov-stability}, 
+or domain invariance \labelcref{eq:positive-invariance} \cite{yangLyapunovstableNeuralControl2024}.
 
 Instead of maximizing a classification loss \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}, 
 the gradient-based search is repurposed to actively identify states associated with large violations of the Lyapunov conditions.

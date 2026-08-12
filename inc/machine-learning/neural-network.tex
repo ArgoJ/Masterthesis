@@ -27,8 +27,8 @@ while $\sigma^{(l)}(\cdot)$ represents a non-linear activation function applied 
 the pre-activation vector $z^{(l)}$ \citeSec{3.2}{kollmannsbergerDeepLearningComputational2021}. 
 Without these non-linearities, the layers would simply be reduced to a single linear transformation, 
 drastically limiting the model's ability to capture complexity \citeSec{1.5}{aggarwalNeuralNetworksDeep2023}. 
-Common activation functions in neural control include the hyperbolic tangent \eqref{eq:tanh} and 
-the rectified linear unit (ReLU) \eqref{eq:relu}, defined respectively as
+Common activation functions in neural control include the hyperbolic tangent \labelcref{eq:tanh} and 
+the rectified linear unit (ReLU) \labelcref{eq:relu}, defined respectively as
 \citeSec{3.5}{kollmannsbergerDeepLearningComputational2021}.
 \begin{subequations}
     \label{eq:act-funs}
@@ -106,21 +106,18 @@ augmented with weight regularization and auxiliary loss terms \citeSec{3.7}{koll
         + \omega_{\mathrm{reg}} \loss_{\mathrm{reg}}(\theta)
         + \omega_{\mathrm{aux}} \loss_{\mathrm{aux}}(\mathcal{D}; \theta).
 \end{equation}
-where $\omega_{\mathrm{reg}}, \omega_{\mathrm{aux}} \geq 0$ serve as weighting hyperparameters balancing prediction error, 
+where $\omega_{\mathrm{reg}}, \omega_{\mathrm{aux}} \geq 0$ are utilized as weights balancing prediction error, 
 parameter regularization, and constraint satisfaction.
-
 The regularization term $\loss_{\mathrm{reg}}$ constrains the network's parameter space, typically realized as an 
 $\ell_1$-norm ($\|\theta\|_1$) or $\ell_2$-norm ($\|\theta\|_2^2$) penalty. 
 While $\ell_1$-regularization promotes sparse parameter representations, $\ell_2$-regularization 
 penalizes large parameter magnitudes and can improve numerical stability and generalization. 
 In practice, these penalties are applied exclusively to the network's weight matrices $W \subset \theta$, 
 leaving bias vectors $b$ unpenalized. \citeSec{3.7.2}{kollmannsbergerDeepLearningComputational2021}.
-
-In addition to regularization penalties, the auxiliary loss $\loss_{\mathrm{aux}}$ embeds domain knowledge into the 
-optimization process. Popularized by Physics-Informed Neural Networks (PINNs), it directly penalizes violations of 
-explicit rules, such as differential equations or Lyapunov conditions \citeSec{5}{kollmannsbergerDeepLearningComputational2021}, 
-\cite{yangLyapunovstableNeuralControl2024}. Enforcing these properties during training helps the network learn the 
-desired solutions.
+Alongside regularization penalties, the auxiliary loss $\loss_{\mathrm{aux}}$ incorporates domain knowledge into the 
+optimization process, such as differential equations or Lyapunov conditions 
+\citeSec{5}{kollmannsbergerDeepLearningComputational2021}, \cite{yangLyapunovstableNeuralControl2024}. 
+Enforcing these properties during training helps the network learn the desired physically sound solutions.
 
 
 \paragraph{Gradient Computation via Backpropagation.}
@@ -128,7 +125,7 @@ For updating the network parameters $\theta$ using gradient-based optimization,
 the partial derivatives of the loss $\loss(\mathcal{D}, \theta)$ with respect 
 to all weight matrices $W^{(l)}$ and bias vectors $b^{(l)}$ must be evaluated. 
 Backpropagation efficiently computes chain-rule derivatives of loss components that depend on
-the parameters through the network output by combining a forward pass \eqref{eq:nn-forward} 
+the parameters through the network output by combining a forward pass \labelcref{eq:nn-forward} 
 with a backward pass \citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
 
 During the backward pass, the algorithm computes the sensitivity of the loss with respect to the pre-activations, 

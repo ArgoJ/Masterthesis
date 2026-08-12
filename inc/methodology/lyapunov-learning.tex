@@ -40,7 +40,7 @@ The complete architectural layout of $V_\theta(x)$ is illustrated in \cref{fig:n
 \label{subsec:lyapunov-formulation}
 
 \todo[inline]{add more explanations}
-To ensure that the Lyapunov candidate described in \eqref{eq:lyapunov-candidate} can be certified for stability, 
+To ensure that the Lyapunov candidate described in \labelcref{eq:lyapunov-candidate} can be certified for stability, 
 the loss function must comprise multiple components. 
 It utilizes the previously introduced ReLU function $[\cdot]_+$ for one-sided penalties, 
 alongside a weighted mean to aggregate the sample losses.
@@ -96,8 +96,8 @@ The loss per sample for the next state $x^+_V$ is computed as
 
 
 \paragraph{Combined $\rho$-Gated Condition Loss} is the sample-wise $\rho$-gated combination of 
-the relative Lyapunov decrease loss from \eqref{eq:rel-lyapunov-decrease} and 
-the relative state invariance loss from \eqref{eq:rel-invariance},
+the relative Lyapunov decrease loss from \labelcref{eq:rel-lyapunov-decrease} and 
+the relative state invariance loss from \labelcref{eq:rel-invariance},
 \begin{equation}
     \label{eq:combined-condition-violation}
     \loss_{\mathrm{cond}} = 
@@ -165,7 +165,7 @@ causing the loss to decrease.
 
 
 \paragraph{LIRPA-Condition Loss} makes the Lyapunov function more verifier-friendly 
-by penalizing formal violations of the Lyapunov decrease condition as defined in \eqref{eq:lyapunov-decrease}. 
+by penalizing formal violations of the Lyapunov decrease condition as defined in \labelcref{eq:lyapunov-decrease}. 
 These violations are identified using the LIRPA framework \cite{xuFastCompleteEnabling2021}.
 To reduce the computational cost during training, LIRPA is applied only to a 
 heuristic subset of regions. Specifically, a hyper-rectangular cell is selected 
@@ -289,8 +289,8 @@ estimated attractor region with the targeted exploitation of known error modes.
 conditions and iteratively inject them into the counterexample pool $\mathcal{C}$. 
 Specifically, an $\ell_\infty$-Projected Gradient Descent (PGD) is employed 
 to search for adversarial states $x_{\mathrm{adv}} \in \mathcal{X}_V$ 
-that maximize the condition violation defined in \eqref{eq:combined-condition-violation} 
-and \eqref{eq:rho-gate}. The per-sample PGD objective is defined as
+that maximize the condition violation defined in \labelcref{eq:combined-condition-violation} 
+and \labelcref{eq:rho-gate}. The per-sample PGD objective is defined as
 \begin{equation}
     \label{eq:pgd-objective}
     \mathcal{J}(x; \theta) = w_{\rho}(x) \loss_{\mathrm{cond}}(x).
@@ -354,7 +354,7 @@ Consequently, the condition loss continuously penalizes recent violations while 
 
 \subsection{\texorpdfstring{$\rho$}{ρ}-Sublevel Estimation}
 \label{subsec:rho-sublevel-estim}
-To evaluate the $\rho$-gated condition loss in \eqref{eq:rho-gated-condition-loss}, the target sublevel bound $\rho$ 
+To evaluate the $\rho$-gated condition loss in \labelcref{eq:rho-gated-condition-loss}, the target sublevel bound $\rho$ 
 must be continuously estimated throughout training as the Lyapunov candidate $V_\theta(x)$ evolves. 
 Since the goal is to identify the largest sublevel set $\mathcal{V}_\rho := \{ x \in \mathcal{X}_V \mid V_\theta(x) \le \rho \}$ 
 that remains within the training domain $\mathcal{X}_V$, the sublevel set reaches the boundary of the domain at 
