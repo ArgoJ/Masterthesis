@@ -78,8 +78,8 @@ training objective:
 
 
 \paragraph{Dataset and Primary Loss Function.}
-The training process relies on an offline dataset $\mathcal{D} = \left\{ (x_i, y_i) \right\}_{i=1}^M$ containing $M$ 
-input-target pairs sampled across the domain. For continuous regression tasks, a common loss term is the 
+The training process uses a dataset $\mathcal{D} = \left\{ (x_i, y_i) \right\}_{i=1}^M$ containing $M$ 
+input-target pairs sampled across the domain. For a continuous regression tasks, a common loss term is the 
 mean squared error (MSE) evaluated over the training dataset:
 \begin{equation}
     \label{eq:mse-loss}
@@ -91,12 +91,13 @@ mean squared error (MSE) evaluated over the training dataset:
         \pi_\theta(x) - y
     \right\|_2^2.
 \end{equation}
-Here, $x$ denotes a system state and $y$ denotes the corresponding target value.
+Here, $x$ and $y$ denote an input sample and its corresponding target, respectively. Minimizing this objective 
+penalizes prediction deviations, thereby encouraging the network to accurately capture the underlying mapping.
 
 
 \paragraph{Loss Augmentation and Regularization.}
-In supervised learning, relying solely on empirical error minimization over a finite dataset can lead to overfitting 
-and fails to enforce underlying structural or domain-specific constraints. To improve generalization and 
+In supervised learning, focusing exclusively on minimizing empirical error over a finite dataset can lead to overfitting.  
+Furthermore, it may fail to enforce underlying structural or physical properties. To improve generalization and 
 incorporate prior knowledge directly into the optimization process, the objective is frequently 
 augmented with weight regularization and auxiliary loss terms \citeSec{3.7}{kollmannsbergerDeepLearningComputational2021}:
 \begin{equation}
@@ -149,51 +150,52 @@ $\loss_{\mathrm{reg}}$ completes the total gradient evaluation:
     \frac{\partial \loss}{\partial b^{(l)}} = \delta^{(l)}.
 \end{equation}
 By reusing intermediate activations and error signals, backpropagation avoids redundant derivative 
-calculations and computes parameter gradients with computational cost of the same order as a forward 
-evaluation of the network \citeSec{3.4,2.3}{kollmannsbergerDeepLearningComputational2021,aggarwalNeuralNetworksDeep2023}.
+calculations and computes parameter gradients with a computational cost similar to that of a forward pass
+through the network \citeSec{3.4,2.3}{kollmannsbergerDeepLearningComputational2021,aggarwalNeuralNetworksDeep2023}.
 
 
 \paragraph{Optimization via Mini-Batch Gradient Descent.}
 While full-batch gradient descent evaluates the loss gradient over the entire dataset $\mathcal{D}$, 
 this can become computationally expensive and impractical for large dataset sizes $M$. 
 Conversely, single-sample stochastic gradient descent (SGD) results in high variance of the parameter updates, 
-leading to erratic optimization trajectories. Mini-batch gradient descent balances this trade-off by dividing the 
+leading to erratic optimization trajectories. Mini-batch gradient solves this problem by dividing the 
 dataset into smaller subsets $\mathcal{B} \subset \mathcal{D}$ of size $B = |\mathcal{B}|$. For a mini-batch, 
 the loss $\loss(\mathcal{B}; \theta)$ is evaluated analogously to \cref{eq:total-loss}, 
 with $\mathcal{D}$ replaced by $\mathcal{B}$ in all data-dependent loss terms. 
 The mini-batch gradient $g$ typically has lower variance than the gradient obtained from a single sample, 
 while mini-batch processing enables efficient parallelization on modern GPU hardware.
 During training, the parameters $\theta$ are iteratively updated along the negative gradient direction scaled by a 
-learning rate $\alpha > 0$. This update loop is executed for a total of $E \in \mathbb{N}$ epochs (full passes through the dataset), 
-as detailed in \cref{alg:mini-batch-sgd} \citeSec{2.6.1,2.6}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
+learning rate $\alpha > 0$. This update loop is inturn executed for a total of $E \in \mathbb{N}$ epochs 
+\citeSec{2.6.1,2.6}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
 
-\begin{algorithm}[htpb]
-    \caption{Mini-Batch Stochastic Gradient Descent}
-    \label{alg:mini-batch-sgd}
-    \SetAlgoLined
-    \KwIn{Dataset $\mathcal{D} = \{(x_i, y_i)\}_{i=1}^M$, learning rate $\alpha$, 
-        batch size $B$, max epochs $E$, initial parameters $\theta_0$}
-    \KwOut{Optimized parameters $\theta$}
+% as detailed in \cref{alg:mini-batch-sgd} 
+% \begin{algorithm}[htpb]
+%     \caption{Mini-Batch Stochastic Gradient Descent}
+%     \label{alg:mini-batch-sgd}
+%     \SetAlgoLined
+%     \KwIn{Dataset $\mathcal{D} = \{(x_i, y_i)\}_{i=1}^M$, learning rate $\alpha$, 
+%         batch size $B$, max epochs $E$, initial parameters $\theta_0$}
+%     \KwOut{Optimized parameters $\theta$}
 
-    \BlankLine
-    $\theta \leftarrow \theta_0$\;
-    \For{\text{epoch} $\leftarrow 1$ \KwTo $E$}{
-        Sample random partition $\{\mathcal{B}_1, \dots, \mathcal{B}_K\}$ of $\mathcal{D}$ such that $|\mathcal{B}_k| \leq B$\;
-        \ForEach{$\mathcal{B} \in \{\mathcal{B}_1, \dots, \mathcal{B}_K\}$}{
-            $\hat{y} = \pi_\theta(x) \quad \forall (x,y) \in \mathcal{B}$\;
-            $g \leftarrow \nabla_\theta \loss(\mathcal{B}; \theta)$\;
-            $\theta \leftarrow \theta - \alpha g$\;
-        }
-    }
-    \KwRet $\theta$\;
-\end{algorithm}
+%     \BlankLine
+%     $\theta \leftarrow \theta_0$\;
+%     \For{\text{epoch} $\leftarrow 1$ \KwTo $E$}{
+%         Sample random partition $\{\mathcal{B}_1, \dots, \mathcal{B}_K\}$ of $\mathcal{D}$ such that $|\mathcal{B}_k| \leq B$\;
+%         \ForEach{$\mathcal{B} \in \{\mathcal{B}_1, \dots, \mathcal{B}_K\}$}{
+%             $\hat{y} = \pi_\theta(x) \quad \forall (x,y) \in \mathcal{B}$\;
+%             $g \leftarrow \nabla_\theta \loss(\mathcal{B}; \theta)$\;
+%             $\theta \leftarrow \theta - \alpha g$\;
+%         }
+%     }
+%     \KwRet $\theta$\;
+% \end{algorithm}
 
 
 \paragraph{Adaptive Moment Estimation.}
 Although mini-batch gradient descent improves stability compared to SGD, its performance depends on 
-a static learning rate $\alpha$. In loss landscapes with ill-conditioned curvature or noisy 
-mini-batch gradients, a fixed learning rate can cause parameter updates to oscillate in steep directions while 
-making slow progress along plateaus \citeSec{4.5.4}{aggarwalNeuralNetworksDeep2023}.
+a static learning rate $\alpha$. In loss landscapes with noisy mini-batch gradients or challanging curvature, 
+a fixed learning rate can cause parameter updates to oscillate in steep directions while 
+making slow progress or none on plateaus \citeSec{4.5.4}{aggarwalNeuralNetworksDeep2023}.
 
 To resolve these limitations, the Adaptive Moment Estimation (Adam) optimizer \cite{kingmaAdamMethodStochastic2017} 
 computes individual, adaptive learning rates for each parameter by tracking exponential moving averages of both past 
@@ -206,11 +208,12 @@ gradients $m_t$ and past squared gradients $v_t$
         v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2,
     \end{align}
 \end{subequations}
-where $\beta_1, \beta_2 \in [0, 1)$ dictate the exponential decay rates, and $g_t^2$ denotes the element-wise 
+where $\beta_1, \beta_2 \in [0, 1)$ are the exponential decay rates, and $g_t^2$ denotes the element-wise 
 square of the current mini-batch gradient $g_t = \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$. 
 
-Because $m_0$ and $v_0$ are initialized as zero vectors, both moment estimates are initially biased toward zero. 
-To counteract this initialization bias, dynamic correction factors are applied at each timestep $t$:
+Since $m_0$ and $v_0$ are initialized as zero vectors, both moments are biased towards zero. 
+This is counteracted by dynamic correction factors $\hat{m}_t$ and $\hat{v}_t$, 
+which are applied at each timestep $t$:
 \begin{equation}
     \label{eq:adam-bias-correction}
     \hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \qquad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}.
@@ -220,44 +223,44 @@ The network parameters are then updated element-wise according to:
     \label{eq:adam-update}
     \theta_t = \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon},
 \end{equation}
-where $\epsilon > 0$ is a small constant ensuring numerical stability. Following \cite{kingmaAdamMethodStochastic2017}, 
-standard default hyperparameters are chosen as $\alpha = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$, 
-providing robust convergence across various deep learning architectures. The complete iterative training loop using 
-Adam is summarized in \cref{alg:adam-optimizer}.
+where $\epsilon > 0$ is a small constant used for numerical stability. Following \cite{kingmaAdamMethodStochastic2017}, 
+the default hyperparameters are chosen as $\alpha = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$, 
+providing robust convergence across various deep learning architectures. 
+% The complete iterative training loop using Adam is summarized in \cref{alg:adam-optimizer}.
 
-\begin{algorithm}[htpb]
-    \caption{Adaptive Moment Estimation (Adam)}
-    \label{alg:adam-optimizer}
-    \SetAlgoLined
-    \KwIn{Dataset $\mathcal{D}$, initial parameters $\theta_0$, step size $\alpha = 0.001$, decay rates $\beta_1 = 0.9, \beta_2 = 0.999$, 
-        stability constant $\epsilon = 10^{-8}$}
-    \KwOut{Optimized parameters $\theta$}
+% \begin{algorithm}[htpb]
+%     \caption{Adaptive Moment Estimation (Adam)}
+%     \label{alg:adam-optimizer}
+%     \SetAlgoLined
+%     \KwIn{Dataset $\mathcal{D}$, initial parameters $\theta_0$, step size $\alpha = 0.001$, decay rates $\beta_1 = 0.9, \beta_2 = 0.999$, 
+%         stability constant $\epsilon = 10^{-8}$}
+%     \KwOut{Optimized parameters $\theta$}
 
-    \BlankLine
-    \tcp{Initializations}
-    $m_0 \leftarrow 0$\;
-    $v_0 \leftarrow 0$\;
-    $t \leftarrow 0$\;
+%     \BlankLine
+%     \tcp{Initializations}
+%     $m_0 \leftarrow 0$\;
+%     $v_0 \leftarrow 0$\;
+%     $t \leftarrow 0$\;
 
-    \BlankLine
-    \While{$\theta$ not converged}{
-        $t \leftarrow t + 1$\;
-        Sample mini-batch $\mathcal{B}_t \subset \mathcal{D}$\;
-        Compute mini-batch gradient: $g_t \leftarrow \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$\;
+%     \BlankLine
+%     \While{$\theta$ not converged}{
+%         $t \leftarrow t + 1$\;
+%         Sample mini-batch $\mathcal{B}_t \subset \mathcal{D}$\;
+%         Compute mini-batch gradient: $g_t \leftarrow \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$\;
         
-        \BlankLine
-        \tcp{Update biased moment estimates}
-        $m_t \leftarrow \beta_1 m_{t-1} + (1 - \beta_1) g_t$\;
-        $v_t \leftarrow \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$\;
+%         \BlankLine
+%         \tcp{Update biased moment estimates}
+%         $m_t \leftarrow \beta_1 m_{t-1} + (1 - \beta_1) g_t$\;
+%         $v_t \leftarrow \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$\;
         
-        \BlankLine
-        \tcp{Compute bias-corrected estimates}
-        $\hat{m}_t \leftarrow m_t / (1 - \beta_1^t)$\;
-        $\hat{v}_t \leftarrow v_t / (1 - \beta_2^t)$\;
+%         \BlankLine
+%         \tcp{Compute bias-corrected estimates}
+%         $\hat{m}_t \leftarrow m_t / (1 - \beta_1^t)$\;
+%         $\hat{v}_t \leftarrow v_t / (1 - \beta_2^t)$\;
         
-        \BlankLine
-        \tcp{Update parameters}
-        $\theta_t \leftarrow \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$\;
-    }
-    \KwRet $\theta_t$\;
-\end{algorithm}
+%         \BlankLine
+%         \tcp{Update parameters}
+%         $\theta_t \leftarrow \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$\;
+%     }
+%     \KwRet $\theta_t$\;
+% \end{algorithm}

@@ -65,7 +65,7 @@ The conditions \labelcref{eq:term-state-constraint} and \labelcref{eq:term-input
 local control input remain within the admissible state and input bounds $\mathcal{X}$ and $\mathcal{U}$. 
 Additionally, positive invariance in \labelcref{eq:term-positive-invariance} ensures that every state in 
 $\mathcal{X}_f$ remains in $\mathcal{X}_f$ under the local controller $\pi_f(x)$ \citeDef{2.9}{rawlingsModelPredictiveControl2020}. 
-This property is crucial for proving recursive feasibility, as it allows the terminal state of a feasible solution at horizon $N$ 
+This property is key for proving recursive feasibility, as it allows the terminal state of a feasible solution at horizon $N$ 
 to be extended by the local control action $\pi_f(x_N^*)$. This yields a feasible candidate trajectory for the subsequent 
 sampling step $k+1$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
 The terminal cost decrease condition in \labelcref{eq:term-cost-decrease} acts as a local Lyapunov condition within $\mathcal{X}_f$. 

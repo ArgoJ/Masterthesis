@@ -22,21 +22,21 @@ The discrete-time function $f: \mathbb{R}^{n_x} \times \mathbb{R}^{n_u} \to \mat
 numerical integration scheme, such as the forward Euler or a fourth-order Runge-Kutta (RK4) method 
 \cite{butcherNumericalMethodsOrdinary2016}.
 
-To account for physical and operational limits, the system states and control inputs are restricted to 
-compact constraint sets $\mathcal{X} := [\underline{x}, \overline{x}] \subseteq \mathbb{R}^{n_x}$ and 
+To account for physical and operational limitations, the system states and control inputs are restricted to 
+constraint sets $\mathcal{X} := [\underline{x}, \overline{x}] \subseteq \mathbb{R}^{n_x}$ and 
 $\mathcal{U} := [\underline{u}, \overline{u}] \subseteq \mathbb{R}^{n_u}$. 
 Furthermore, without loss of generality, any equilibrium $(x^*, u^*)$ can be shifted to the origin 
-via deviation variables $\tilde{x} := x - x^*$ and $\tilde{u} := u - u^*$. To keep notation concise, 
-the tildes are omitted and $x$ and $u$ are used directly for the shifted variables, 
-assuming $(x^*, u^*) = (\mathbf{0}, \mathbf{0})$ throughout this chapter.
+via deviation variables $\tilde{x} := x - x^*$ and $\tilde{u} := u - u^*$. For readability, 
+the tilde notation is subsequently dropped, so that $x$ and $u$ represent the shifted variables, 
+assuming $(x^*, u^*) = (\mathbf{0}, \mathbf{0})$ throughout this work.
 
 
 \subsection{Lyapunov Stability}
 \label{subsec:lyapunov-stability}
 Consider the discrete-time closed-loop system under a state-feedback control policy 
-$\pi: \mathcal{X} \to \mathcal{U}$ with the origin $x = \mathbf{0}$ as an equilibrium point, 
+$\pi: \mathcal{X} \to \mathcal{U}$. The origin serves as an equilibrium point  $x^* = \mathbf{0}$ 
 satisfying $\pi(\mathbf{0}) = \mathbf{0}$ and $f(\mathbf{0}, \mathbf{0}) = \mathbf{0}$.
-Assuming the state constraint set $\mathcal{X}$ is positively invariant under $\pi$, 
+Assuming the state constraint set $\mathcal{X}$ is positively forward invariant under $\pi$, 
 the origin is locally asymptotically stable in $\mathcal{X}$ if there exists a positive definite function 
 $V: \mathcal{X} \to \mathbb{R}_{\ge 0}$ satisfying \citeThm{2.13}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
@@ -47,6 +47,6 @@ $V: \mathcal{X} \to \mathbb{R}_{\ge 0}$ satisfying \citeThm{2.13}{rawlingsModelP
         V(f(x, \pi(x))) - V(x) &< 0 \qquad && \forall x \in \mathcal{X} \setminus \{\mathbf{0}\}.
     \end{aligned}
 \end{equation}
-The strict decrease condition guarantees trajectory convergence to the origin for all initial states 
-$x_0$ within a certified domain.
+Here, the decrease condition ensures that any trajectory starting in $\mathcal{X}$
+remains bounded and decays toward the equilibrium $x^*$.
 \todo[inline]{look up if all assumtions are named}
