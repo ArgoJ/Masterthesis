@@ -37,8 +37,12 @@
 %Literaturverzeichnis
 %%%%%%%%%%%%%%%%%%%
 % ACHTUNG: bei Problemen ggf. den ieee Style nachinstallieren oder einen anderen nutzen
-\catcode30=12  % Workaround for current biblatex problem (https://tex.stackexchange.com/questions/564990/error-after-miktex-reinstall-text-line-contains-an-invalid-character)
-\usepackage[backend=biber,style=ieee,bibencoding=utf8]{biblatex}
+\usepackage[backend=biber,style=ieee,bibencoding=utf8,url=false,doi=false,eprint=false]{biblatex}
+\AtEveryBibitem{
+  \clearfield{url}
+  \clearfield{urldate}
+  \clearfield{eprint}
+}
 \addbibresource{literature.bib}
 
 
@@ -116,7 +120,7 @@
 \phantomsection         % Für Aufnahme ins Inhaltsverzeichnis
 \addcontentsline{toc}{chapter}{\bibname}  % In Inhaltsverzeichnis von
                                           % Dokument und pdf aufnehmen
-\printbibliography 
+\printbibliography[nottype=online]
 % =================================================================================
 
   
