@@ -4,14 +4,14 @@
 This section adapts the search algorithm for the maximal certifiable sublevel set $\mathcal{V}_\rho$ 
 proposed in \cite{yangLyapunovstableNeuralControl2024}. 
 Specifically, for a given target level $\rho > 0$, formal verification aims to certify that all states within 
-the candidate region $\mathcal{V}_\rho := \{ x \in \mathcal{B}_C \mid V_\theta(x) \le \rho \}$ satisfy controlled 
+the candidate region $\mathcal{V}_\rho := \{ x \in \mathcal{B}_C \mid V_\phi(x) \le \rho \}$ satisfy controlled 
 regional invariance and exponential decay:
 \begin{equation}
     \label{eq:lyapunov-certified-property}
-    V_\theta(x) \le \rho \implies 
+    V_\phi(x) \le \rho \implies 
     \begin{cases} 
         x^+ \in \mathcal{B}_C, \\ 
-        V_\theta(x^+) \le (1 - \kappa) V_\theta(x),
+        V_\phi(x^+) \le (1 - \kappa) V_\phi(x),
     \end{cases}
 \end{equation}
 where $\kappa \in (0, 1)$ specifies the targeted convergence rate and $x^+ = f(x, \pi_\theta(x))$ denotes the discrete 
@@ -20,7 +20,7 @@ one-step state transition.
 Before evaluating the stability conditions, the equilibrium $x^*$ must be explicitly excluded from the bounded 
 certification domain 
 $\mathcal{B}_C := \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \bar{x}_C \} \subseteq \mathcal{B}_V$. 
-By construction, $V_\theta(x^*) = 0$ and $x^+ = x^*$ hold at the equilibrium, 
+By construction, $V_\phi(x^*) = 0$ and $x^+ = x^*$ hold at the equilibrium, 
 causing the strict positivity and strict decrease conditions to evaluate to false at this exact point. 
 Since these conditions are only required to hold for $x \neq x^*$, and positive definiteness is structurally 
 enforced by the network architecture, formal verification is instead performed over the punctured evaluation domain 
@@ -44,16 +44,16 @@ $\mathcal{B}_{\mathrm{eval}}$. The individual logical terms are defined as follo
 \begin{subequations}\label{eq:certification-specification}
     \begin{align}
         \Phi_{\mathrm{sub}}
-            &\equiv V_\theta(x) > \rho,
+            &\equiv V_\phi(x) > \rho,
             \label{eq:outside-certification}\\
         \Phi_{\mathrm{pos}}
-            &\equiv V_\theta(x) > 0,
+            &\equiv V_\phi(x) > 0,
             \label{eq:positive-certification}\\
         \Phi_{\mathrm{inv}}
             &\equiv \underline{x}_C \le x^+ \le \bar{x}_C,
             \label{eq:invariance-certification}\\
         \Phi_{\mathrm{dec}}
-            &\equiv (1 - \kappa) V_\theta(x) > V_\theta(x^+).
+            &\equiv (1 - \kappa) V_\phi(x) > V_\phi(x^+).
             \label{eq:decrease-certification}
     \end{align}
 \end{subequations}

@@ -86,22 +86,22 @@ or domain invariance \labelcref{eq:term-positive-invariance} \cite{yangLyapunovs
 Instead of maximizing a classification loss \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}, 
 the gradient-based search is utilized to identify states associated with large violations of the Lyapunov conditions.
 In the setting further defined in \cref{sec:imitation-learning} and \cref{subsec:lyapunov-network-architecture}, 
-the Lyapunov candidate and the controller are parameterized independently as $V_{\theta_V}(x)$ and $\pi_{\theta_\pi}(x)$, 
+the Lyapunov candidate and the controller are parameterized independently as $V_\phi(x)$ and $\pi_\theta(x)$, 
 respectively.
 Adapting the robust optimization paradigm \cite{madryDeepLearningModels2019} to deterministic control, 
 their joint training can be formulated as a saddle-point problem:
 \begin{equation}
     \label{eq:lyapunov-min-max}
-    \min_{(\theta_V,\theta_\pi)} 
+    \min_{(\phi,\theta)} 
     \quad 
     \max_{x_{\mathrm{adv}} \in \mathcal{X}} 
     \quad 
-    \mathcal{J}(x_{\mathrm{adv}}; \theta_V,\theta_\pi)
+    \mathcal{J}(x_{\mathrm{adv}}; \phi,\theta)
 \end{equation}
 Here, the inner maximization searches for candidate states within the training domain $\mathcal{X}$ 
-that yield large violations of the Lyapunov conditions. The objective $\mathcal{J}(x_{\mathrm{adv}};\theta_V,\theta_\pi)$ 
+that yield large violations of the Lyapunov conditions. The objective $\mathcal{J}(x_{\mathrm{adv}};\phi,\theta)$ 
 therefore depends on both the Lyapunov-function parameters and the controller parameters.
-Conversely, the outer minimization updates $\theta_V$ and $\theta_\pi$ to resolve these 
+Conversely, the outer minimization updates $\phi$ and $\theta$ to resolve these 
 violations \cite{madryDeepLearningModels2019}.
 
 Since uniform sampling may fail to discover violations in high-dimensional spaces \citeSec{12.4}{aggarwalNeuralNetworksDeep2023}, 

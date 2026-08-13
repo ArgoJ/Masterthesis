@@ -12,20 +12,20 @@ therefore make the Lyapunov candidate a valid certificate for stability.
 \label{subsec:lyapunov-network-architecture}
 
 Following \cite{yangLyapunovstableNeuralControl2024}, 
-the Lyapunov candidate $V_\theta(x)$ is parameterized to be positive definite by construction:
+the Lyapunov candidate $V_\phi(x)$ is parameterized to be positive definite by construction:
 \begin{equation}
     \label{eq:lyapunov-candidate}
-    V_{\theta}(x) = \left| g_{\theta}(x) - g_{\theta}(x^*) \right| 
-        + \left\|  (\varepsilon I + R_\theta^\top R_\theta) (x - x^*)  \right\|_1,
+    V_{\phi}(x) = \left| g_{\phi}(x) - g_{\phi}(x^*) \right| 
+        + \left\|  (\varepsilon I + R_\phi^\top R_\phi) (x - x^*)  \right\|_1,
 \end{equation}
-where $g_{\theta} : \mathbb{R}^{n_x} \to \mathbb{R}$ is a neural network, $x \in \mathbb{R}^{n_x}$ is the current state, 
+where $g_{\phi} : \mathbb{R}^{n_x} \to \mathbb{R}$ is a neural network, $x \in \mathbb{R}^{n_x}$ is the current state, 
 $x^* \in \mathbb{R}^{n_x}$ is the equilibrium, $\varepsilon > 0$ is a small regularization constant, 
-and $R_\theta \in \mathbb{R}^{n_x \times n_x}$ is a learnable matrix. 
+and $R_\phi \in \mathbb{R}^{n_x \times n_x}$ is a learnable matrix. 
 While the first term is only positive semi-definite and may vanish away from the equilibrium, 
 the second term guarantees strict positive definiteness $\forall x \in \mathcal{X} \setminus \{x^*\}$, 
-as the matrix $(\varepsilon I + R_\theta^\top R_\theta)$ is strictly 
+as the matrix $(\varepsilon I + R_\phi^\top R_\phi)$ is strictly 
 positive definite by construction for any $\varepsilon > 0$.
-The complete architectural layout of $V_\theta(x)$ is illustrated in \cref{fig:neural-lyapunov}.
+The complete architectural layout of $V_\phi(x)$ is illustrated in \cref{fig:neural-lyapunov}.
 
 \begin{figure}[htbp]
     \centering
@@ -51,7 +51,7 @@ $\mathcal{X}_V := \left\{ x \in \mathcal{X}_\pi \mid \underline{x}_V \leq  x \le
 defined as
 \begin{equation}
     \label{eq:sublevel-set}
-    \mathcal{V}_\rho := \{ x \in \mathcal{X}_V \mid V_\theta(x) \le \rho \}.
+    \mathcal{V}_\rho := \{ x \in \mathcal{X}_V \mid V_\phi(x) \le \rho \}.
 \end{equation}
 To prevent this certified region from trivially collapsing towards the origin during optimization, 
 and to ensure numerical stability during normalizations, $\rho$ is strictly constrained 
@@ -65,15 +65,15 @@ in the co-training setup and is thus referred to as $\pi_V$ hereafter.
 For each sample, the decrease violation is defined as
 \begin{equation}
     \label{eq:lyapunov-decrease}
-    e_V = (1 - \kappa) V_\theta(x) - V_\theta(x^+_V),
+    e_V = (1 - \kappa) V_\phi(x) - V_\phi(x^+_V),
 \end{equation}
 where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease. 
-To balance the optimization scale across different magnitudes of $V_\theta$, 
+To balance the optimization scale across different magnitudes of $V_\phi$, 
 we normalize this violation to obtain the relative decrease loss:
 \begin{equation}
     \label{eq:rel-lyapunov-decrease}
     \loss_{\mathrm{dec}} = \left[
-        \frac{e_V}{\max(|V_\theta(x)|, \varepsilon_{\text{rel}})}
+        \frac{e_V}{\max(|V_\phi(x)|, \varepsilon_{\text{rel}})}
     \right]_+,
 \end{equation}
 where $\varepsilon_{\text{rel}} > 0$ prevents division by zero. 
@@ -109,7 +109,7 @@ However, to apply the $\rho$-gate appropriately, $\loss_{\mathrm{cond}}$ is weig
 \begin{equation}
     \label{eq:rho-gate}
     w_{\rho} = \sigma \left(
-        s \cdot \frac{\rho - V_\theta(x)}{\max (\rho, \varepsilon_{\text{rel}})}
+        s \cdot \frac{\rho - V_\phi(x)}{\max (\rho, \varepsilon_{\text{rel}})}
     \right),
 \end{equation}
 where $s > 0$ denotes the gate sharpness. This smooth formulation ensures that the weights 
@@ -147,7 +147,7 @@ using \cite{yangLyapunovstableNeuralControl2024}
     \label{eq:roa-loss}
     \loss_{\mathrm{ROA}} = \frac{1}{|\mathcal{B}_{\text{ROA}}|} \sum_{x \in \mathcal{B}_{\text{ROA}}} \ln \left(
         \left[
-            \frac{V_\theta(x)}{\rho} - 1
+            \frac{V_\phi(x)}{\rho} - 1
         \right]_+ + 1
     \right).
 \end{equation}
@@ -170,7 +170,7 @@ These violations are identified using the LIRPA framework \cite{xuFastCompleteEn
 To reduce the computational cost during training, LIRPA is applied only to a 
 heuristic subset of regions. Specifically, a hyper-rectangular cell is selected 
 if at least one of its $2^{n_x}$ corners, or optionally its center point $x_{\mathrm{center}}$, 
-lies within the sublevel set $\mathcal{V}_\rho$ (i.e., $\min(V(x)) \leq \rho$ evaluated over these points).
+lies within the sublevel set $\mathcal{V}_\rho$.
 For each selected region, LIRPA then provides a formal lower bound $e_{V,\mathrm{lower}}$ on the 
 signed Lyapunov decrease $-e_V$. 
 After evaluation, the LIRPA-condition violation for each region is computed as
@@ -179,7 +179,7 @@ After evaluation, the LIRPA-condition violation for each region is computed as
     \mathcal{M}_{\mathrm{L}} = \frac{
         \ln ([-e_{V,\mathrm{lower}}]_+ + 1)
     }{
-        \max(V_\theta(x_{\mathrm{center}}), \varepsilon_{\mathrm{rel}})
+        \max(V_\phi(x_{\mathrm{center}}), \varepsilon_{\mathrm{rel}})
     }.
 \end{equation}
 The final LIRPA-condition loss is then computed as the weighted mean over all evaluated regions, 
@@ -217,7 +217,7 @@ sampled via a low-discrepancy Sobol sequence \cite{joeConstructingSobolSequences
 The logarithm of the mean Lyapunov value over this batch is defined as
 \begin{equation}
     \label{eq:mean-lyapunov-log}
-    \ell_V = \ln \left( \frac{1}{|\mathcal{B}_V|} \sum_{x \in \mathcal{B}_V} V_\theta(x) \right),
+    \ell_V = \ln \left( \frac{1}{|\mathcal{B}_V|} \sum_{x \in \mathcal{B}_V} V_\phi(x) \right),
 \end{equation}
 leading to the scaling loss formulation
 \begin{equation}
@@ -254,14 +254,14 @@ The normalized deviation between the learned policy and the imitation controller
 \end{equation}
 
 
-\paragraph{$R$-Matrix Loss} regularizes the learnable matrix $R_\theta$ by penalizing deviations 
+\paragraph{$R$-Matrix Loss} regularizes the learnable matrix $R_\phi$ by penalizing deviations 
 of its Frobenius norm from its initial value $\ell_{R,0}$:
 \begin{equation}
     \label{eq:r-matrix-loss}
     \loss_R = \left( \ell_{R,0} - \lVert R \rVert_F \right)^2.
 \end{equation}
-However, $\ell_{R,0} = \lVert R_\theta \rVert_F$ is automatically computed, 
-based on the initial $R_{\theta,0}$ matrix.
+However, $\ell_{R,0} = \lVert R_\phi \rVert_F$ is automatically computed, 
+based on the initial $R_{\phi,0}$ matrix.
 
 
 \paragraph{Overall Lyapunov Loss} represents the combined objective function, 
@@ -293,7 +293,7 @@ that maximize the condition violation defined in \labelcref{eq:combined-conditio
 and \labelcref{eq:rho-gate}. The per-sample PGD objective is defined as
 \begin{equation}
     \label{eq:pgd-objective}
-    \mathcal{J}(x; \theta) = w_{\rho}(x) \loss_{\mathrm{cond}}(x).
+    \mathcal{J}(x; \phi, \theta) = w_{\rho}(x) \loss_{\mathrm{cond}}(x).
 \end{equation}
 The adversarial search is initialized using the explorative pool $\mathcal{S}$, 
 with up to $25\%$ of the batch supplemented by existing counterexamples to encourage local refinement.
@@ -303,7 +303,7 @@ by iteratively updating candidate states along the sign of their loss gradient:
     \label{eq:pgd-update-lyapunov}
     x_{\mathrm{adv}}^{(j+1)} \leftarrow \Pi_{\mathcal{X}_V} \left(
         x_{\mathrm{adv}}^{(j)} + \alpha_{\mathrm{PGD}} \operatorname{sign} \left(
-            \nabla_{x_{\mathrm{adv}}^{(j)}} \mathcal{J}\left(x_{\mathrm{adv}}^{(j)}; \theta\right)
+            \nabla_{x_{\mathrm{adv}}^{(j)}} \mathcal{J}\left(x_{\mathrm{adv}}^{(j)}; \phi, \theta\right)
         \right)
     \right),
 \end{equation}
@@ -324,13 +324,12 @@ From these candidates, $N_{\mathcal{S}}$ states are probabilistically sampled ba
 centered around an expanded sublevel boundary $m \cdot \rho$ (with margin $m > 1$). 
 This weighting smoothly penalizes states further outside the estimated region of attraction, 
 significantly reducing their likelihood of being selected.
-\todo[inline]{theta anpassen}
 
 \begin{algorithm}[htpb]
     \caption{Probabilistic Explorative State Pool Resampling}
     \label{alg:state-pool-resample}
 
-    \KwIn{Lyapunov function $V_\theta$, current ROA estimate $\rho$, margin $m$, sharpness $s$, target size $N_{\mathcal{S}}$}
+    \KwIn{Lyapunov function $V_\phi$, current ROA estimate $\rho$, margin $m$, sharpness $s$, target size $N_{\mathcal{S}}$}
     \KwOut{Updated state pool $\mathcal{S}$ of size $N_{\mathcal{S}}$}
 
     \BlankLine
@@ -338,7 +337,7 @@ significantly reducing their likelihood of being selected.
 
     \BlankLine
     For all $x \in \mathcal{B}_{\mathcal{S}}$, assign weight $w(x) \leftarrow \sigma \left(
-        s \, \frac{m \cdot \rho - V_\theta(x)}{\max(\rho, 10^{-9})}
+        s \, \frac{m \cdot \rho - V_\phi(x)}{\max(\rho, 10^{-9})}
     \right) + \varepsilon$\;
 
     \BlankLine
@@ -356,24 +355,24 @@ Consequently, the condition loss continuously penalizes recent violations while 
 \subsection{\texorpdfstring{$\rho$}{ρ}-Sublevel Estimation}
 \label{subsec:rho-sublevel-estim}
 To evaluate the $\rho$-gated condition loss in \labelcref{eq:rho-gated-condition-loss}, the target sublevel bound $\rho$ 
-must be continuously estimated throughout training as the Lyapunov candidate $V_\theta(x)$ evolves. 
-Since the goal is to identify the largest sublevel set $\mathcal{V}_\rho := \{ x \in \mathcal{X}_V \mid V_\theta(x) \le \rho \}$ 
+must be continuously estimated throughout training as the Lyapunov candidate $V_\phi(x)$ evolves. 
+Since the goal is to identify the largest sublevel set $\mathcal{V}_\rho := \{ x \in \mathcal{X}_V \mid V_\phi(x) \le \rho \}$ 
 that remains within the training domain $\mathcal{X}_V$, the sublevel set reaches the boundary of the domain at 
 its maximum admissible value. 
-Therefore, the theoretical upper bound for $\rho$ is given by the minimum value of $V\theta(x)$ on the boundary:
+Therefore, the theoretical upper bound for $\rho$ is given by the minimum value of $V_\phi(x)$ on the boundary:
 \begin{equation}
     \label{eq:rho-boundary-definition}
-    \rho_{\mathrm{max}} = \min_{x \in \partial \mathcal{X}_V} V_\theta(x).
+    \rho_{\mathrm{max}} = \min_{x \in \partial \mathcal{X}_V} V_\phi(x).
 \end{equation}
 
-Following the boundary-evaluation principle established by \cite{yangLyapunovstableNeuralControl2024}, evaluating $V_\theta(x)$ 
+Following the boundary-evaluation principle established by \cite{yangLyapunovstableNeuralControl2024}, evaluating $V_\phi(x)$ 
 along the boundary $\partial \mathcal{X}_V$ is sufficient to estimate $\rho_{\mathrm{max}}$ without searching the entire domain. 
-However, because $\partial \mathcal{X}_V$ can be a high-dimensional surface and $V_\theta(x)$ defines a non-convex landscape, 
+However, because $\partial \mathcal{X}_V$ can be a high-dimensional surface and $V_\phi(x)$ defines a non-convex landscape, 
 simple uniform sampling on the boundary may fail to identify low-valued boundary points. 
-Therefore, Projected Gradient Descent (PGD) is employed to search for local minima of $V\theta(x)$ along the boundary.
+Therefore, Projected Gradient Descent (PGD) is employed to search for local minima of $V_\phi(x)$ along the boundary.
 
 Starting from uniform boundary seeds $\mathcal{B}_{\partial} \sim \mathcal{U}(\partial \mathcal{X}_V)$, 
-PGD \emph{iteratively minimizes} $V_\theta(x)$ along the negative gradient.
+PGD \emph{iteratively minimizes} $V_\phi(x)$ along the negative gradient.
 To maintain candidate states on the hyper-rectangular boundary surface $\partial\mathcal{X}_V$, 
 the projection operator $\Pi_{\partial \mathcal{X}_V}$ projects the updated states onto the domain bounds 
 while keeping the active face-defining coordinate fixed at its boundary value. 
@@ -393,7 +392,7 @@ overestimated by applying a growth factor $\gamma > 1$:
 \begin{equation}
     \label{eq:rho-estimation}
     \tilde{\rho} = \max \left( 
-        \rho_{\text{min}}, \gamma \cdot \min_{x \in \mathcal{B}_{\partial}} V_\theta(x) 
+        \rho_{\text{min}}, \gamma \cdot \min_{x \in \mathcal{B}_{\partial}} V_\phi(x) 
     \right).
 \end{equation}
 
@@ -443,10 +442,10 @@ attraction.
     \label{fig:train-flow}
 \end{figure}
 
-After completion of the training procedure, the optimized parameters of the policy $\pi_V$ and the Lyapunov candidate $V_\theta$ 
+After completion of the training procedure, the optimized parameters of the policy $\pi_V$ and the Lyapunov candidate $V_\phi$ 
 yield a candidate control-Lyapunov pair. 
 However, while falsification-guided adversarial training seeks to eliminate counterexamples over the trained state domain, 
 it does not guarantee the complete absence of stability violations across the continuous state space. 
-To transition from empirical validation to a formal stability proof, the learned candidate pair $(\pi_V, V_\theta)$ 
+To transition from empirical validation to a formal stability proof, the learned candidate pair $(\pi_V, V_\phi)$ 
 is subsequently subjected to formal neural network verification, as detailed in the following section.
 
