@@ -100,8 +100,8 @@ their joint training can be formulated as a saddle-point problem:
 \end{equation}
 Here, the inner maximization searches for candidate states within the training domain $\mathcal{X}$ 
 that yield large violations of the Lyapunov conditions. The objective $\mathcal{J}(x_{\mathrm{adv}};\phi,\theta)$ 
-therefore depends on both the Lyapunov-function parameters and the controller parameters.
-Conversely, the outer minimization updates $\phi$ and $\theta$ to resolve these 
+therefore depends on both the Lyapunov-function parameters $\phi$ and the controller parameters $\theta$.
+Conversely, the parameters are updated during the outer optimization, to resolve these 
 violations \cite{madryDeepLearningModels2019}.
 
 Since uniform sampling may fail to discover violations in high-dimensional spaces \citeSec{12.4}{aggarwalNeuralNetworksDeep2023}, 
