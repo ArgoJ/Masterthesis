@@ -14,7 +14,7 @@ is solved at each time step $k$ given the current system state $x_k$ \citeSec{2.
 \begin{equation}
     \label{eq:mpc-problem}
     \begin{aligned}
-        \min_{\{x_{i|k}\}_{i=0}^N, \{u_{i|k}\}_{i=0}^{N-1}} \; 
+        \min_{(x_{i|k})_{i=0}^N, (u_{i|k})_{i=0}^{N-1}} \; 
                         & & J(x_k) &= \sum_{i=0}^{N-1} \ell(x_{i|k}, u_{i|k}) + V_f(x_{N|k}) \\
         \text{s.t.} \;  & & x_{i+1|k}   &= f(x_{i|k}, u_{i|k}),     && i = 0, \dots, N-1, \\
                         & & x_{i|k}     &\in \mathcal{X},           && i = 0, \dots, N-1, \\
@@ -27,7 +27,7 @@ Here, $N \in \mathbb{N}$ denotes the prediction horizon, $\ell: \mathcal{X} \tim
 and $V_f: \mathcal{X}_f \to \mathbb{R}_{\ge 0}$ represents the terminal cost function, which is defined over the terminal constraint set 
 $\mathcal{X}_f \subseteq \mathcal{X}$. To distinguish optimization from closed-loop variables, 
 $x_{i|k}$ and $u_{i|k}$ denote the predicted state and input at horizon step $i$, initialized at sampling time $k$. 
-The sequences $\{x_{i|k}\}_{i=0}^N$ and $\{u_{i|k}\}_{i=0}^{N-1}$ serve as optimization variables constrained by the 
+The sequences $(x_{i|k})_{i=0}^N$ and $(u_{i|k})_{i=0}^{N-1}$ serve as optimization variables constrained by the 
 sets $\mathcal{X}$ and $\mathcal{U}$ \citeSec{3.2}{gruneNonlinearModelPredictive2017}. 
 
 For this work, the stage cost is chosen as the quadratic cost function with positive definite weighting matrices $Q \succ 0$ and $R \succ 0$, 
@@ -36,8 +36,15 @@ which is defined as follows \citeSec{1.3}{rawlingsModelPredictiveControl2020}:
     \label{eq:stage-cost}
     \ell(x_{i|k}, u_{i|k}) = x_{i|k}^\top Q x_{i|k} + u_{i|k}^\top R u_{i|k}.
 \end{equation}
-Following the receding horizon principle, only the first control input $u_{0|k}^*$ from the optimal sequence is applied to the system, 
-and the optimization is repeated at the next closed-loop step \citeSec{2.2,3.1}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}.
+Following the receding horizon principle, only the first optimal control input $u_{0|k}^*$ of the sequence is applied to the system.
+This implicitly defines the closed-loop MPC feedback policy $\pi_0: \mathcal{X} \to \mathcal{U}$ as
+\begin{equation}
+    \label{eq:mpc-feedback-policy}
+    \pi_0(x_k) := u_{0|k}^*,
+\end{equation}
+yielding the nominal closed-loop dynamics $x_{k+1} = f(x_k, \pi_0(x_k))$. 
+The optimal control problem \labelcref{eq:mpc-problem} is then repeated at the subsequent step with 
+the updated state \citeSec{2.2,3.1}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}.
 
 
 \subsection{Terminal Ingredients and their Construction}
@@ -66,16 +73,16 @@ local control input remain within the admissible state and input bounds $\mathca
 Additionally, positive invariance in \labelcref{eq:term-positive-invariance} ensures that every state in 
 $\mathcal{X}_f$ remains in $\mathcal{X}_f$ under the local controller $\pi_f(x)$ \citeDef{2.9}{rawlingsModelPredictiveControl2020}. 
 This property is key for proving recursive feasibility, as it allows the terminal state of a feasible solution at horizon $N$ 
-to be extended by the local control action $\pi_f(x_{N|k}^*)$. This yields a feasible candidate trajectory for the subsequent 
-sampling step $k+1$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
+to be extended by the local control input $\pi_f(x_{N|k}^*)$. This yields a feasible candidate trajectory for the subsequent 
+sampling step $k+1$, as further described in \cref{subsec:closed-loop-stability} \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
 The terminal cost decrease condition in \labelcref{eq:term-cost-decrease} acts as a local Lyapunov condition within $\mathcal{X}_f$. 
 While positive invariance ensures that the local trajectory remains in $\mathcal{X}_f$, the decrease condition requires 
 the terminal cost $V_f$ to decrease along the local closed-loop trajectory by at least the stage cost $\ell(x,\pi_f(x))$ 
 \citeAsm{5.9}{gruneNonlinearModelPredictive2017}.
 
 The predictive mechanism and the geometric role of the terminal set are illustrated in \cref{fig:terminal-set-comparison}. 
-While intermediate predicted states $x_{0|k}, \dots, x_{N-1|k}$ are required to remain in the 
-safe state space $\mathcal{X}$, the terminal constraint enforces $x_{N|k} \in \mathcal{X}_f$, where the local controller 
+While intermediate predicted states are required to remain in the 
+safe state space $x_{i|k} \in \mathcal{X}$ for $i = 0, \dots, N-1$, the terminal constraint enforces $x_{N|k} \in \mathcal{X}_f$, where the local controller 
 satisfies the Lyapunov decrease condition in \labelcref{eq:term-cost-decrease} 
 \citeThm{2.19}{rawlingsModelPredictiveControl2020}.
 
@@ -127,25 +134,45 @@ linearization errors of the underlying nonlinear dynamics.
 \subsection{Recursive Feasibility and Closed-Loop Stability}
 \label{subsec:closed-loop-stability}
 
-\todo[inline]{more detail on recursive feasibility, smoother transition to closed loop stability.}
-Under the MPC policy $\pi_0(x_k) := u_0^*(x_k)$, 
-the optimal value function $V_N^*(x_k)$ of \labelcref{eq:mpc-problem} serves as a Lyapunov candidate 
-over the feasible set $\mathcal{X}_N \subseteq \mathcal{X}$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}. 
-Using the terminal ingredients from \cref{subsec:terminal-set-cost}, the recursive
-feasibility at time step $k+1$ is determined by using the remaining inputs of the optimal sequence 
-computed at time step $k$ and appending the terminal control action $\pi(x_N^*)$ \citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
+Due to state and input constraints, as well as system dynamics, the optimal control problem (OCP) may be infeasible 
+for arbitrary states $x \in \mathcal{X}$. 
+Therefore, the MPC domain is restricted to the \emph{feasible set}, which is defined as \citeSec{3.3}{gruneNonlinearModelPredictive2017}:
+\begin{equation}
+    \label{eq:feasible-set-compact}
+    \mathcal{X}_N := \left\{ 
+        x_0 \in \mathcal{X} \;\middle|\; \exists (u_i)_{i=0}^{N-1} \in \mathcal{U}^N 
+            \; : \; x_{i+1} = f(x_i, u_i) \in \mathcal{X} \; \forall i = 0, \dots, N-1, \, x_N \in \mathcal{X}_f
+    \right\}.
+\end{equation}
+For any state $x_k \in \mathcal{X}_N$, solving \eqref{eq:mpc-problem} yields the optimal input sequence 
+$(u_{i|k}^*)_{i=0}^{N-1}$ and the corresponding optimal state sequence $(x_{i|k}^*)_{i=0}^{N}$, 
+where $x_{0|k}^* = x_k$ and $x_{N|k}^* \in \mathcal{X}_f$. 
+Under the MPC policy $\pi_0$ from \labelcref{eq:mpc-feedback-policy}, 
+the nominal closed-loop system yields the successor state $x_{k+1} = f(x_k, \pi_0(x_k)) = x_{1|k}^*$.
 
-Consequently, $V_N^*$ satisfies a decrease condition along closed-loop trajectories $x_{k+1} = f(x_k, \pi_0(x_k))$. 
-Relaxing the standard stability conditions, this can be expressed with the relaxed Lyapunov decrease formulation 
-\citeThm{4.11}{gruneNonlinearModelPredictive2017}, \citeEq{4.14}{gruneNonlinearModelPredictive2017}:
+\paragraph{Recursive Feasibility with Sequence Shifting.}
+In the nominal closed-loop setup, an optimal control problem is \textit{recursively feasible}, 
+if \labelcref{eq:mpc-problem} is feasible for $x_k \in \mathcal{X}_N$, resulting in a subsequent state $x_{k+1}$ 
+that is also feasible. 
+This can be demonstrated with the shifted candidate input sequence $(\tilde{u}_{i|k+1})_{i=0}^{N-1}$ 
+constructed for the state $x_{k+1} = x_{1|k}^*$, where the terminal controller $\pi_f$ is appended:
 \begin{equation}
-    \label{eq:relaxed-mpc-stability}
-    V_N^*(x_{k+1}) \leq V_N^*(x_k) - \alpha_N \ell(x_k, \pi_0(x_k)), \qquad \forall x_k \in \mathcal{X}_N,
+    \label{eq:candidate-input-sequence}
+    (\tilde{u}_{i|k+1})_{i=0}^{N-1} := \left( u_{1|k}^*, \dots, u_{N-1|k}^*, \pi_f(x_{N|k}^*) \right).
 \end{equation}
-where $\alpha_N \in (0, 1]$ denotes the relaxed decrease factor \citeThm{4.11}{gruneNonlinearModelPredictive2017}. 
-Setting $\alpha_N = 1$ yields the standard nominal Lyapunov decrease
+The corresponding predicted state sequence is given by
 \begin{equation}
-    V_N^*(x_{k+1}) - V_N^*(x_k) \leq -\ell(x_k, \pi_0(x_k)),
+    \label{eq:candidate-state-sequence}
+    (\tilde{x}_{i|k+1})_{i=0}^{N} := \left( x_{1|k}^*, \dots, x_{N|k}^*, f(x_{N|k}^*, \pi_f(x_{N|k}^*)) \right).
 \end{equation}
-guaranteeing asymptotic stability of the origin $\mathbf{0}$ for all initial states $x_0 \in \mathcal{X}_N$ 
-\citeAsm{2.14}{rawlingsModelPredictiveControl2020}.
+For $i = 0, \dots, N-2$, the pairs $(\tilde{x}_{i|k+1}, \tilde{u}_{i|k+1}) = (x_{i+1|k}^*, u_{i+1|k}^*)$ are feasible 
+by construction. Additionally, for $i = N-1$, the input $\tilde{u}_{N-1|k+1} = \pi_f(x_{N|k}^*)$ is admissible 
+according to \labelcref{eq:term-input-constraint}, since $x_{N|k}^* \in \mathcal{X}_f$.
+The computed terminal state satisfies $\tilde{x}_{N|k+1} = f(x_{N|k}^*, \pi_f(x_{N|k}^*)) \in \mathcal{X}_f \subseteq \mathcal{X}$ 
+due to the positive invariance of $\mathcal{X}_f$ in \labelcref{eq:term-positive-invariance}.
+Thus, the control sequence $(\tilde{u}_{i|k+1})_{i=0}^{N-1}$ is feasible for $x_{k+1}$, 
+which proves that $x_{k+1} \in \mathcal{X}_N$. Consequently, for all future time steps $k \ge 0$, 
+the closed-loop state remains in the feasible set $\mathcal{X}_N$, 
+which confirms both positive invariance of $\mathcal{X}_N$ under $\pi_0$ and recursive feasibility.
+
+\paragraph{Monotonic Decrease of the Optimal Value Function}
