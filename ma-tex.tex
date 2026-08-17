@@ -19,24 +19,21 @@
 ]{tudapub}
 
 
-% Der folgende Block ist nur bei pdfTeX auf Versionen vor April 2018 notwendig
+%%%%%%%%%%%%%%%%%%%
+% Main Setup
+%%%%%%%%%%%%%%%%%%%
 \usepackage{iftex}
 \ifPDFTeX
-\usepackage[utf8]{inputenc}%kompatibilität mit TeX Versionen vor April 2018
+  \usepackage[utf8]{inputenc}
 \fi
 
-%%%%%%%%%%%%%%%%%%%
-%Sprachanpassung & Verbesserte Trennregeln
-%%%%%%%%%%%%%%%%%%%
 \usepackage[ngerman, main=english]{babel}
-\usepackage[autostyle]{csquotes}% Anführungszeichen vereinfacht
+\usepackage[autostyle]{csquotes}
 \usepackage{microtype}
 
 
-%%%%%%%%%%%%%%%%%%%
-%Literaturverzeichnis
-%%%%%%%%%%%%%%%%%%%
-% ACHTUNG: bei Problemen ggf. den ieee Style nachinstallieren oder einen anderen nutzen
+\input{common/includes.tex}
+
 \usepackage[backend=biber,style=ieee,bibencoding=utf8,url=false,doi=false,eprint=false]{biblatex}
 \AtEveryBibitem{
   \clearfield{url}
@@ -45,16 +42,12 @@
 }
 \addbibresource{literature.bib}
 
-
-\input{common/includes.tex}
-
 \input{common/include_and_setup_lstlistings.tex}
 \input{common/include_and_setup_pgf.tex}
 
 \input{common/commonmacros.tex}
 \input{common/custommacros.tex}
 \input{common/cite_preamble.tex}
-
 
 % \Metadata{  % Metadaten im erzeugten PDF/A
 %   title=Hinweise zum Abfassen einer (Abschluss-)Arbeit am IAT,

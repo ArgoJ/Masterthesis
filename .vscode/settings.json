@@ -30,5 +30,8 @@
       ]
     }
   ],
-  "latex-workshop.latex.rootFile.useSubFile": false
+  "latex-workshop.latex.rootFile.useSubFile": false,
+  "editor.renderWhitespace": "all",
+  "editor.unicodeHighlight.nonBasicASCII": true,
+  "editor.unicodeHighlight.invisibleCharacters": true
 }
