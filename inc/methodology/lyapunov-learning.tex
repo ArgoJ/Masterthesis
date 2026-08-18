@@ -11,7 +11,7 @@ therefore make the Lyapunov candidate a valid certificate for stability.
 \subsection{Lyapunov Network Architecture}
 \label{subsec:lyapunov-network-architecture}
 
-Following \cite{yangLyapunovstableNeuralControl2024}, 
+Following~\cite{yangLyapunovstableNeuralControl2024}, 
 the Lyapunov candidate $V_\phi(x)$ is parameterized to be positive definite by construction:
 \begin{equation}
     \label{eq:lyapunov-candidate}
@@ -142,7 +142,7 @@ $\mathcal{B}_{\text{ROA}}$ from $\mathcal{X}_V \setminus \xi \mathcal{X}_V$,
 where $\xi \in [0, 1)$ is a scaling factor defining the inner boundary of the shell, 
 as shown in \cref{fig:box-shell}.
 The loss is then evaluated over these candidates 
-using \cite{yangLyapunovstableNeuralControl2024} 
+using~\cite{yangLyapunovstableNeuralControl2024} 
 \begin{equation}
     \label{eq:roa-loss}
     \loss_{\mathrm{ROA}} = \frac{1}{|\mathcal{B}_{\text{ROA}}|} \sum_{x \in \mathcal{B}_{\text{ROA}}} \ln \left(
@@ -166,7 +166,7 @@ causing the loss to decrease.
 
 \paragraph{LIRPA-Condition Loss} makes the Lyapunov function more verifier-friendly 
 by penalizing formal violations of the Lyapunov decrease condition as defined in \labelcref{eq:lyapunov-decrease}. 
-These violations are identified using the LIRPA framework \cite{xuFastCompleteEnabling2021}.
+These violations are identified using the LIRPA framework~\cite{xuFastCompleteEnabling2021}.
 To reduce the computational cost during training, LIRPA is applied only to a 
 heuristic subset of regions. Specifically, a hyper-rectangular cell is selected 
 if at least one of its $2^{n_x}$ corners, or optionally its center point $x_{\mathrm{center}}$, 
@@ -213,7 +213,7 @@ Finally, the LIRPA-condition loss over $N_{\mathrm{L}}$ regions is computed as
 \paragraph{Lyapunov Scaling Loss} prevents numerical collapse to zero 
 by penalizing deviations from the initial average magnitude over a 
 quasi-Monte Carlo batch $\mathcal{B}_V \subset \mathcal{X}_V$, 
-sampled via a low-discrepancy Sobol sequence \cite{joeConstructingSobolSequences2008}, as illustrated in \cref{fig:sobol-sampling}.
+sampled via a low-discrepancy Sobol sequence~\cite{joeConstructingSobolSequences2008}, as illustrated in \cref{fig:sobol-sampling}.
 The logarithm of the mean Lyapunov value over this batch is defined as
 \begin{equation}
     \label{eq:mean-lyapunov-log}
@@ -240,7 +240,7 @@ with a specified probability at each optimization step.
 \paragraph{Policy Scaling Loss} encourages the learned policy $\pi_V$ to remain close 
 to the output of the original imitation controller $\pi$, which is based on the MPC teacher. 
 A quasi-Monte Carlo batch $\mathcal{B}_{\mathrm{pol}} \subset \mathcal{X}_V$ is sampled using a 
-low-discrepancy Sobol sequence \cite{joeConstructingSobolSequences2008}. 
+low-discrepancy Sobol sequence~\cite{joeConstructingSobolSequences2008}. 
 To prevent overfitting to a static set of states, this batch also is resampled from $\mathcal{X}_V$ 
 with a given probability each optimization step. 
 The normalized deviation between the learned policy and the imitation controller over this batch is formulated as
@@ -279,7 +279,7 @@ hyperparameters that balance the relative importance of the individual loss comp
 \subsection{Falsification-Guided Training}
 \label{subsec:fals-guided-training}
 Relying solely on uniform state sampling is not sufficient to reliably detect violations of the Lyapunov condition, 
-especially in higher-dimensional state spaces \cite{yangLyapunovstableNeuralControl2024}. To overcome this problem, falsification-guided training 
+especially in higher-dimensional state spaces~\cite{yangLyapunovstableNeuralControl2024}. To overcome this problem, falsification-guided training 
 actively searches for adversarial counterexamples and incorporates them into the training distribution as described in 
 \cref{subsec:pgd-lyapunov-control}. This is made possible by an adversarial replay buffer that reconciles the exploration of the 
 estimated attractor region with the targeted exploitation of known error modes.
@@ -365,7 +365,7 @@ Therefore, the theoretical upper bound for $\rho$ is given by the minimum value 
     \rho_{\mathrm{max}} = \min_{x \in \partial \mathcal{X}_V} V_\phi(x).
 \end{equation}
 
-Following the boundary-evaluation principle established by \cite{yangLyapunovstableNeuralControl2024}, evaluating $V_\phi(x)$ 
+Following the boundary-evaluation principle established by~\cite{yangLyapunovstableNeuralControl2024}, evaluating $V_\phi(x)$ 
 along the boundary $\partial \mathcal{X}_V$ is sufficient to estimate $\rho_{\mathrm{max}}$ without searching the entire domain. 
 However, because $\partial \mathcal{X}_V$ can be a high-dimensional surface and $V_\phi(x)$ defines a non-convex landscape, 
 simple uniform sampling on the boundary may fail to identify low-valued boundary points. 

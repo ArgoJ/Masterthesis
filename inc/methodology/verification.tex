@@ -2,7 +2,7 @@
 \label{sec:formal-verification}
 
 This section adapts the search algorithm for the maximal certifiable sublevel set $\mathcal{V}_\rho$ 
-proposed in \cite{yangLyapunovstableNeuralControl2024}. 
+proposed in~\cite{yangLyapunovstableNeuralControl2024}. 
 Specifically, for a given target level $\rho > 0$, formal verification aims to certify that all states within 
 the candidate region $\mathcal{V}_\rho := \{ x \in \mathcal{B}_C \mid V_\phi(x) \le \rho \}$ satisfy controlled 
 regional invariance and exponential decay:
@@ -37,7 +37,7 @@ as shown in \cref{fig:hole-exclusion}.
 \end{figure}
 
 To certify property \labelcref{eq:lyapunov-certified-property} over $\mathcal{B}_{\mathrm{eval}}$ using 
-$\alpha\beta$-CROWN \cite{wang2021beta,xuFastCompleteEnabling2021}, 
+$\alpha\beta$-CROWN~\cite{wang2021beta,xuFastCompleteEnabling2021}, 
 the implication is rewritten into a disjunctive formulation supported by the verifier: 
 a state must either lie outside $\mathcal{V}_\rho$ or satisfy all stability conditions inside 
 $\mathcal{B}_{\mathrm{eval}}$. The individual logical terms are defined as follows:
@@ -83,7 +83,7 @@ First, a scaling phase exponentially expands or contracts $\rho$ by a factor $s 
 boundary within an interval $[\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}]$.
 Second, a bisection phase narrows this interval until the gap falls below a tolerance $\varepsilon$. 
 Upon termination, the lower bound yields the maximum certified value $\rho^* \approx \rho_{\mathrm{lo}}$.
-Compared to the proposed formulation by Yang in \cite{yangLyapunovstableNeuralControl2024}, 
+Compared to the proposed formulation by Yang in~\cite{yangLyapunovstableNeuralControl2024}, 
 explicit iteration limits $N_{\mathrm{scale}}$ and $N_{\mathrm{bisect}}$ are integrated into both phases. 
 This caps the maximum number of verifier calls, effectively preventing excessive computational 
 overhead on difficult verification problems.

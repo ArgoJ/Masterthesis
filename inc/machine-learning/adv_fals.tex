@@ -1,16 +1,16 @@
 \section{Adversarial Examples and Projected Gradient Methods}
 \label{sec:adversarial-examples}
 Deep neural networks are known to be vulnerable to small, intentionally crafted perturbations that drastically 
-affect model outputs or maximize loss metrics \cite{szegedyIntriguingPropertiesNeural2014,goodfellowExplainingHarnessingAdversarial2015}. 
+affect model outputs or maximize loss metrics~\cite{szegedyIntriguingPropertiesNeural2014,goodfellowExplainingHarnessingAdversarial2015}. 
 This vulnerability arises from the fundamental difference between average-case and worst-case generalization: 
 Random sampling may fail to reliably expose inputs associated with large loss values, 
-whereas gradient-guided optimization explicitly searches for such directions \citeSec{12.4}{aggarwalNeuralNetworksDeep2023}. 
+whereas gradient-guided optimization explicitly searches for such directions~\citeSec{12.4}{aggarwalNeuralNetworksDeep2023}. 
 By applying gradient ascent directly to the inputs under the constraint of a bounded $\ell_p$-norm 
 $\|\delta\|_p \le \varepsilon_\delta$, the approach targets regions where the objective value is large.
 In neural control, such adversarial search strategies can be adapted to serve as 
 empirical falsification tools. Rather than aiming to deceive a model, the goal is to identify input configurations that 
 expose potential violations of safety or stability. This provides a computationally efficient approach to find 
-high violations during training \cite{yangLyapunovstableNeuralControl2024}.
+high violations during training~\cite{yangLyapunovstableNeuralControl2024}.
 
 In supervised learning, the generation of adversarial examples can be formulated as a constrained optimization problem 
 \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}. 
@@ -29,7 +29,7 @@ $\delta \in \mathbb{R}^{n_0}$ that maximizes the model's loss function $\mathcal
     \|\delta\|_p \leq \varepsilon_\delta,
 \end{equation}
 where $\varepsilon_\delta > 0$ bounds the perturbation size under an $\ell_p$-norm, with typical choices 
-being $p \in \{2, \infty\}$ \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}.
+being $p \in \{2, \infty\}$~\cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}.
 In practical applications, the perturbed input may additionally be clipped to
 the valid input range.
 
@@ -40,10 +40,10 @@ the valid input range.
 To solve the loss maximization problem \labelcref{eq:adversarial-problem}, the Fast Gradient Sign Method (FGSM) 
 \cite{goodfellowExplainingHarnessingAdversarial2015} provides a fast, linear one-step approximation by taking a 
 single step along the sign of the loss gradient. However, in highly non-convex loss landscapes, 
-one-step attacks may yield weaker loss-maximizing candidates than iterative attacks \cite{madryDeepLearningModels2019}.
+one-step attacks may yield weaker loss-maximizing candidates than iterative attacks~\cite{madryDeepLearningModels2019}.
 
 Projected Gradient Descent (PGD) extends FGSM into an iterative multi-step gradient ascent scheme. 
-Following the robust optimization framework proposed by Madry \cite{madryDeepLearningModels2019}, 
+Following the robust optimization framework proposed by Madry~\cite{madryDeepLearningModels2019}, 
 $\mathcal{P}$ denotes the set of allowed perturbations. 
 For an $\ell_\infty$-norm constraint, $\mathcal{P}$ forms a hyper-rectangular box centered at the origin:
 \begin{equation}
@@ -81,14 +81,14 @@ As a result, $x_{\mathrm{adv}}^{(j+1)}$ satisfies the perturbation constraint at
 When moving from conventional adversarial attacks to neural Lyapunov control, the adversary's objective fundamentally changes. 
 Rather than deceiving a classifier, the goal becomes to identify counterexample states $x_{\mathrm{adv}}$ 
 that violate control-theoretic guarantees, such as Lyapunov decrease \labelcref{eq:asymptotic-lyapunov-stability} 
-or domain invariance \labelcref{eq:term-positive-invariance} \cite{yangLyapunovstableNeuralControl2024}.
+or domain invariance \labelcref{eq:term-positive-invariance}~\cite{yangLyapunovstableNeuralControl2024}.
 
-Instead of maximizing a classification loss \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}, 
+Instead of maximizing a classification loss~\cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}, 
 the gradient-based search is utilized to identify states associated with large violations of the Lyapunov conditions.
 In the setting further defined in \cref{sec:imitation-learning} and \cref{subsec:lyapunov-network-architecture}, 
 the Lyapunov candidate and the controller are parameterized independently as $V_\phi(x)$ and $\pi_\theta(x)$, 
 respectively.
-Adapting the robust optimization paradigm \cite{madryDeepLearningModels2019} to deterministic control, 
+Adapting the robust optimization paradigm~\cite{madryDeepLearningModels2019} to deterministic control, 
 their joint training can be formulated as a saddle-point problem:
 \begin{equation}
     \label{eq:lyapunov-min-max}
@@ -102,9 +102,9 @@ Here, the inner maximization searches for candidate states within the training d
 that yield large violations of the Lyapunov conditions. The objective $\mathcal{J}(x_{\mathrm{adv}};\phi,\theta)$ 
 therefore depends on both the Lyapunov-function parameters $\phi$ and the controller parameters $\theta$.
 Conversely, the parameters are updated during the outer optimization, to resolve these 
-violations \cite{madryDeepLearningModels2019}.
+violations~\cite{madryDeepLearningModels2019}.
 
-Since uniform sampling may fail to discover violations in high-dimensional spaces \citeSec{12.4}{aggarwalNeuralNetworksDeep2023}, 
+Since uniform sampling may fail to discover violations in high-dimensional spaces~\citeSec{12.4}{aggarwalNeuralNetworksDeep2023}, 
 gradient-guided ascent along $\nabla_{x} \mathcal{J}$ can focus the search on candidate states associated with large 
 Lyapunov condition violations. In this context, PGD serves as an adversarial training mechanism, 
 iteratively feeding high-violation candidate states back into the optimization to reinforce Lyapunov stability margins 

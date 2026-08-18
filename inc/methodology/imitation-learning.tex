@@ -4,7 +4,7 @@
 
 \paragraph{Data Generation} uses the MPC expert policy $\pi_0$ defined in \cref{subsec:closed-loop-stability}.
 To ensure solver convergence and obtain consistent expert trajectories during data generation, 
-the shifted initialization is used \citeSec{12.5}{gruneNonlinearModelPredictive2017}. 
+the shifted initialization is used~\citeSec{12.5}{gruneNonlinearModelPredictive2017}. 
 By shifting the previously computed optimal sequence $(u_{i|k}^*)_{i=0}^{N-1}$ and appending the local terminal controller 
 $\pi_f(x_{N|k}^*)$, the optimization problem initializes from a feasible candidate trajectory. 
 This prevents the solver from getting stuck in local minima between adjacent sampling instances.
@@ -19,7 +19,7 @@ Storing the visited states and their corresponding optimal control actions yield
 where $x^{(i)} \in \mathcal{X}_\pi$ and $u^{(i)} = \pi_0(x^{(i)})$.
 
 
-\paragraph{Imitation Policy} follows the structure proposed in \cite{yangLyapunovstableNeuralControl2024}, 
+\paragraph{Imitation Policy} follows the structure proposed in~\cite{yangLyapunovstableNeuralControl2024}, 
 as it enforces true control inputs at the equilibrium $\pi_\theta(x^*) = u^*$ and 
 satisfies the control input constraints $\underline{u} \leq \pi_\theta(x) \leq \overline{u}$ 
 by construction. The neural policy $\pi_\theta$ is visualized in \cref{fig:imitation-policy} and 

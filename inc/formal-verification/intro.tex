@@ -1,1 +1,9 @@
-\todo[inline]{only overview because we only use it.}
+When using neural networks as control policies in safety-critical domains, it is essential to provide 
+formal guarantees of safety, robustness, and stability for all states within the region of interest. 
+To perform scalable formal verification, this work relies on the $\alpha,\beta$-CROWN framework
+~\cite{wang2021beta,xuFastCompleteEnabling2021}, which utilizes GPU parallelization and efficient bound propagation. 
+This chapter covers the theoretical foundations of the verification methods used in $\alpha,\beta$-CROWN: 
+\cref{sec:incom-verification} introduces incomplete verification based on linear bound propagation via CROWN
+~\cite{zhangEfficientNeuralNetwork2018} and its optimized variant $\alpha$-CROWN~\cite{xuFastCompleteEnabling2021}. 
+The subsequent \cref{sec:comp-verification} discusses complete verification using branch-and-bound in combination with 
+$\beta$-CROWN~\cite{wang2021beta} to soundly verify properties subject to neuron split constraints.

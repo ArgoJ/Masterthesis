@@ -21,9 +21,9 @@ is the pre-activation vector of layer $l$, and $a^{(L)} := \hat{y} \in \mathbb{R
 is the final network prediction. The matrix $W^{(l)} \in \mathbb{R}^{n_l \times n_{l-1}}$ 
 and vector $b^{(l)} \in \mathbb{R}^{n_l}$ denote the weight matrix and bias vector of layer $l$, respectively, 
 while $\sigma^{(l)}(\cdot)$ represents a non-linear activation function applied element-wise to 
-the pre-activation vector $z^{(l)}$ \citeSec{3.2}{kollmannsbergerDeepLearningComputational2021}. 
+the pre-activation vector $z^{(l)}$~\citeSec{3.2}{kollmannsbergerDeepLearningComputational2021}. 
 Without these non-linearities, the layers would simply be reduced to a single linear transformation, 
-drastically limiting the model's ability to capture complexity \citeSec{1.5}{aggarwalNeuralNetworksDeep2023}. 
+drastically limiting the model's ability to capture complexity~\citeSec{1.5}{aggarwalNeuralNetworksDeep2023}. 
 Common activation functions in neural control include the hyperbolic tangent \labelcref{eq:tanh} and 
 the rectified linear unit (ReLU) \labelcref{eq:relu}, defined respectively as
 \citeSec{3.5}{kollmannsbergerDeepLearningComputational2021}.
@@ -54,7 +54,7 @@ illustrates a representative architecture.
     \input{tikz/ml/ann.tex}
     \caption[MLP]{
         Architecture of an exemplary Multi-Layer Perceptron with three inputs, two outputs and two hidden layers with four neurons each. 
-        Illustration adapted from \citeFig{3.1}{kollmannsbergerDeepLearningComputational2021}
+        Illustration adapted from~\citeFig{3.1}{kollmannsbergerDeepLearningComputational2021}
     }
     \label{fig:mlp-architecture}
 \end{figure}
@@ -65,7 +65,7 @@ illustrates a representative architecture.
 \label{subsec:opt-training}
 
 To approximate an expert control law with a neural network $\pi_\theta(x)$, the parameters $\theta$ are updated 
-via gradient-based optimization \citeSec{2.5}{kollmannsbergerDeepLearningComputational2021}. 
+via gradient-based optimization~\citeSec{2.5}{kollmannsbergerDeepLearningComputational2021}. 
 The objective is to find parameters $\theta^\star$ that minimize the empirical
 training objective:
 \begin{equation}
@@ -96,7 +96,7 @@ penalizes prediction deviations, thereby encouraging the network to accurately c
 In supervised learning, focusing exclusively on minimizing empirical error over a finite dataset can lead to overfitting.  
 Furthermore, it may fail to enforce underlying structural or physical properties. To improve generalization and 
 incorporate prior knowledge directly into the optimization process, the objective is frequently 
-augmented with weight regularization and auxiliary loss terms \citeSec{3.7}{kollmannsbergerDeepLearningComputational2021}:
+augmented with weight regularization and auxiliary loss terms~\citeSec{3.7}{kollmannsbergerDeepLearningComputational2021}:
 \begin{equation}
     \label{eq:total-loss}
     \loss(\mathcal{D}; \theta) =
@@ -111,10 +111,10 @@ $\ell_1$-norm ($\|\theta\|_1$) or $\ell_2$-norm ($\|\theta\|_2^2$) penalty.
 While $\ell_1$-regularization promotes sparse parameter representations, $\ell_2$-regularization 
 penalizes large parameter magnitudes and can improve numerical stability and generalization. 
 In practice, these penalties are applied exclusively to the network's weight matrices $W \subset \theta$, 
-leaving bias vectors $b$ unpenalized. \citeSec{3.7.2}{kollmannsbergerDeepLearningComputational2021}.
+leaving bias vectors $b$ unpenalized.~\citeSec{3.7.2}{kollmannsbergerDeepLearningComputational2021}.
 Alongside regularization penalties, the auxiliary loss $\loss_{\mathrm{aux}}$ incorporates domain knowledge into the 
 optimization process, such as differential equations or Lyapunov conditions 
-\citeSec{5}{kollmannsbergerDeepLearningComputational2021}, \cite{yangLyapunovstableNeuralControl2024}. 
+\citeSec{5}{kollmannsbergerDeepLearningComputational2021},~\cite{yangLyapunovstableNeuralControl2024}. 
 Enforcing these properties during training helps the network learn the desired physically sound solutions.
 
 
@@ -124,7 +124,7 @@ the partial derivatives of the loss $\loss(\mathcal{D}, \theta)$ with respect
 to all weight matrices $W^{(l)}$ and bias vectors $b^{(l)}$ must be evaluated. 
 Backpropagation efficiently computes chain-rule derivatives of loss components that depend on
 the parameters through the network output by combining a forward pass \labelcref{eq:nn-forward} 
-with a backward pass \citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
+with a backward pass~\citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
 
 During the backward pass, the algorithm computes the sensitivity of the loss with respect to the pre-activations, 
 defined as the error signal $\delta^{(l)} = \frac{\partial \loss}{\partial z^{(l)}}$. 
@@ -148,7 +148,7 @@ $\loss_{\mathrm{reg}}$ completes the total gradient evaluation:
 \end{equation}
 By reusing intermediate activations and error signals, backpropagation avoids redundant derivative 
 calculations and computes parameter gradients with a computational cost similar to that of a forward pass
-through the network \citeSec{3.4,2.3}{kollmannsbergerDeepLearningComputational2021,aggarwalNeuralNetworksDeep2023}.
+through the network~\citeSec{3.4,2.3}{kollmannsbergerDeepLearningComputational2021,aggarwalNeuralNetworksDeep2023}.
 
 
 \paragraph{Optimization via Mini-Batch Gradient Descent.}
@@ -192,9 +192,9 @@ learning rate $\alpha > 0$. This update loop is inturn executed for a total of $
 Although mini-batch gradient descent improves stability compared to SGD, its performance depends on 
 a static learning rate $\alpha$. In loss landscapes with noisy mini-batch gradients or challanging curvature, 
 a fixed learning rate can cause parameter updates to oscillate in steep directions while 
-making slow progress or none on plateaus \citeSec{4.5.4}{aggarwalNeuralNetworksDeep2023}.
+making slow progress or none on plateaus~\citeSec{4.5.4}{aggarwalNeuralNetworksDeep2023}.
 
-To resolve these limitations, the Adaptive Moment Estimation (Adam) optimizer \cite{kingmaAdamMethodStochastic2017} 
+To resolve these limitations, the Adaptive Moment Estimation (Adam) optimizer~\cite{kingmaAdamMethodStochastic2017} 
 computes individual, adaptive learning rates for each parameter by tracking exponential moving averages of both past 
 gradients $m_t$ and past squared gradients $v_t$ 
 \citeSec{4.5.5.2}{aggarwalNeuralNetworksDeep2023}:
@@ -220,7 +220,7 @@ The network parameters are then updated element-wise according to:
     \label{eq:adam-update}
     \theta_t = \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon},
 \end{equation}
-where $\epsilon > 0$ is a small constant used for numerical stability. Following \cite{kingmaAdamMethodStochastic2017}, 
+where $\epsilon > 0$ is a small constant used for numerical stability. Following~\cite{kingmaAdamMethodStochastic2017}, 
 the default hyperparameters are chosen as $\alpha = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$, 
 providing robust convergence across various deep learning architectures. 
 % The complete iterative training loop using Adam is summarized in \cref{alg:adam-optimizer}.
