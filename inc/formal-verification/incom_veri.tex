@@ -1,14 +1,101 @@
 \section{Incomplete Verification}
 \label{sec:incom-verification}
-The aim of general formal neural network verification is to prove that a desired specification holds for all inputs within 
-a predefined domain $\mathcal{F} \subset \mathbb{R}^{n_0}$. 
-Consider a feed-forward neural network as defined in \labelcref{eq:nn-forward} and a scalar specification function 
-$\psi(x) \in \mathbb{R}$, where $\psi(x) > 0$ denotes satisfaction of the safety or stability condition. 
-From this, the verification problem can be formulated as a global minimization problem:
+The aim of formal neural network verification is to prove that a prescribed condition holds for all inputs within 
+a predefined domain $\mathcal{F} = \left\{ x \in \mathbb{R}^{n_0} \;\middle|\; \underline{x}_F \le x \le \overline{x}_F \right\}$. 
+Consider an $L$-layer feed-forward neural network as defined in \labelcref{eq:nn-forward}, 
+along with a scalar specification function $\psi(a^{(L)}) \in \mathbb{R}$, where $\psi(a^{(L)}) > 0$ 
+denotes satisfaction of the safety or stability condition. 
+The verification problem is formulated as a constrained global minimization problem:
 \begin{equation}
     \label{eq:verification-problem}
-    f^\star = \min_{x \in \mathcal{F}} \psi(x) 
+    \psi^\star = \min_{x \in \mathcal{F}} \psi(a^{(L)}) 
     \quad \text{s.t.} 
     \quad z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)}, \quad a^{(l)} = \sigma^{(l)}\!\left(z^{(l)}\right), \quad a^{(0)} = x,  
 \end{equation}
 for all layers $l \in \{1, \dots, L\}$. 
+
+The prescribed condition is formally satisfied over the entire domain $\mathcal{F}$ if and only if the global minimum  
+satisfies $\psi^\star > 0$. Non-linear activations such as ReLU, further defined in \labelcref{eq:act-funs}, 
+introduce nonconvexity, which makes finding the exact minimum $\psi^\star$ computationally hard. 
+In order to circumvent this computational limitation, incomplete verification methods approximate the nonlinearities 
+by convex relaxations.
+These incomplete verification methods yield a guaranteed lower bound $\underline{\psi} \le \psi^\star$, where:
+\begin{itemize}
+    \item \textbf{Verified if $\underline{\psi} > 0$: } Since $0 < \underline{\psi} \le \psi^\star \implies \psi^\star > 0$, 
+        the specification $\psi(a^{(L)}(x)) > 0$ is formally certified for all $x \in \mathcal{F}$, ensuring soundness. 
+    \item \textbf{Inconclusive if $\underline{\psi} \le 0$:} No conclusion can be drawn.
+        It remains unknown whether there exists an actual counterexample or whether the relaxations are too loose. 
+\end{itemize}
+Consequently, incomplete verifiers are computationally efficient and scalable, 
+enabling both fast standalone certification and efficient bounding in complete verification frameworks. 
+
+
+
+\subsection{CROWN}
+\label{subsec:crown}
+While traditional incomplete verifiers rely on computationally expensive linear programs (LPs) solved over the entire network, 
+the CROWN framework~\cite{zhangEfficientNeuralNetwork2018} achieves significantly higher efficiency with backward linear bound 
+propagation. Given pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$ for each neuron $j$ in layer $l$, 
+CROWN upper- and lower-bounds any continuous or piecewise-linear activation function $\sigma(z_j^{(l)})$ over 
+this interval by linear bounding functions:
+\begin{equation}
+    \alpha_{L,j}^{(l)} z_j^{(l)} + \beta_{L,j}^{(l)} 
+    \;\le\; \sigma\!\left(z_j^{(l)}\right) \;\le\; 
+    \alpha_{U,j}^{(l)} z_j^{(l)} + \beta_{U,j}^{(l)},
+    \label{eq:crown-general-bounds}
+\end{equation}
+where $\alpha_{L,j}^{(l)}, \alpha_{U,j}^{(l)}$ denote the slopes and $\beta_{L,j}^{(l)}, \beta_{U,j}^{(l)}$ 
+denote the intercepts of the bounding lines.
+
+For general nonlinear activations with a differentiable curvature, such as $\tanh$ or $\operatorname{sigmoid}$, 
+CROWN divides the neurons of layer $l$ into three distinct subsets based on the signs of their 
+pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$, as shown in \cref{fig:crown-relaxations}:
+\begin{enumerate}
+    \item \textbf{Strictly Concave Region ($\mathcal{S}_l^+ = \{j \mid 0 \le l_j^{(l)} \le u_j^{(l)}\}$):} 
+        The upper bound is chosen as a tangent at an adaptive point $d \in [l_j^{(l)}, u_j^{(l)}]$, 
+        while the lower bound is the secant line connecting the interval endpoints $(l_j^{(l)}, \sigma(l_j^{(l)}))$ and 
+        $(u_j^{(l)}, \sigma(u_j^{(l)}))$.
+    \item \textbf{Strictly Convex Region ($\mathcal{S}_l^- = \{j \mid l_j^{(l)} \le u_j^{(l)} \le 0\}$):} 
+        The upper bound is the secant connecting the interval endpoints, whereas the lower bound is formed by 
+        a tangent at an adaptive point $d \in [l_j^{(l)}, u_j^{(l)}]$.
+    \item \textbf{Mixed Curvature with Inflection Point ($\mathcal{S}_l^\pm = \{j \mid l_j^{(l)} < 0 < u_j^{(l)}\}$):} 
+        The upper bound is the tangent passing through the left boundary $(l_j^{(l)}, \sigma(l_j^{(l)}))$ with contact 
+        point $d \ge 0$, and the lower bound is the tangent passing through the right boundary $(u_j^{(l)}, \sigma(u_j^{(l)}))$ 
+        with contact point $d \le 0$.
+\end{enumerate}
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/verification/linear_relaxation.tex}
+    \caption{
+        Linear bounds for general S-shaped activation functions $\sigma(z) = \tanh(z)$, 
+        inspired by Zhang at al.~\cite{zhangEfficientNeuralNetwork2018}. 
+        The green dotted lines denote the upper bounds and the red dotted lines denote the lower bounds. 
+    }
+    \label{fig:crown-relaxations}
+\end{figure}
+
+Piecewise-linear activations such as ReLU represent a special case within this 
+framework~\cite{zhangEfficientNeuralNetwork2018}. Stable neurons in $\mathcal{S}_l^+$ and $\mathcal{S}_l^-$ 
+are evaluated exactly without relaxation, yielding $\sigma(z_j^{(l)}) = z_j^{(l)}$ and $\sigma(z_j^{(l)}) = 0$, respectively. 
+Only unstable neurons in $\mathcal{S}_l^\pm$ are relaxed using the standard triangle relaxation:
+\begin{equation}
+    \alpha_j^{(l)} z_j^{(l)} \;\le\; \text{ReLU}\!\left(z_j^{(l)}\right) 
+        \;\le\; 
+        \frac{u_j^{(l)}}{u_j^{(l)} - l_j^{(l)}} \left( z_j^{(l)} - l_j^{(l)} \right),
+    \label{eq:crown-relu-bounds}
+\end{equation}
+where $\alpha_j^{(l)} \in [0, 1]$ parameterizes the slope of the linear lower bound.
+
+By recursively applying these linear bounds through backward bound propagation from the output layer back to the network input 
+$x \in \mathcal{F}$, CROWN constructs an explicit linear bounding function:
+\begin{equation}
+    \psi(a^{(L)}) \ge a_{\text{CROWN}}^\top x + c_{\text{CROWN}}.
+\end{equation}
+Since the output bound is linear in $x$, its minimum over a compact domain $\mathcal{F}$ can be evaluated analytically 
+in closed form, enabling fast, GPU-accelerated tensor computations instead of iterative linear programming.
+
+
+
+\subsection{\texorpdfstring{$ \alpha $}{α}-CROWN}
+\label{subsec:alpha-crown}

@@ -1,0 +1,153 @@
+\begin{tikzpicture}[
+    pt-green/.style={circle, fill=green!70!black, draw=black, inner sep=1.3pt},
+    pt-red/.style={circle, fill=red!80!black, draw=black, inner sep=1.3pt},
+    pt-hollow/.style={circle, fill=white, draw=black, line width=0.6pt, inner sep=1.3pt}
+]
+\begin{groupplot}[
+    group style={
+        group size=3 by 1,
+        horizontal sep=1.4cm,
+    },
+    width=5.2cm,
+    height=4.8cm,
+    xmin=-4, xmax=4,
+    ymin=-1.5, ymax=1.5,
+    ytick={-1.5, -1, -0.5, 0, 0.5, 1, 1.5},
+    yticklabels={-1.5, -1, -0.5, 0, 0.5, 1, 1.5},
+    tick label style={font=\scriptsize},
+    every axis plot/.append style={line width=1pt},
+    axis on top=true,
+    clip=false,
+    xlabel={$z$},
+    xlabel style={font=\small, at={(axis description cs:0.5,-0.12)}, anchor=north} % Sauber unterhalb der 0 platziert
+]
+
+% -------------------------------------------------------------
+% (a) j in S_l^+
+% -------------------------------------------------------------
+\nextgroupplot[
+    xtick={-4, -2, 0},
+    ylabel={$\sigma(z)$},
+    ylabel style={font=\small}
+]
+    % Grauer Bereich [l=1.0, u=3.2]
+    \fill[black!10] (axis cs:1.0, -1.5) rectangle (axis cs:3.2, 1.5);
+
+    % Funktion sigma(z) = tanh(z)
+    \addplot[domain=-4:4, samples=100, black, line width=1.1pt] {tanh(x)};
+
+    % Linear UB: Tangente bei d=2.0
+    \addplot[domain=1.0:3.2, samples=2, green!70!black, line width=1.3pt, densely dotted] 
+        {0.96403 + 0.07065*(x - 2.0)};
+
+    % Linear LB: Sekante von l=1.0 nach u=3.2
+    \addplot[domain=1.0:3.2, samples=2, red!80!black, line width=1.3pt, densely dotted] 
+        {0.76159 + 0.10686*(x - 1.0)};
+
+    % Punkte UB
+    \node[pt-hollow] at (axis cs:1.0, 0.89338) {};
+    \node[pt-green]  at (axis cs:2.0, 0.96403) {};
+    \node[pt-hollow] at (axis cs:3.2, 1.04881) {};
+
+    % Punkte LB
+    \node[pt-red] at (axis cs:1.0, 0.76159) {};
+    \node[pt-red] at (axis cs:3.2, 0.99668) {};
+
+    % Beschriftungen
+    \node[blue!80!black, below, font=\small] at (axis cs:1.0, -1.5) {$l_j^{(l)}$};
+    \node[blue!80!black, below, font=\small] at (axis cs:3.2, -1.5) {$u_j^{(l)}$};
+    \node[green!70!black, font=\small\bfseries] at (axis cs:2.0, -1.3) {$d$};
+
+    \node[below=1.1cm, font=\small] at (axis description cs:0.5, 0) {(a) $j \in \mathcal{S}_l^+$};
+
+% -------------------------------------------------------------
+% (b) j in S_l^-
+% -------------------------------------------------------------
+\nextgroupplot[
+    xtick={0, 2, 4},
+]
+    % Grauer Bereich [l=-3.2, u=-1.0]
+    \fill[black!10] (axis cs:-3.2, -1.5) rectangle (axis cs:-1.0, 1.5);
+
+    % Funktion sigma(z) = tanh(z)
+    \addplot[domain=-4:4, samples=100, black, line width=1.1pt] {tanh(x)};
+
+    % Linear UB: Sekante von l=-3.2 nach u=-1.0
+    \addplot[domain=-3.2:-1.0, samples=2, green!70!black, line width=1.3pt, densely dotted] 
+        {-0.99668 + 0.10686*(x + 3.2)};
+
+    % Linear LB: Tangente bei d=-2.0
+    \addplot[domain=-3.2:-1.0, samples=2, red!80!black, line width=1.3pt, densely dotted] 
+        {-0.96403 + 0.07065*(x + 2.0)};
+
+    % Punkte UB
+    \node[pt-green] at (axis cs:-3.2, -0.99668) {};
+    \node[pt-green] at (axis cs:-1.0, -0.76159) {};
+
+    % Punkte LB
+    \node[pt-hollow] at (axis cs:-3.2, -1.04881) {};
+    \node[pt-red]    at (axis cs:-2.0, -0.96403) {};
+    \node[pt-hollow] at (axis cs:-1.0, -0.89338) {};
+
+    % Beschriftungen
+    \node[blue!80!black, below, font=\small] at (axis cs:-3.2, -1.5) {$l_j^{(l)}$};
+    \node[blue!80!black, below, font=\small] at (axis cs:-1.0, -1.5) {$u_j^{(l)}$};
+    \node[red!80!black, font=\small\bfseries] at (axis cs:-2.0, -1.3) {$d$};
+
+    \node[below=1.1cm, font=\small] at (axis description cs:0.5, 0) {(b) $j \in \mathcal{S}_l^-$};
+
+% -------------------------------------------------------------
+% (c) j in S_l^\pm
+% -------------------------------------------------------------
+\nextgroupplot[
+    xtick={-4, 0, 4},
+    legend to name=sharedlegend,
+    legend style={
+        draw=none,
+        fill=none,
+        legend columns=3,
+        font=\small,
+        /tikz/every even column/.append style={column sep=0.6cm}
+    }
+]
+    % Grauer Bereich [l=-2.0, u=2.2]
+    \fill[black!10] (axis cs:-2.0, -1.5) rectangle (axis cs:2.2, 1.5);
+
+    % Funktion sigma(z) = tanh(z)
+    \addplot[domain=-4:4, samples=100, black, line width=1.1pt] {tanh(x)};
+    \addlegendentry{$\sigma(z)$}
+
+    % Linear UB: Tangente durch l=-2.0
+    \addplot[domain=-2.0:2.2, samples=2, green!70!black, line width=1.3pt, densely dotted] 
+        {-0.96403 + 0.58131*(x + 2.0)};
+    \addlegendentry{Linear UB}
+
+    % Linear LB: Tangente durch u=2.2
+    \addplot[domain=-2.0:2.2, samples=2, red!80!black, line width=1.3pt, densely dotted] 
+        {0.97574 + 0.54644*(x - 2.2)};
+    \addlegendentry{Linear LB}
+
+    % Punkte UB
+    \node[pt-green]  at (axis cs:-2.0,   -0.96403) {};
+    \node[pt-green]  at (axis cs: 0.7702, 0.64707) {};
+    \node[pt-hollow] at (axis cs: 2.2,    1.47746) {};
+
+    % Punkte LB
+    \node[pt-hollow] at (axis cs:-2.0,   -1.31931) {};
+    \node[pt-red]    at (axis cs:-0.8170,-0.67347) {};
+    \node[pt-red]    at (axis cs: 2.2,    0.97574) {};
+
+    % Beschriftungen
+    \node[blue!80!black, below, font=\small] at (axis cs:-2.0, -1.5) {$l_j^{(l)}$};
+    \node[blue!80!black, below, font=\small] at (axis cs: 2.2, -1.5) {$u_j^{(l)}$};
+    \node[red!80!black, font=\small\bfseries]   at (axis cs:-0.817, -1.3) {$d$};
+    \node[green!70!black, font=\small\bfseries] at (axis cs: 0.770, -1.3) {$d$};
+
+    \node[below=1.1cm, font=\small] at (axis description cs:0.5, 0) {(c) $j \in \mathcal{S}_l^\pm$};
+
+\end{groupplot}
+
+% Gemeinsame Legende zentriert darunter
+\node[below=1.8cm] at (group c2r1.south) {\pgfplotslegendfromname{sharedlegend}};
+
+\end{tikzpicture}
