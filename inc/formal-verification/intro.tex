@@ -7,10 +7,10 @@ In contrast, \emph{complete verifiers} provide a definite decision by reducing t
 ensuring that the prescribed condition is either formally proven or a concrete counterexample is found. 
 
 Early complete verifiers typically used exact non-convex activation functions with specialized 
-Satisfiability Modulo Theories (SMT)~\cite{katzReluplexEfficientSMT2017a} or 
+Satisfiability Modulo Theories (SMT)~\cite{katzReluplexEfficientSMT2017} or 
 Mixed-Integer Linear Programming (MILP)~\cite{tjengEvaluatingRobustnessNeural2019} solvers.
 Although these solvers guarantee completeness, their complexity restricts their scalability on larger networks, 
-which has led to the development of branch-and-bound (BaB)~\cite{bunelUnifiedViewPiecewise2017} 
+which has led to the development of branch-and-bound (BaB)~\cite{bunelUnifiedViewPiecewise2018} 
 frameworks that utilize parallelized incomplete bounds.
 
 To perform scalable formal verification, this work relies on the $\alpha,\beta$-CROWN framework

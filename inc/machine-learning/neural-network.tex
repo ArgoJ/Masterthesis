@@ -158,7 +158,7 @@ While full-batch gradient descent evaluates the loss gradient over the entire da
 this can become computationally expensive and impractical for large dataset sizes $M$. 
 Conversely, single-sample stochastic gradient descent (SGD) results in high variance of the parameter updates, 
 leading to erratic optimization trajectories. Mini-batch gradient solves this problem by dividing the 
-dataset into smaller subsets $\mathcal{B} \subset \mathcal{D}$ of size $B = |\mathcal{B}|$. For a mini-batch, 
+dataset into smaller subsets $\mathcal{B} \subset \mathcal{D}$ of size $|\mathcal{B}|$. For a mini-batch, 
 the loss $\loss(\mathcal{B}; \theta)$ is evaluated analogously to \cref{eq:total-loss}, 
 with $\mathcal{D}$ replaced by $\mathcal{B}$ in all data-dependent loss terms. 
 Typically, the mini-batch gradient $g$ has lower variance than the gradient obtained from a single sample, 

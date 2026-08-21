@@ -87,7 +87,6 @@ $\theta^*$ & Optimal network parameters \\
 $\mathcal{D}$ & Training dataset \\
 $M$ & Training data size \\
 $\mathcal{B}$ & Mini-batch \\
-$B$ & Mini-batch size \\
 $\loss$ & Total training loss function \\
 $\loss_{\mathrm{MSE}}$ & Mean squared error loss \\
 $\loss_{\mathrm{reg}}$ & Regularization loss \\
@@ -137,6 +136,11 @@ $\mathcal{S}_l^+, \mathcal{S}_l^-, \mathcal{S}_l^\pm$ & Strictly concave, convex
 $a_{\text{CROWN}}, c_{\text{CROWN}}$ & Explicit CROWN linear bounding vector and constant \\
 $\mathcal{G}(\alpha)$ & Lower bound objective function in $\alpha$-CROWN \\
 $K$ & Number of unstable neurons in $\alpha$-CROWN \\
+$\mathcal{Z}$ & Set of neuron split constraints \\
+$S^{(l)}$ & Diagonal neuron split indicator matrix \\
+$\beta^{(l)}, \beta$ & Lagrange multipliers for neuron split constraints \\
+$\underline{\psi}_\beta^\star$ & Optimized lower bound via $\beta$-CROWN \\
+$\underline{\psi}_{\alpha,\beta}^\star$ & Jointly optimized lower bound via $\alpha,\beta$-CROWN \\
 \midrule
 
 % --- Chapter 6.1: Methodology - Imitation Learning ---
