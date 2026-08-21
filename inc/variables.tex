@@ -9,7 +9,7 @@
 \bottomrule
 \endfoot
 
-% --- Chapter 2: System Dynamics & Control ---
+% --- Chapter 3: System Dynamics & Control ---
 \multicolumn{2}{@{}l}{\textit{System Dynamics \& Control}} \\
 \midrule
 $n_x$ & State space dimension \\
@@ -38,7 +38,7 @@ $f_c(x, u)$ & Continuous-time system dynamics \\
 $f(x_k, u_k)$ & Discrete-time system dynamics \\
 \midrule
 
-% --- Chapter 2: Optimal Control & MPC ---
+% --- Chapter 3: Optimal Control & MPC ---
 \multicolumn{2}{@{}l}{\textit{Optimal Control \& Model Predictive Control (MPC)}} \\
 \midrule
 $N$ & Prediction horizon \\
@@ -64,7 +64,7 @@ $\alpha_N$ & Relaxed Lyapunov decrease factor \\
 $\mathcal{X}_N$ & Feasible initial state set \\
 \midrule
 
-% --- Chapter 3: Machine Learning ---
+% --- Chapter 4: Machine Learning ---
 \multicolumn{2}{@{}l}{\textit{Machine Learning}} \\
 \midrule
 $L$ & Total layer count \\
@@ -121,7 +121,7 @@ $\Pi_{x + \mathcal{P}}(\cdot)$ & Projection operator onto perturbation set \\
 $\operatorname{sign}(\cdot)$ & Signum function \\
 \midrule
 
-% --- Chapter 4: Neural Network Verification Foundations ---
+% --- Chapter 5: Neural Network Verification Foundations ---
 \multicolumn{2}{@{}l}{\textit{Neural Network Verification (Foundations)}} \\
 \midrule
 $\mathcal{F}$ & Incomplete verification input domain \\
@@ -139,7 +139,7 @@ $\mathcal{G}(\alpha)$ & Lower bound objective function in $\alpha$-CROWN \\
 $K$ & Number of unstable neurons in $\alpha$-CROWN \\
 \midrule
 
-% --- Chapter 5: Methodology - Imitation Learning ---
+% --- Chapter 6.1: Methodology - Imitation Learning ---
 \multicolumn{2}{@{}l}{\textit{Imitation Learning (Methodology)}} \\
 \midrule
 $\mathcal{X}_{\mathrm{MPC}}$ & MPC trajectory sampling domain \\
@@ -152,7 +152,6 @@ $\mathcal{D}_\pi$ & Imitation learning dataset \\
 $N_{\mathcal{D}}$ & Imitation learning dataset sample count \\
 $(x^{(i)}, u^{(i)})$ & State-action sample pair in dataset \\
 $\mathcal{B}_\pi$ & Imitation learning training batch \\
-$M_\pi$ & Imitation learning batch size \\
 $\pi_0(x)$ & Expert MPC policy \\
 $\pi_\theta(x)$ & Learned imitation policy \\
 $h_\theta(x)$ & Unconstrained neural network output \\
@@ -172,7 +171,7 @@ $\omega_f$ & Dynamics-aware constraint loss weight \\
 $\loss_\pi$ & Total imitation policy loss \\
 \midrule
 
-% --- Chapter 5: Methodology - Neural Lyapunov Learning & Falsification ---
+% --- Chapter 6.2: Methodology - Neural Lyapunov Learning & Falsification ---
 \multicolumn{2}{@{}l}{\textit{Neural Lyapunov Learning \& Falsification}} \\
 \midrule
 $\pi_V(x)$ & Co-trained imitation policy \\
@@ -221,8 +220,8 @@ $\ell_{V,0}$ & Initial mean Lyapunov log-value \\
 $\loss_V$ & Lyapunov magnitude scaling loss \\
 $\mathcal{B}_{\mathrm{pol}}$ & Policy scaling Sobol sample batch \\
 $\loss_{\mathrm{pol}}$ & Policy scaling loss \\
-$\ell_{R,0}$ & Initial matrix $R$ Frobenius norm \\
-$\loss_R$ & Matrix $R$ regularization loss \\
+$\ell_{R_\phi,0}$ & Initial matrix $R_\phi$ Frobenius norm \\
+$\loss_{R_\phi}$ & Matrix $R_\phi$ regularization loss \\
 $\loss_{\mathrm{total}}$ & Total combined Lyapunov loss \\
 $\omega_{\rho\mathrm{-gated}}$ & Soft-gated condition loss weight \\
 $\omega_{\mathrm{ROA}}$ & Region of Attraction expansion loss weight \\
@@ -246,7 +245,7 @@ $K_{\mathrm{steps}}$ & Inner mini-batch optimization steps per epoch \\
 $N_{\mathrm{cex}}$ & Counterexample mining step interval \\
 \midrule
 
-% --- Chapter 5: Methodology - Formal Stability Verification ---
+% --- Chapter 6.3: Methodology - Formal Stability Verification ---
 \multicolumn{2}{@{}l}{\textit{Formal Stability Verification (Methodology)}} \\
 \midrule
 $\mathcal{B}_C$ & Formal verification domain \\
@@ -265,7 +264,7 @@ $N_{\mathrm{scale}}, N_{\mathrm{bisect}}$ & Scaling and bisection iteration limi
 $\rho^*$ & Maximal verified sublevel value \\
 \midrule
 
-% --- Chapter 6: Benchmark Systems & Experimental Evaluation ---
+% --- Chapter 7: Benchmark Systems & Experimental Evaluation ---
 \multicolumn{2}{@{}l}{\textit{Benchmark Systems \& Experimental Evaluation}} \\
 \midrule
 $\Delta t$ & Discrete simulation sampling time \\

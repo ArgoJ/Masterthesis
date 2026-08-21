@@ -20,18 +20,20 @@ where $a^{(0)} := x$ is the network input, $z^{(l)} \in \mathbb{R}^{n_l}$
 is the pre-activation vector of layer $l$, and $a^{(L)} := \hat{y} \in \mathbb{R}^{n_L}$ 
 is the final network prediction. The matrix $W^{(l)} \in \mathbb{R}^{n_l \times n_{l-1}}$ 
 and vector $b^{(l)} \in \mathbb{R}^{n_l}$ denote the weight matrix and bias vector of layer $l$, respectively, 
-while $\sigma^{(l)}(\cdot)$ represents a non-linear activation function applied element-wise to 
-the pre-activation vector $z^{(l)}$~\citeSec{3.2}{kollmannsbergerDeepLearningComputational2021}. 
-Without these non-linearities, the layers would simply be reduced to a single linear transformation, 
+while the function $\sigma^{(l)}(\cdot)$ represents an element-wise activation function
+~\citeSec{3.2}{kollmannsbergerDeepLearningComputational2021}. For regression and control tasks, 
+the output layer is typically chosen as the identity mapping $\sigma^{(L)}(z^{(L)}) = z^{(L)}$, 
+whereas hidden layers utilize non-linear activations $\sigma^{(l)}$ for $l \in \{1, \dots, L-1\}$.
+Without these non-linearities, the layers would simply be reduced to a single affine transformation, 
 drastically limiting the model's ability to capture complexity~\citeSec{1.5}{aggarwalNeuralNetworksDeep2023}. 
 Common activation functions in neural control include the hyperbolic tangent \labelcref{eq:tanh} and 
 the rectified linear unit (ReLU) \labelcref{eq:relu}, defined respectively as
-\citeSec{3.5}{kollmannsbergerDeepLearningComputational2021}.
+\citeSec{3.5}{kollmannsbergerDeepLearningComputational2021}:
 \begin{subequations}
     \label{eq:act-funs}
     \begin{align}
         \tanh z &= \frac{\mathrm{e}^{2z} - 1}{\mathrm{e}^{2z} + 1} \label{eq:tanh} \\
-        {[z]_+} &= \max(0, z) \label{eq:relu}
+        {[z]_+} &= \max(0, z) \label{eq:relu}.
     \end{align}
 \end{subequations}
 Their qualitative profiles are illustrated in \cref{fig:activation-funs}.
@@ -119,26 +121,26 @@ Enforcing these properties during training helps the network learn the desired p
 
 
 \paragraph{Gradient Computation via Backpropagation.}
-For updating the network parameters $\theta$ using gradient-based optimization, 
+To update the network parameters $\theta$ using gradient-based optimization, 
 the partial derivatives of the loss $\loss(\mathcal{D}, \theta)$ with respect 
-to all weight matrices $W^{(l)}$ and bias vectors $b^{(l)}$ must be evaluated. 
+to all weight matrices $W^{(l)}$ and bias vectors $b^{(l)}$ are calculated. 
 Backpropagation efficiently computes chain-rule derivatives of loss components that depend on
 the parameters through the network output by combining a forward pass \labelcref{eq:nn-forward} 
 with a backward pass~\citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
 
 During the backward pass, the algorithm computes the sensitivity of the loss with respect to the pre-activations, 
-defined as the error signal $\delta^{(l)} = \frac{\partial \loss}{\partial z^{(l)}}$. 
-At the output layer $L$, this signal is initialized as:
+defined as the loss sensitivity $\delta^{(l)} = \frac{\partial \loss}{\partial z^{(l)}}$. 
+At the output layer $L$, this sensitivity is initialized as:
 \begin{equation}
     \delta^{(L)} = \frac{\partial \loss}{\partial a^{(L)}} \odot \frac{\partial a^{(L)}}{\partial z^{(L)}},
 \end{equation}
 where $\odot$ represents the element-wise (Hadamard) product. 
-Propagating the error backward for $l = L-1, \dots, 1$ yields the recursive relation:
+Propagating the sensitivity backward for $l = L-1, \dots, 1$ results in the recursive equation:
 \begin{equation}
     \label{eq:backprop-recursive-fraction}
     \delta^{(l)} = \left( (W^{(l+1)})^T \delta^{(l+1)} \right) \odot \frac{\partial a^{(l)}}{\partial z^{(l)}}
 \end{equation}
-Combining these error signals with stored activations $a^{(l-1)}$ yields the network-dependent gradients 
+Combining these loss sensitivitys with stored activations $a^{(l-1)}$ yields the network-dependent gradients 
 of the output-dependent loss terms. Adding the explicit derivative of the parameter regularization term 
 $\loss_{\mathrm{reg}}$ completes the total gradient evaluation:
 \begin{equation}
@@ -146,7 +148,7 @@ $\loss_{\mathrm{reg}}$ completes the total gradient evaluation:
         \omega_{\mathrm{reg}} \frac{\partial \loss_{\mathrm{reg}}}{\partial W^{(l)}}, \quad 
     \frac{\partial \loss}{\partial b^{(l)}} = \delta^{(l)}.
 \end{equation}
-By reusing intermediate activations and error signals, backpropagation avoids redundant derivative 
+By reusing intermediate activations and sensitivities, backpropagation avoids redundant derivative 
 calculations and computes parameter gradients with a computational cost similar to that of a forward pass
 through the network~\citeSec{3.4,2.3}{kollmannsbergerDeepLearningComputational2021,aggarwalNeuralNetworksDeep2023}.
 
@@ -159,33 +161,11 @@ leading to erratic optimization trajectories. Mini-batch gradient solves this pr
 dataset into smaller subsets $\mathcal{B} \subset \mathcal{D}$ of size $B = |\mathcal{B}|$. For a mini-batch, 
 the loss $\loss(\mathcal{B}; \theta)$ is evaluated analogously to \cref{eq:total-loss}, 
 with $\mathcal{D}$ replaced by $\mathcal{B}$ in all data-dependent loss terms. 
-The mini-batch gradient $g$ typically has lower variance than the gradient obtained from a single sample, 
+Typically, the mini-batch gradient $g$ has lower variance than the gradient obtained from a single sample, 
 while mini-batch processing enables efficient parallelization on modern GPU hardware.
-During training, the parameters $\theta$ are iteratively updated along the negative gradient direction scaled by a 
+During training, the parameters $\theta$ are iteratively updated following gradient descent, scaled by a 
 learning rate $\alpha > 0$. This update loop is inturn executed for a total of $E \in \mathbb{N}$ epochs 
 \citeSec{2.6.1,2.6}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
-
-% as detailed in \cref{alg:mini-batch-sgd} 
-% \begin{algorithm}[htpb]
-%     \caption{Mini-Batch Stochastic Gradient Descent}
-%     \label{alg:mini-batch-sgd}
-%     \SetAlgoLined
-%     \KwIn{Dataset $\mathcal{D} = \{(x_i, y_i)\}_{i=1}^M$, learning rate $\alpha$, 
-%         batch size $B$, max epochs $E$, initial parameters $\theta_0$}
-%     \KwOut{Optimized parameters $\theta$}
-
-%     \BlankLine
-%     $\theta \leftarrow \theta_0$\;
-%     \For{\text{epoch} $\leftarrow 1$ \KwTo $E$}{
-%         Sample random partition $\{\mathcal{B}_1, \dots, \mathcal{B}_K\}$ of $\mathcal{D}$ such that $|\mathcal{B}_k| \leq B$\;
-%         \ForEach{$\mathcal{B} \in \{\mathcal{B}_1, \dots, \mathcal{B}_K\}$}{
-%             $\hat{y} = \pi_\theta(x) \quad \forall (x,y) \in \mathcal{B}$\;
-%             $g \leftarrow \nabla_\theta \loss(\mathcal{B}; \theta)$\;
-%             $\theta \leftarrow \theta - \alpha g$\;
-%         }
-%     }
-%     \KwRet $\theta$\;
-% \end{algorithm}
 
 
 \paragraph{Adaptive Moment Estimation.}
@@ -223,41 +203,3 @@ The network parameters are then updated element-wise according to:
 where $\epsilon > 0$ is a small constant used for numerical stability. Following~\cite{kingmaAdamMethodStochastic2017}, 
 the default hyperparameters are chosen as $\alpha = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$, 
 providing robust convergence across various deep learning architectures. 
-% The complete iterative training loop using Adam is summarized in \cref{alg:adam-optimizer}.
-
-% \begin{algorithm}[htpb]
-%     \caption{Adaptive Moment Estimation (Adam)}
-%     \label{alg:adam-optimizer}
-%     \SetAlgoLined
-%     \KwIn{Dataset $\mathcal{D}$, initial parameters $\theta_0$, step size $\alpha = 0.001$, decay rates $\beta_1 = 0.9, \beta_2 = 0.999$, 
-%         stability constant $\epsilon = 10^{-8}$}
-%     \KwOut{Optimized parameters $\theta$}
-
-%     \BlankLine
-%     \tcp{Initializations}
-%     $m_0 \leftarrow 0$\;
-%     $v_0 \leftarrow 0$\;
-%     $t \leftarrow 0$\;
-
-%     \BlankLine
-%     \While{$\theta$ not converged}{
-%         $t \leftarrow t + 1$\;
-%         Sample mini-batch $\mathcal{B}_t \subset \mathcal{D}$\;
-%         Compute mini-batch gradient: $g_t \leftarrow \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$\;
-        
-%         \BlankLine
-%         \tcp{Update biased moment estimates}
-%         $m_t \leftarrow \beta_1 m_{t-1} + (1 - \beta_1) g_t$\;
-%         $v_t \leftarrow \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$\;
-        
-%         \BlankLine
-%         \tcp{Compute bias-corrected estimates}
-%         $\hat{m}_t \leftarrow m_t / (1 - \beta_1^t)$\;
-%         $\hat{v}_t \leftarrow v_t / (1 - \beta_2^t)$\;
-        
-%         \BlankLine
-%         \tcp{Update parameters}
-%         $\theta_t \leftarrow \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$\;
-%     }
-%     \KwRet $\theta_t$\;
-% \end{algorithm}

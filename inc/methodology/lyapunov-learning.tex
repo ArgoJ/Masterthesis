@@ -38,8 +38,6 @@ The complete architectural layout of $V_\phi(x)$ is illustrated in \cref{fig:neu
 
 \subsection{Loss Formulation}
 \label{subsec:lyapunov-formulation}
-
-\todo[inline]{add more explanations}
 To ensure that the Lyapunov candidate described in \labelcref{eq:lyapunov-candidate} can be certified for stability, 
 the loss function must comprise multiple components. 
 It utilizes the previously introduced ReLU function $[\cdot]_+$ for one-sided penalties, 
@@ -65,7 +63,7 @@ in the co-training setup and is thus referred to as $\pi_V$ hereafter.
 For each sample, the decrease violation is defined as
 \begin{equation}
     \label{eq:lyapunov-decrease}
-    e_V = (1 - \kappa) V_\phi(x) - V_\phi(x^+_V),
+    e_V =  V_\phi(x^+_V) - (1 - \kappa) V_\phi(x),
 \end{equation}
 where $\kappa \in (0, 1)$ is a hyperparameter that controls the desired rate of decrease. 
 To balance the optimization scale across different magnitudes of $V_\phi$, 
@@ -254,14 +252,14 @@ The normalized deviation between the learned policy and the imitation controller
 \end{equation}
 
 
-\paragraph{$R$-Matrix Loss} regularizes the learnable matrix $R_\phi$ by penalizing deviations 
-of its Frobenius norm from its initial value $\ell_{R,0}$:
+\paragraph{$R_\phi$-Matrix Loss} regularizes the learnable matrix $R_\phi$ by penalizing deviations 
+of its Frobenius norm from its initial value $\ell_{R_\phi,0}$:
 \begin{equation}
     \label{eq:r-matrix-loss}
-    \loss_R = \left( \ell_{R,0} - \lVert R \rVert_F \right)^2.
+    \loss_{R_\phi} = \left( \ell_{R_\phi,0} - \lVert R_\phi \rVert_F \right)^2.
 \end{equation}
-However, $\ell_{R,0} = \lVert R_\phi \rVert_F$ is automatically computed, 
-based on the initial $R_{\phi,0}$ matrix.
+However, $\ell_{R_\phi,0} = \lVert R_\phi \rVert_F$ is automatically computed, 
+based on the initial $R_\phi$ matrix.
 
 
 \paragraph{Overall Lyapunov Loss} represents the combined objective function, 
@@ -271,7 +269,7 @@ summing all previously defined weighted components, given by
     \loss_{\mathrm{total}} = \sum_{m}
         \omega_m \loss_m
 \end{equation}
-where the weights $\omega_m > 0$, with $m \in \{ \rho\mathrm{-gated},\;\mathrm{ROA},\;\mathrm{L},\;V,\;\mathrm{pol},\;R \}$ are 
+where the weights $\omega_m > 0$, with $m \in \{ \rho\mathrm{-gated},\;\mathrm{ROA},\;\mathrm{L},\;V,\;\mathrm{pol},\;R_\phi \}$ are 
 hyperparameters that balance the relative importance of the individual loss components. 
 
 

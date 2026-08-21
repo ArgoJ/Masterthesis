@@ -67,7 +67,7 @@
     % 2. MODELLE & DATEN-SPLITS
     % ==========================================
     % Ebene 1
-    \node[model] (net_v_x) at (-2.5, 0 |- Y_models1) {$V_\theta$};
+    \node[model] (net_v_x) at (-2.5, 0 |- Y_models1) {$V_\phi$};
     \node[model] (sys_f)   at ( 1.5, 0 |- Y_models1) {$f(x, \pi_V(x))$};
     
     \draw[arr] (in_x.south) -- (-0.5, 0 |- Y_split1) -| (net_v_x.north);
@@ -77,7 +77,7 @@
     \node[val] at (1.5, 0 |- sys_f.north) {$x$};
 
     % Ebene 2
-    \node[model] (net_v_xp) at ( 1.5, 0 |- Y_models2) {$V_\theta$};
+    \node[model] (net_v_xp) at ( 1.5, 0 |- Y_models2) {$V_\phi$};
     
     % Routing für f(...) -> x^+
     \coordinate (tap_f) at (1.5, 0 |- Y_split2);
@@ -92,13 +92,13 @@
     % 3.1 Soft Sublevel Weight (w_rho)
     \node[mathloss] (w_rho) at (-5.0, 0 |- Y_lcond) {
         \textbf{Soft Sublevel Weight}\\[4pt]
-        $\displaystyle w_{\rho} = \sigma \left( s \cdot \frac{\rho - V_\theta(x)}{\max (\rho, \varepsilon_{\text{rel}})} \right)$
+        $\displaystyle w_{\rho} = \sigma \left( s \cdot \frac{\rho - V_\phi(x)}{\max (\rho, \varepsilon_{\text{rel}})} \right)$
     };
 
     % 3.2 Relative Decrease Loss (L_dec)
     \node[mathloss] (l_dec) at (-0.5, 0 |- Y_loss) {
         \textbf{Rel. Decrease Loss} $\mathcal{L}_{\text{dec}}$\\[4pt]
-        $\displaystyle = \left[ \frac{(1 - \kappa) V_\theta(x) - V_\theta(x^+_V)}{\max(|V_\theta(x)|, \varepsilon_{\text{rel}})} \right]_+$
+        $\displaystyle = \left[ \frac{V_\phi(x^+_V) - (1 - \kappa) V_\phi(x)}{\max(|V_\phi(x)|, \varepsilon_{\text{rel}})} \right]_+$
     };
 
     % 3.3 Relative Invariance Loss (L_inv)
@@ -123,11 +123,11 @@
     
     % -> zu w_rho
     \draw[arr] (tap_vx) -| (-4.5, 0 |- w_rho.north);
-    \node[val] at (-4.5, 0 |- w_rho.north) {$V_\theta(x)$};
+    \node[val] at (-4.5, 0 |- w_rho.north) {$V_\phi(x)$};
     
     % -> zu L_dec
     \draw[arr] (tap_vx) -| (-1.0, 0 |- l_dec.north);
-    \node[val] at (-1.0, 0 |- l_dec.north) {$V_\theta(x)$};
+    \node[val] at (-1.0, 0 |- l_dec.north) {$V_\phi(x)$};
 
     % -> zu L_inv (Bypass)
     \draw[bus] (tap_f) -- (4.5, 0 |- Y_split2);
@@ -136,7 +136,7 @@
 
     % V_theta(x_V^+) Routing
     \draw[arr] (net_v_xp.south) |- (0.0, 0 |- Y_split4) -- (0.0, 0 |- l_dec.north);
-    \node[val] at (0.0, 0 |- l_dec.north) {$V_\theta(x_V^+)$};
+    \node[val] at (0.0, 0 |- l_dec.north) {$V_\phi(x_V^+)$};
 
 
     % ==========================================

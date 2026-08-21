@@ -30,8 +30,8 @@
     \node[point] (fork_xstar) at (0.9, -0.6) {};
 
     % Term 1: Neuronale Netze (Etage 1 & 2)
-    \node[blockNN] (f1) at (2.0, 1.0) {$g_\theta$};
-    \node[blockNN] (f2) at (2.0, -0.6) {$g_\theta$};
+    \node[blockNN] (f1) at (2.0, 1.0) {$g_\phi$};
+    \node[blockNN] (f2) at (2.0, -0.6) {$g_\phi$};
     
     % Term 1 Operationen (Etage 1)
     \node[sum] (sum_f) at (3.8, 1.0) {$\Sigma$};
@@ -40,19 +40,19 @@
     % Term 2 Operationen (Etage 3 - Ganz unten)
     \node[sum] (sum_x) at (3.8, -2.2) {$\Sigma$};
     \node[blockOp] (norm_weighted) at (6.2, -2.2) {
-        $\|(\varepsilon I + R^\top R) \cdot \|_1$\\[-2pt]
-        {\tiny\itshape\color{navy!70}(learnable $R$)}
+        $\|(\varepsilon I + R_\phi^\top R_\phi) \cdot \|_1$\\[-2pt]
+        {\tiny\itshape\color{navy!70}(learnable $R_\phi$)}
     };
 
     % Finale Zusammenführung (Rechts)
     \node[sum] (sum_final) at (8.4, 1.0) {$\Sigma$};
-    \node[val] (V) at (9.8, 1.0) {$V_{\theta}(x)$};
+    \node[val] (V) at (9.8, 1.0) {$V_{\phi}(x)$};
 
 
     % --- VERBINDUNGEN & ROUTING ---
 
     % Shared weights Indikator
-    \draw[dashed, navy!70, thin] (f1.south) -- node[right, font=\tiny, text=navy] {shared $\theta$} (f2.north);
+    \draw[dashed, navy!70, thin] (f1.south) -- node[right, font=\tiny, text=navy] {shared $\phi$} (f2.north);
 
     % Input x Pfade
     \draw[-] (x) -- (fork_x);

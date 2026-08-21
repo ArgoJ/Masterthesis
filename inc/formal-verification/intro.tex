@@ -3,9 +3,15 @@ formal guarantees of safety, robustness, and stability for all states within the
 Verification methods for neural networks are generally categorized into two approaches: 
 \emph{Incomplete verifiers} efficiently compute sound lower bounds using convex relaxations, but may yield inconclusive 
 results if the over-approximation gap is too large.
-In contrast, \emph{complete verifiers} provide a definite decision by systematically eliminating this relaxation gap 
-with a branch-and-bound approach, to either prove the prescribed condition or construct a valid counterexample 
-given sufficient time.
+In contrast, \emph{complete verifiers} provide a definite decision by reducing this over-approximation gap, 
+ensuring that the prescribed condition is either formally proven or a concrete counterexample is found. 
+
+Early complete verifiers typically used exact non-convex activation functions with specialized 
+Satisfiability Modulo Theories (SMT)~\cite{katzReluplexEfficientSMT2017a} or 
+Mixed-Integer Linear Programming (MILP)~\cite{tjengEvaluatingRobustnessNeural2019} solvers.
+Although these solvers guarantee completeness, their complexity restricts their scalability on larger networks, 
+which has led to the development of branch-and-bound (BaB)~\cite{bunelUnifiedViewPiecewise2017} 
+frameworks that utilize parallelized incomplete bounds.
 
 To perform scalable formal verification, this work relies on the $\alpha,\beta$-CROWN framework
 ~\cite{wang2021beta,xuFastCompleteEnabling2021}, which utilizes GPU parallelization and efficient bound propagation. 

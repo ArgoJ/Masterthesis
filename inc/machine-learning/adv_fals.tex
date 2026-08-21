@@ -7,17 +7,19 @@ Random sampling may fail to reliably expose inputs associated with large loss va
 whereas gradient-guided optimization explicitly searches for such directions~\citeSec{12.4}{aggarwalNeuralNetworksDeep2023}. 
 By applying gradient ascent directly to the inputs under the constraint of a bounded $\ell_p$-norm 
 $\|\delta\|_p \le \varepsilon_\delta$, the approach targets regions where the objective value is large.
-In neural control, such adversarial search strategies can be adapted to serve as 
-empirical falsification tools. Rather than aiming to deceive a model, the goal is to identify input configurations that 
-expose potential violations of safety or stability. This provides a computationally efficient approach to find 
+In neural control, adversarial search strategies can be adapted to serve as tools for empirical falsification. 
+The goal here is not to deceive a model, but rather to identify input configurations that
+identify violations of safety or stability requirements. This provides a computationally efficient approach to find 
 high violations during training~\cite{yangLyapunovstableNeuralControl2024}.
 
 In supervised learning, the generation of adversarial examples can be formulated as a constrained optimization problem 
 \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}. 
-Given a trained model parameterized by $\theta$, a clean input $x \in \mathbb{R}^{n_0}$, 
-and its ground-truth target $y \in \mathbb{R}^{n_L}$, a white-box adversary searches for an optimal perturbation vector 
-$\delta \in \mathbb{R}^{n_0}$ that maximizes the model's loss function $\mathcal{J}(x + \delta, y; \theta)$ 
-\cite{madryDeepLearningModels2019}:
+Consider a trained model parameterized by $\theta$, a nominal input $x \in \mathbb{R}^{n_0}$, 
+and its target value $y \in \mathbb{R}^{n_L}$. 
+Under a white-box assumption, the adversary has full knowledge of the network architecture and weights, 
+which allows the computation of accurate input gradients $\nabla_x \mathcal{J}$. 
+The objective is to find an optimal perturbation vector $\delta \in \mathbb{R}^{n_0}$ 
+that maximizes the loss function $\mathcal{J}(x + \delta, y; \theta)$~\cite{madryDeepLearningModels2019}:
 \begin{equation}
     \label{eq:adversarial-problem}
     \max_{\delta}
@@ -37,10 +39,10 @@ the valid input range.
 
 \subsection{Projected Gradient Descent}
 \label{subsec:pgd}
-To solve the loss maximization problem \labelcref{eq:adversarial-problem}, the Fast Gradient Sign Method (FGSM) 
-\cite{goodfellowExplainingHarnessingAdversarial2015} provides a fast, linear one-step approximation by taking a 
+To solve the maximization problem \labelcref{eq:adversarial-problem}, the Fast Gradient Sign Method 
+(FGSM)~\cite{goodfellowExplainingHarnessingAdversarial2015} provides a fast, linear one-step approximation by taking a 
 single step along the sign of the loss gradient. However, in highly non-convex loss landscapes, 
-one-step attacks may yield weaker loss-maximizing candidates than iterative attacks~\cite{madryDeepLearningModels2019}.
+one-step attacks may yield weaker candidates than iterative attacks~\cite{madryDeepLearningModels2019}.
 
 Projected Gradient Descent (PGD) extends FGSM into an iterative multi-step gradient ascent scheme. 
 Following the robust optimization framework proposed by Madry~\cite{madryDeepLearningModels2019}, 

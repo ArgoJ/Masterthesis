@@ -9,12 +9,12 @@ By shifting the previously computed optimal sequence $(u_{i|k}^*)_{i=0}^{N-1}$ a
 $\pi_f(x_{N|k}^*)$, the optimization problem initializes from a feasible candidate trajectory. 
 This prevents the solver from getting stuck in local minima between adjacent sampling instances.
 Closed-loop trajectories $x_{k+1} = f(x_k, \pi_0(x_k))$ are initialized from states sampled across the mpc sampling
-set $\mathcal{X}_{\mathrm{MPC}} : \{ x \in \mathcal{X} \mid \underline{x}_{\mathrm{MPC}} \leq x \leq \overline{x}_{\mathrm{MPC}} \}$.
-However, the training set is defined as $\mathcal{X}_\pi : \{ x \in \mathcal{X} \mid \underline{x}_\pi \leq x \leq \overline{x}_\pi \}$. 
+set $\mathcal{X}_{\mathrm{MPC}} := \{ x \in \mathcal{X} \mid \underline{x}_{\mathrm{MPC}} \leq x \leq \overline{x}_{\mathrm{MPC}} \}$.
+However, the training set is defined as $\mathcal{X}_\pi := \{ x \in \mathcal{X} \mid \underline{x}_\pi \leq x \leq \overline{x}_\pi \}$. 
 Storing the visited states and their corresponding optimal control actions yields the dataset
 \begin{equation}
     \label{eq:dataset-definition}
-    \mathcal{D}_\pi = \left\{ (x^{(i)}, u^{(i)}) \right\}_{i=1}^{N_{\mathcal{D}}},
+    \mathcal{D}_\pi := \left\{ (x^{(i)}, u^{(i)}) \right\}_{i=1}^{N_{\mathcal{D}}},
 \end{equation}
 where $x^{(i)} \in \mathcal{X}_\pi$ and $u^{(i)} = \pi_0(x^{(i)})$.
 
@@ -34,7 +34,7 @@ formulated as
 \end{equation}
 where $h_\theta : \mathbb{R}^{n_x} \to \mathbb{R}^{n_u}$ is an unconstrained neural network, 
 $u^* \in \mathcal{U} $ represents the desired control action at the equilibrium $x^*$, 
-and $\clamp(\cdot, \overline{\cdot}, \underline{\cdot})$ acts element-wise to enforce the input constraints.
+and $\clamp(\cdot, \underline{\cdot}, \overline{\cdot})$ acts element-wise to enforce the input constraints.
 
 \begin{figure}[htbp]
     \centering
@@ -70,10 +70,10 @@ equilibrium and $\eta \geq 0$ controls the decay rate.
 \paragraph{State-Weighted Behavioral Cloning Loss} penalizes the squared normalized 
 Euclidean distance between the neural network policy and the expert targets. 
 For a mini-batch $\mathcal{B}_\pi \subset \mathcal{D}_\pi$ of size 
-$M_\pi = |\mathcal{B}_\pi|$, the behavioral cloning loss is defined as
+$|\mathcal{B}_\pi|$, the behavioral cloning loss is defined as
 \begin{equation}
     \label{eq:state-weighted-loss}
-    \loss_{\mathrm{BC}} = \frac{1}{M_\pi n_u} 
+    \loss_{\mathrm{BC}} = \frac{1}{|\mathcal{B}_\pi| n_u} 
     \sum_{(x, u) \in \mathcal{B}_\pi} w_x(x) \left\| 
         S_u^{-1} \big( \pi_\theta(x) - u \big) 
     \right\|_2^2.
@@ -88,7 +88,7 @@ the neural policy as $x^+ = f(x,\pi_\theta(x))$.
 Using the element-wise ReLU function defined in \labelcref{eq:relu}, the loss is defined as
 \begin{equation}
     \label{eq:dynamics-aware-loss}
-    \loss_f = \frac{1}{M_\pi n_x} \sum_{x \in \mathcal{B}_\pi} \left( 
+    \loss_f = \frac{1}{|\mathcal{B}_\pi| n_x} \sum_{x \in \mathcal{B}_\pi} \left( 
         \left\| 
             \big[ x^+ - \overline{x}_\pi \big]_+ 
         \right\|_1 + \left\| 

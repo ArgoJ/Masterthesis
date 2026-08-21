@@ -36,8 +36,8 @@ assuming $(x^*, u^*) = (\mathbf{0}, \mathbf{0})$ throughout this work.
 Consider the discrete-time closed-loop system under a state-feedback control policy 
 $\pi: \mathcal{X} \to \mathcal{U}$. The origin serves as an equilibrium point  $x^* = \mathbf{0}$ 
 satisfying $\pi(\mathbf{0}) = \mathbf{0}$ and $f(\mathbf{0}, \mathbf{0}) = \mathbf{0}$.
-Assuming the state constraint set $\mathcal{X}$ is positively forward invariant under $\pi$, 
-the origin is locally asymptotically stable in $\mathcal{X}$ if there exists a positive definite function 
+Assuming the compact state constraint set $\mathcal{X}$ is positively forward invariant under $\pi$, 
+the origin is locally asymptotically stable in $\mathcal{X}$ if there exists a continuous, positive definite function 
 $V: \mathcal{X} \to \mathbb{R}_{\ge 0}$ satisfying~\citeThm{2.13}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:asymptotic-lyapunov-stability}
@@ -48,5 +48,4 @@ $V: \mathcal{X} \to \mathbb{R}_{\ge 0}$ satisfying~\citeThm{2.13}{rawlingsModelP
     \end{aligned}
 \end{equation}
 Here, the decrease condition ensures that any trajectory starting in $\mathcal{X}$
-remains bounded and decays toward the equilibrium $x^*$.
-\todo[inline]{look up if all assumtions are named}
+remains bounded within $\mathcal{X}$ and asymptotically converges towards the equilibrium $x^* = 0$.

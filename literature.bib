@@ -29,6 +29,35 @@
   file = {C\:\\Users\\josua\\Zotero\\storage\\978CDV8Z\\Bechihi und Kapnopoulos - 2025 - Region of Attraction Estimate Learning and Verification for Nonlinear Systems using Neural-Network-b.pdf;C\:\\Users\\josua\\Zotero\\storage\\GHUNLHVW\\2511.html}
 }
 
+@online{bunelBranchBoundPiecewise2025,
+  title = {Branch and {{Bound}} for {{Piecewise Linear Neural Network Verification}}},
+  author = {Bunel, Rudy and Lu, Jingyue and Turkaslan, Ilker and Torr, Philip H. S. and Kohli, Pushmeet and Kumar, M. Pawan},
+  date = {2025-08-26},
+  eprint = {1909.06588},
+  eprinttype = {arXiv},
+  eprintclass = {cs.LG},
+  doi = {10.48550/arXiv.1909.06588},
+  url = {http://arxiv.org/abs/1909.06588},
+  urldate = {2026-08-21},
+  abstract = {The success of Deep Learning and its potential use in many safety-critical applications has motivated research on formal verification of Neural Network (NN) models. In this context, verification involves proving or disproving that an NN model satisfies certain input-output properties. Despite the reputation of learned NN models as black boxes, and the theoretical hardness of proving useful properties about them, researchers have been successful in verifying some classes of models by exploiting their piecewise linear structure and taking insights from formal methods such as Satisifiability Modulo Theory. However, these methods are still far from scaling to realistic neural networks. To facilitate progress on this crucial area, we exploit the Mixed Integer Linear Programming (MIP) formulation of verification to propose a family of algorithms based on Branch-and-Bound (BaB). We show that our family contains previous verification methods as special cases. With the help of the BaB framework, we make three key contributions. Firstly, we identify new methods that combine the strengths of multiple existing approaches, accomplishing significant performance improvements over previous state of the art. Secondly, we introduce an effective branching strategy on ReLU non-linearities. This branching strategy allows us to efficiently and successfully deal with high input dimensional problems with convolutional network architecture, on which previous methods fail frequently. Finally, we propose comprehensive test data sets and benchmarks which includes a collection of previously released testcases. We use the data sets to conduct a thorough experimental comparison of existing and new algorithms and to provide an inclusive analysis of the factors impacting the hardness of verification problems.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Logic in Computer Science,Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\YJN9HKNH\\Bunel et al. - 2025 - Branch and Bound for Piecewise Linear Neural Network Verification.pdf;C\:\\Users\\josua\\Zotero\\storage\\AGYVWNX3\\1909.html}
+}
+
+@online{bunelUnifiedViewPiecewise2017,
+  title = {A {{Unified View}} of {{Piecewise Linear Neural Network Verification}}},
+  author = {Bunel, Rudy and Turkaslan, Ilker and Torr, Philip H. S. and Kohli, Pushmeet and Kumar, M. Pawan},
+  date = {2017},
+  doi = {10.48550/ARXIV.1711.00455},
+  url = {https://arxiv.org/abs/1711.00455},
+  urldate = {2026-08-21},
+  abstract = {The success of Deep Learning and its potential use in many safety-critical applications has motivated research on formal verification of Neural Network (NN) models. Despite the reputation of learned NN models to behave as black boxes and the theoretical hardness of proving their properties, researchers have been successful in verifying some classes of models by exploiting their piecewise linear structure and taking insights from formal methods such as Satisifiability Modulo Theory. These methods are however still far from scaling to realistic neural networks. To facilitate progress on this crucial area, we make two key contributions. First, we present a unified framework that encompasses previous methods. This analysis results in the identification of new methods that combine the strengths of multiple existing approaches, accomplishing a speedup of two orders of magnitude compared to the previous state of the art. Second, we propose a new data set of benchmarks which includes a collection of previously released testcases. We use the benchmark to provide the first experimental comparison of existing algorithms and identify the factors impacting the hardness of verification problems.},
+  pubstate = {prepublished},
+  version = {3},
+  keywords = {Artificial Intelligence (cs.AI),FOS: Computer and information sciences,Machine Learning (cs.LG)}
+}
+
 @inproceedings{bunelUnifiedViewPiecewise2018,
   title = {A {{Unified View}} of {{Piecewise Linear Neural Network Verification}}},
   booktitle = {Advances in {{Neural Information Processing Systems}}},
@@ -149,6 +178,39 @@
   url = {http://epubs.siam.org/doi/10.1137/070709359},
   urldate = {2026-08-03},
   langid = {english}
+}
+
+@incollection{katzReluplexEfficientSMT2017a,
+  title = {Reluplex: {{An Efficient SMT Solver}} for {{Verifying Deep Neural Networks}}},
+  shorttitle = {Reluplex},
+  booktitle = {Computer {{Aided Verification}}},
+  author = {Katz, Guy and Barrett, Clark and Dill, David L. and Julian, Kyle and Kochenderfer, Mykel J.},
+  editor = {Majumdar, Rupak and Kunčak, Viktor},
+  date = {2017},
+  volume = {10426},
+  pages = {97--117},
+  publisher = {Springer International Publishing},
+  location = {Cham},
+  doi = {10.1007/978-3-319-63387-9_5},
+  url = {https://link.springer.com/10.1007/978-3-319-63387-9_5},
+  urldate = {2026-08-21},
+  isbn = {978-3-319-63386-2 978-3-319-63387-9},
+  langid = {english},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Logic in Computer Science},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\3MPTDR3M\\Katz et al. - 2017 - Reluplex An Efficient SMT Solver for Verifying Deep Neural Networks.pdf;C\:\\Users\\josua\\Zotero\\storage\\9QLNKNJ6\\Katz et al. - 2017 - Reluplex An Efficient SMT Solver for Verifying Deep Neural Networks.pdf;C\:\\Users\\josua\\Zotero\\storage\\G625V28W\\1702.html}
+}
+
+@inproceedings{katzReluplexEfficientSMT2017a,
+  title = {Reluplex: {{An}} Efficient {{SMT}} Solver for Verifying Deep Neural Networks},
+  booktitle = {Computer Aided Verification},
+  author = {Katz, Guy and Barrett, Clark and Dill, David L. and Julian, Kyle and Kochenderfer, Mykel J.},
+  editor = {Majumdar, Rupak and Kunčak, Viktor},
+  date = {2017},
+  pages = {97--117},
+  publisher = {Springer International Publishing},
+  location = {Cham},
+  abstract = {Deep neural networks have emerged as a widely used and effective means for tackling complex, real-world problems. However, a major obstacle in applying them to safety-critical systems is the great difficulty in providing formal guarantees about their behavior. We present a novel, scalable, and efficient technique for verifying properties of deep neural networks (or providing counter-examples). The technique is based on the simplex method, extended to handle the non-convex Rectified Linear Unit (ReLU) activation function, which is a crucial ingredient in many modern neural networks. The verification procedure tackles neural networks as a whole, without making any simplifying assumptions. We evaluated our technique on a prototype deep neural network implementation of the next-generation airborne collision avoidance system for unmanned aircraft (ACAS Xu). Results show that our technique can successfully prove properties of networks that are an order of magnitude larger than the largest networks verified using existing methods.},
+  isbn = {978-3-319-63387-9}
 }
 
 @inproceedings{kingmaAdamMethodStochastic2017,

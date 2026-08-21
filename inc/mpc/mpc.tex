@@ -73,7 +73,7 @@ The conditions \labelcref{eq:term-state-constraint} and \labelcref{eq:term-input
 local control input remain within the admissible state and input bounds $\mathcal{X}$ and $\mathcal{U}$. 
 Additionally, positive invariance in \labelcref{eq:term-positive-invariance} ensures that every state in 
 $\mathcal{X}_f$ remains in $\mathcal{X}_f$ under the local controller $\pi_f(x)$~\citeDef{2.9}{rawlingsModelPredictiveControl2020}. 
-This property is key for proving recursive feasibility, as it allows the terminal state of a feasible solution at horizon $N$ 
+This property is essential for proving recursive feasibility, as it enables the terminal state of a feasible solution at horizon $N$ 
 to be extended by the local control input $\pi_f(x_{N|k}^*)$. This yields a feasible candidate trajectory for the subsequent 
 sampling step $k+1$, as further described in \cref{subsec:closed-loop-stability}~\citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
 The terminal cost decrease condition in \labelcref{eq:term-cost-decrease} acts as a local Lyapunov condition within $\mathcal{X}_f$. 
@@ -87,8 +87,8 @@ safe state space $x_{i|k} \in \mathcal{X}$ for $i = 0, \dots, N-1$, the terminal
 satisfies the Lyapunov decrease condition in \labelcref{eq:term-cost-decrease} 
 \citeThm{2.19}{rawlingsModelPredictiveControl2020}.
 
-For nonlinear systems, the terminal ingredients are typically designed by linearizing the system dynamics around 
-the equilibrium point $(x, u) = (\mathbf{0}, \mathbf{0})$, yielding the linearized discrete-time model:
+For nonlinear systems, the terminal ingredients are typically designed by using a linearized discrete-time model, 
+which can be obtained by linearizing the system dynamics around the equilibrium point $(x, u) = (\mathbf{0}, \mathbf{0})$, yielding
 \begin{equation}
     \label{eq:linearized-system}
     x_{k+1} = A x_k + B u_k,
@@ -207,18 +207,19 @@ Together with $u^\top R u \geq 0$, this results in a strict lower bound on the s
     \label{eq:stage-cost-lower-bound}
     \ell(x, u) \geq x^\top Q x \geq \lambda_{\min}(Q) \|x\|^2 > 0, \qquad \forall x \neq \mathbf{0}.
 \end{equation}
-Consequently, this provides a negative upper bound on the Lyapunov decrease in \labelcref{eq:mpc-lyapunov-decrease}:
+Consequently, this yields a negative upper bound on the Lyapunov decrease in \labelcref{eq:mpc-lyapunov-decrease}:
 \begin{equation}
     \label{eq:lyapunov-decrease-eigenvalue}
     V_N(x_{k+1}) - V_N(x_k) \leq -\ell(x_k, \pi_0(x_k)) \leq -\lambda_{\min}(Q) \|x_k\|^2 < 0, 
         \qquad \forall x_k \in \mathcal{X}_N \setminus \{\mathbf{0}\}.
 \end{equation}
-The optimal value function satisfies the lower bound $V_N(x) \geq \ell(x, \pi_0(x)) \geq \lambda_{\min}(Q) \|x\|^2$, 
-thus ensuring that $V_N(x) > 0$ for all $x \neq \mathbf{0}$, where $V_N(\mathbf{0}) = 0$. Under the assumption that $V_N$ 
-is continuous at the origin, $V_N$ is strictly positive definite and radially bounded by class $\mathcal{K}_\infty$ 
-functions on $\mathcal{X}_N$~\citeDef{2.13}{gruneNonlinearModelPredictive2017}.
+Furthermore, the optimal value function satisfies $V_N(0) = 0$ and the lower bound 
+$V_N(x) \ge \ell(x, \pi_0(x)) \ge \lambda_{\min}(Q) \|x\|^2 > 0$ for all $x \in \mathcal{X}_N \setminus \{0\}$. 
+Under the assumption that $V_N$ is continuous at the origin, $V_N$ is strictly positive definite on 
+$\mathcal{X}_N$~\citeDef{2.13}{gruneNonlinearModelPredictive2017}.
 
-Together with the positive invariance of $\mathcal{X}_N$ proven by recursive feasibility, $V_N$ serves as a valid Lyapunov function. 
-Therefore, the origin $\mathbf{0}$ of the nominal closed-loop system is asymptotically stable, and any trajectory initialized at 
-$x_0 \in \mathcal{X}_N$ converges to the origin, making the feasible set $\mathcal{X}_N$ the \emph{region of attraction}
-\citeThm{2.19,5.13}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}.
+In combination with the positive forward invariance of $\mathcal{X}_N$ established by recursive feasibility, 
+$V_N$ defines a valid Lyapunov function. 
+Therefore, the origin $\mathbf{0}$ of the nominal closed-loop system is asymptotically stable, and every 
+trajectory initialized at $x_0 \in \mathcal{X}_N$ converges to the origin, making the feasible set $\mathcal{X}_N$ 
+the \emph{region of attraction}~\citeThm{2.19,5.13}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}.

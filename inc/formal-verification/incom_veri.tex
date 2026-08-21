@@ -14,9 +14,9 @@ The verification problem is formulated as a constrained global minimization prob
 \end{equation}
 for all layers $l \in \{1, \dots, L\}$. 
 
-The prescribed condition is formally satisfied over the entire domain $\mathcal{F}$ if and only if the global minimum  
-satisfies $\psi^\star > 0$. Non-linear activations such as ReLU, further defined in \labelcref{eq:act-funs}, 
-introduce nonconvexity, which makes finding the exact minimum $\psi^\star$ computationally hard. 
+The given condition is formally satisfied over the whole domain $\mathcal{F}$ if and only if the global minimum  
+satisfies $\psi^\star > 0$. Nonlinear activations functions result in nonconvexity, 
+which makes it computationally difficult to determine the exact minimum $\psi^\star$. 
 In order to circumvent this computational limitation, incomplete verification methods approximate the nonlinearities 
 by convex relaxations.
 These incomplete verification methods yield a guaranteed lower bound $\underline{\psi} \le \psi^\star$, where:
