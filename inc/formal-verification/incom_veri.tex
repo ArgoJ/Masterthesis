@@ -69,7 +69,7 @@ pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$, as shown in \cref{fig:crown-rela
     \input{tikz/verification/linear_relaxation.tex}
     \caption{
         Linear bounds for general S-shaped activation functions $\sigma(z) = \tanh(z)$, 
-        inspired by Zhang at al.~\cite{zhangEfficientNeuralNetwork2018}. 
+        inspired by Zhang et al.~\cite{zhangEfficientNeuralNetwork2018}. 
         The green dotted lines denote the upper bounds and the red dotted lines denote the lower bounds. 
     }
     \label{fig:crown-relaxations}
@@ -78,19 +78,19 @@ pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$, as shown in \cref{fig:crown-rela
 Piecewise-linear activations such as ReLU represent a special case within this 
 framework~\cite{zhangEfficientNeuralNetwork2018}. Stable neurons in $\mathcal{S}_l^+$ and $\mathcal{S}_l^-$ 
 are evaluated exactly without relaxation, yielding $\sigma(z_j^{(l)}) = z_j^{(l)}$ and $\sigma(z_j^{(l)}) = 0$, respectively. 
-Only unstable neurons in $\mathcal{S}_l^\pm$ are relaxed using the standard triangle relaxation:
+Only unstable neurons in $\mathcal{S}_l^\pm$ are relaxed using the triangle relaxation:
 \begin{equation}
-    \alpha_j^{(l)} z_j^{(l)} \;\le\; \text{ReLU}\!\left(z_j^{(l)}\right) 
+    \alpha_{L,j}^{(l)} z_j^{(l)} \;\le\; \left[z_j^{(l)}\right]_+
         \;\le\; 
         \frac{u_j^{(l)}}{u_j^{(l)} - l_j^{(l)}} \left( z_j^{(l)} - l_j^{(l)} \right),
     \label{eq:crown-relu-bounds}
 \end{equation}
-where $\alpha_j^{(l)} \in [0, 1]$ parameterizes the slope of the linear lower bound.
+where $\alpha_{L,j}^{(l)} \in [0, 1]$ parameterizes the slope of the linear lower bound.
 
 By recursively applying these linear bounds through backward bound propagation from the output layer back to the network input 
 $x \in \mathcal{F}$, CROWN constructs an explicit linear bounding function:
 \begin{equation}
-    \psi(a^{(L)}) \ge a_{\text{CROWN}}^\top x + c_{\text{CROWN}}.
+    \psi\!\left(a^{(L)}(x)\right) \ge a_{\text{CROWN}}^\top x + c_{\text{CROWN}}.
 \end{equation}
 Since the output bound is linear in $x$, its minimum over a compact domain $\mathcal{F}$ can be evaluated analytically 
 in closed form, enabling fast, GPU-accelerated tensor computations instead of iterative linear programming.
@@ -99,3 +99,22 @@ in closed form, enabling fast, GPU-accelerated tensor computations instead of it
 
 \subsection{\texorpdfstring{$ \alpha $}{α}-CROWN}
 \label{subsec:alpha-crown}
+In the CROWN formulation, the lower bound slope $\alpha_{L,j}^{(l)}$ in \labelcref{eq:crown-general-bounds} is selected based on fixed 
+heuristic rules~\cite{zhangEfficientNeuralNetwork2018}. For instance, for unstable ReLU activations, standard heuristics assign 
+$\alpha_{L,j}^{(l)} = 1$ if $u_j^{(l)} > |l_j^{(l)}|$ and $\alpha_{L,j}^{(l)} = 0$ otherwise, whereas for smooth activations 
+such as $\tanh$, fixed tangent points are selected.
+While computationally efficient, fixed rules often result in loose lower bounds, which may degrade verification tightness.
+$\alpha$-CROWN~\cite{xuFastCompleteEnabling2021} addresses this limitation by using the lower-bound slopes of all unstable 
+neurons across all layers as continuous optimizable parameters, denoted as 
+$\alpha \in [0, 1]^K$. 
+Therefore, the verification task is formulated as the maximization of the resulting lower bound $\mathcal{G}(\alpha)$:
+\begin{equation}
+    \label{eq:alpha-crown-opt}
+    \underline{\psi}^\star = \max_{\alpha \in [0, 1]^K} \mathcal{G}(\alpha) \le \min_{x \in \mathcal{F}} \psi(a^{(L)}).
+\end{equation}
+Since the objective $\mathcal{G}(\alpha)$ is fully differentiable w.r.t. $\alpha$, 
+this constrained optimization problem can be solved efficiently using projected gradient ascent with the  
+Adam optimizer~\cite{kingmaAdamMethodStochastic2017} on the GPU. 
+Crucially, every intermediate configuration $\alpha \in [0, 1]^K$ defines a valid relaxation. 
+Therefore, early termination inherently ensures soundness while also providing significantly tighter bounds 
+than static heuristics.
