@@ -12,7 +12,7 @@ The goal here is not to deceive a model, but rather to identify input configurat
 identify violations of safety or stability requirements. This provides a computationally efficient approach to find 
 high violations during training~\cite{yangLyapunovstableNeuralControl2024}.
 
-In supervised learning, the generation of adversarial examples can be formulated as a constrained optimization problem 
+In supervised learning, the generation of adversarial examples can be formulated as a constrained optimization problem~
 \cite{goodfellowExplainingHarnessingAdversarial2015,madryDeepLearningModels2019}. 
 Consider a trained model parameterized by $\theta$, a nominal input $x \in \mathbb{R}^{n_0}$, 
 and its target value $y \in \mathbb{R}^{n_L}$. 
@@ -57,7 +57,7 @@ For an $\ell_\infty$-norm constraint, $\mathcal{P}$ forms a hyper-rectangular bo
     \right\}.
 \end{equation}
 Instead of initializing the search at the clean input $x$, the initial candidate $x_{\mathrm{adv}}^{(0)}$ is sampled uniformly 
-from $x + \mathcal{P}$ to prevent the optimization from getting stuck in suboptimal local maxima 
+from $x + \mathcal{P}$ to prevent the optimization from getting stuck in suboptimal local maxima~
 \cite{madryDeepLearningModels2019}. At each step $j \in \{0, \dots, I-1\}$, the adversarial sample is updated along the gradient direction:
 \begin{equation}
     \label{eq:adversarial-update}
@@ -71,7 +71,7 @@ from $x + \mathcal{P}$ to prevent the optimization from getting stuck in subopti
         \right),
 \end{equation}
 where $\alpha_{\mathrm{PGD}} > 0$ denotes the step size and $I \in \mathbb{N}$ represents the total number of iterations. 
-Furthermore, $\Pi_{x + \mathcal{P}}(\cdot)$ projects the updated sample back onto the constraint set 
+Furthermore, $\Pi_{x + \mathcal{P}}(\cdot)$ projects the updated sample back onto the constraint set~
 \cite{madryDeepLearningModels2019}. This projection can be implemented by clipping 
 each input component to the interval $[x-\varepsilon_\delta,x+\varepsilon_\delta]$. 
 As a result, $x_{\mathrm{adv}}^{(j+1)}$ satisfies the perturbation constraint at every iteration.
@@ -109,5 +109,5 @@ violations~\cite{madryDeepLearningModels2019}.
 Since uniform sampling may fail to discover violations in high-dimensional spaces~\citeSec{12.4}{aggarwalNeuralNetworksDeep2023}, 
 gradient-guided ascent along $\nabla_{x} \mathcal{J}$ can focus the search on candidate states associated with large 
 Lyapunov condition violations. In this context, PGD serves as an adversarial training mechanism, 
-iteratively feeding high-violation candidate states back into the optimization to reinforce Lyapunov stability margins 
+iteratively feeding high-violation candidate states back into the optimization to reinforce Lyapunov stability margins~
 \cite{madryDeepLearningModels2019,yangLyapunovstableNeuralControl2024}.

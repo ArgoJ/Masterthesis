@@ -19,7 +19,8 @@
   \str_if_eq:nnTF {#1} {true}
     { \bool_set_true:N \l_smartcite_parens_bool }
     { \bool_set_false:N \l_smartcite_parens_bool }
-  
+
+  \unskip\penalty 1000\space
   \int_step_inline:nn { \clist_count:N \l_smartcite_keys_clist }
     {
       % Trennkomma + Leerzeichen zwischen den Zitaten
@@ -28,21 +29,15 @@
       \clist_pop:NN \l_smartcite_post_clist \l_tmpa_item
       \clist_pop:NN \l_smartcite_keys_clist \l_tmpb_item
       
-      \tl_if_empty:NTF \l_tmpa_item
-        { 
-          \autocite{\l_tmpb_item}
-        }
-        { 
-          \bool_if:NTF \l_smartcite_parens_bool
-            {
-              % Mit Klammern: [2, Eq. (1.18)]
-              \autocite[#2\nobreakspace (\l_tmpa_item)]{\l_tmpb_item}
-            }
-            {
-              % Ohne Klammern: [1, Sec. 3.1]
-              \autocite[#2\nobreakspace \l_tmpa_item]{\l_tmpb_item}
-            }
-        }
+      \mbox{
+        \tl_if_empty:NTF \l_tmpa_item
+          { \autocite{\l_tmpb_item} }
+          { 
+            \bool_if:NTF \l_smartcite_parens_bool
+              { \autocite[#2\nobreakspace (\l_tmpa_item)]{\l_tmpb_item} }
+              { \autocite[#2\nobreakspace \l_tmpa_item]{\l_tmpb_item} }
+          }
+      }
     }
 }
 

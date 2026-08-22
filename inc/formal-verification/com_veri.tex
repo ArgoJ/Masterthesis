@@ -1,6 +1,52 @@
 \section{Complete Verification}
 \label{sec:comp-verification}
+When incomplete methods yield an inconclusive result, complete verifiers are required to obtain a definitive decision. 
+These verifiers typically employ a Branch-and-Bound (BaB) framework~\cite{bunelUnifiedViewPiecewise2018,wang2021beta}. 
+Conceptually, BaB resolves the nonlinearities by systematically splitting the search space, 
+either by branching over the input domain or by splitting unstable intermediate neurons. 
+Within each branch of the search tree, an incomplete verifier evaluates the lower bound $\underline{\psi}_{\text{sub}}$:
+\begin{itemize}
+    \item \textbf{Pruning:} 
+        Subdomains that satisfy $\underline{\psi}_{\text{sub}} > 0$ are formally certified and discarded from further search.
+    \item \textbf{Branching / Falsification:} 
+        Inconclusive subdomains with $\underline{\psi}_{\text{sub}} \le 0$ are partitioned further, 
+        or evaluated to find a concrete counterexample.
+\end{itemize}
+By iteratively adding branching constraints, the approximation error is systematically minimized in all subdomains, 
+so that the verification problem can be solved in a finite number of steps until global optimality is 
+achieveds~\cite{bunelUnifiedViewPiecewise2018,wang2021beta}.
 
 
-\subsection{\texorpdfstring{$ \beta $}{β}-CROWN}
+
+\subsection{\texorpdfstring{$\beta$}{β}-CROWN}
 \label{subsec:beta-crown}
+When applying Branch-and-Bound to neural networks with piecewise-linear activations such as ReLU, 
+each branching step results in split constraints for unstable neurons. This is done by either forcing 
+a neuron $j$ in layer $l$ into its active linear phase $z_j^{(l)} \ge 0$ or into its inactive phase 
+$z_j^{(l)} < 0$~\cite{wang2021beta}. While classical LP solvers handle these constraints without any problems, 
+they are computationally expensive and cannot be efficiently parallelized on GPUs~\cite{bunelUnifiedViewPiecewise2018}. 
+However, standard linear bound propagation lacks the mechanism to encode split constraints, 
+which yields overly loose bounds and unnecessary branching~\cite{xuFastCompleteEnabling2021,wang2021beta}.
+
+To overcome this limitation, $\beta$-CROWN~\cite{wang2021beta} incorporates neuron split constraints directly into 
+backward bound propagation using Lagrangian relaxation. By assigning non-negative Lagrange multipliers $\beta \ge 0$ 
+to each split condition, constraint violations are penalized linearly during the backward pass.
+Propagating these penalized bounds back to the input layer yields a linear lower-bounding surrogate 
+$w(\alpha, \beta)^\top x + b(\alpha, \beta) \le \psi(a^{(L)}(x))$. Evaluating its analytical closed-form minimum 
+over the domain $\mathcal{F}$ defines the parameterized lower-bound objective:
+\begin{equation}
+    \mathcal{G}(\alpha, \beta) := \min_{x \in \mathcal{F}} \left( w(\alpha, \beta)^\top x + b(\alpha, \beta) \right).
+    \label{eq:beta-g-def}
+\end{equation}
+The verification problem for each BaB subdomain is then cast as finding the tightest bounding plane by maximizing 
+$\mathcal{G}(\alpha, \beta)$ jointly over the relaxation slopes $\alpha$ and Lagrange multipliers $\beta$:
+\begin{equation}
+    \label{eq:beta-crown-opt}
+    \underline{\psi}_{\beta}^\star = \max_{\alpha \in [0, 1]^K, \, \beta \ge 0} \mathcal{G}(\alpha, \beta) \;\le\; \psi^\star_{\text{sub}}.
+\end{equation}
+
+Because the objective $\mathcal{G}(\alpha, \beta)$ is concave and jointly differentiable w.r.t. both $\alpha$ and $\beta$, 
+it can be solved efficiently via projected gradient ascent directly on the GPU~\cite{wang2021beta}. 
+By weak duality, any valid configuration $\beta \ge 0$ and $\alpha \in [0, 1]^K$ defines a mathematically sound lower bound. 
+Early stopping therefore guarantees soundness, enabling $\beta$-CROWN to evaluate thousands of BaB branches in parallel 
+with tight, constraint-aware bounds.

@@ -49,7 +49,7 @@ $\mathcal{X}_V := \left\{ x \in \mathcal{X}_\pi \mid \underline{x}_V \leq  x \le
 defined as
 \begin{equation}
     \label{eq:sublevel-set}
-    \mathcal{V}_\rho := \{ x \in \mathcal{X}_V \mid V_\phi(x) \le \rho \}.
+    \mathcal{V}_\rho := \left\{ x \in \mathcal{X}_V \mid V_\phi(x) \le \rho \right\}.
 \end{equation}
 To prevent this certified region from trivially collapsing towards the origin during optimization, 
 and to ensure numerical stability during normalizations, $\rho$ is strictly constrained 
@@ -354,7 +354,7 @@ Consequently, the condition loss continuously penalizes recent violations while 
 \label{subsec:rho-sublevel-estim}
 To evaluate the $\rho$-gated condition loss in \labelcref{eq:rho-gated-condition-loss}, the target sublevel bound $\rho$ 
 must be continuously estimated throughout training as the Lyapunov candidate $V_\phi(x)$ evolves. 
-Since the goal is to identify the largest sublevel set $\mathcal{V}_\rho := \{ x \in \mathcal{X}_V \mid V_\phi(x) \le \rho \}$ 
+Since the goal is to identify the largest sublevel set $\mathcal{V}_\rho := \left\{ x \in \mathcal{X}_V \mid V_\phi(x) \le \rho \right\}$ 
 that remains within the training domain $\mathcal{X}_V$, the sublevel set reaches the boundary of the domain at 
 its maximum admissible value. 
 Therefore, the theoretical upper bound for $\rho$ is given by the minimum value of $V_\phi(x)$ on the boundary:

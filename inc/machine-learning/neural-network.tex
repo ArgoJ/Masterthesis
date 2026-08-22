@@ -5,7 +5,7 @@
 \label{subsec:mlp}
 
 Multi-layer perceptrons (MLPs) are fully connected feed-forward networks that map an input 
-through $L-1$ hidden layers to an output layer 
+through $L-1$ hidden layers to an output layer~
 \citeSec{1.4,3.1}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
 Let $n_l \in \mathbb{N}$ denote the number of neurons in layer $l \in \{0, \dots, L\}$, where $n_0$ represents 
 the input dimension and $n_L$ the output dimension.
@@ -46,9 +46,9 @@ Their qualitative profiles are illustrated in \cref{fig:activation-funs}.
 \end{figure}
 
 Based on the universal approximation theorem, an MLP with at least one sufficiently sized hidden layer and non-linear activations 
-can approximate any continuous multidimensional function on compact sets to arbitrary accuracy 
+can approximate any continuous multidimensional function on compact sets to arbitrary accuracy~
 \citeSec{3.1}{kollmannsbergerDeepLearningComputational2021}. 
-The trainable parameters are represented by $\theta = \{W^{(l)}, b^{(l)}\}_{l=1}^L$. \Cref{fig:mlp-architecture} 
+The trainable parameters are represented by $\theta = \left\{W^{(l)}, b^{(l)}\right\}_{l=1}^L$. \Cref{fig:mlp-architecture} 
 illustrates a representative architecture.
 
 \begin{figure}[htbp]
@@ -115,7 +115,7 @@ penalizes large parameter magnitudes and can improve numerical stability and gen
 In practice, these penalties are applied exclusively to the network's weight matrices $W \subset \theta$, 
 leaving bias vectors $b$ unpenalized.~\citeSec{3.7.2}{kollmannsbergerDeepLearningComputational2021}.
 Alongside regularization penalties, the auxiliary loss $\loss_{\mathrm{aux}}$ incorporates domain knowledge into the 
-optimization process, such as differential equations or Lyapunov conditions 
+optimization process, such as differential equations or Lyapunov conditions~
 \citeSec{5}{kollmannsbergerDeepLearningComputational2021},~\cite{yangLyapunovstableNeuralControl2024}. 
 Enforcing these properties during training helps the network learn the desired physically sound solutions.
 
@@ -129,7 +129,7 @@ the parameters through the network output by combining a forward pass \labelcref
 with a backward pass~\citeSec{3.4}{kollmannsbergerDeepLearningComputational2021}.
 
 During the backward pass, the algorithm computes the sensitivity of the loss with respect to the pre-activations, 
-defined as the loss sensitivity $\delta^{(l)} = \frac{\partial \loss}{\partial z^{(l)}}$. 
+defined as $\delta^{(l)} = \frac{\partial \loss}{\partial z^{(l)}}$. 
 At the output layer $L$, this sensitivity is initialized as:
 \begin{equation}
     \delta^{(L)} = \frac{\partial \loss}{\partial a^{(L)}} \odot \frac{\partial a^{(L)}}{\partial z^{(L)}},
@@ -164,7 +164,7 @@ with $\mathcal{D}$ replaced by $\mathcal{B}$ in all data-dependent loss terms.
 Typically, the mini-batch gradient $g$ has lower variance than the gradient obtained from a single sample, 
 while mini-batch processing enables efficient parallelization on modern GPU hardware.
 During training, the parameters $\theta$ are iteratively updated following gradient descent, scaled by a 
-learning rate $\alpha > 0$. This update loop is inturn executed for a total of $E \in \mathbb{N}$ epochs 
+learning rate $\alpha > 0$. This update loop is inturn executed for a total of $E \in \mathbb{N}$ epochs~
 \citeSec{2.6.1,2.6}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
 
 
@@ -176,7 +176,7 @@ making slow progress or none on plateaus~\citeSec{4.5.4}{aggarwalNeuralNetworksD
 
 To resolve these limitations, the Adaptive Moment Estimation (Adam) optimizer~\cite{kingmaAdamMethodStochastic2017} 
 computes individual, adaptive learning rates for each parameter by tracking exponential moving averages of both past 
-gradients $m_t$ and past squared gradients $v_t$ 
+gradients $m_t$ and past squared gradients $v_t$~
 \citeSec{4.5.5.2}{aggarwalNeuralNetworksDeep2023}:
 \begin{subequations}
     \begin{align}

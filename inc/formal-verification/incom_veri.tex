@@ -39,12 +39,12 @@ propagation. Given pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$ for each neuro
 CROWN upper- and lower-bounds any continuous or piecewise-linear activation function $\sigma(z_j^{(l)})$ over 
 this interval by linear bounding functions:
 \begin{equation}
-    \alpha_{L,j}^{(l)} z_j^{(l)} + \beta_{L,j}^{(l)} 
+    \alpha_{L,j}^{(l)} z_j^{(l)} + d_{L,j}^{(l)} 
     \;\le\; \sigma\!\left(z_j^{(l)}\right) \;\le\; 
-    \alpha_{U,j}^{(l)} z_j^{(l)} + \beta_{U,j}^{(l)},
+    \alpha_{U,j}^{(l)} z_j^{(l)} + d_{U,j}^{(l)},
     \label{eq:crown-general-bounds}
 \end{equation}
-where $\alpha_{L,j}^{(l)}, \alpha_{U,j}^{(l)}$ denote the slopes and $\beta_{L,j}^{(l)}, \beta_{U,j}^{(l)}$ 
+where $\alpha_{L,j}^{(l)}, \alpha_{U,j}^{(l)}$ denote the slopes and $d_{L,j}^{(l)}, d_{U,j}^{(l)}$ 
 denote the intercepts of the bounding lines.
 
 For general nonlinear activations with a differentiable curvature, such as $\tanh$ or $\operatorname{sigmoid}$, 
@@ -52,16 +52,16 @@ CROWN divides the neurons of layer $l$ into three distinct subsets based on the 
 pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$, as shown in \cref{fig:crown-relaxations}:
 \begin{enumerate}
     \item \textbf{Strictly Concave Region ($\mathcal{S}_l^+ = \{j \mid 0 \le l_j^{(l)} \le u_j^{(l)}\}$):} 
-        The upper bound is chosen as a tangent at an adaptive point $d \in [l_j^{(l)}, u_j^{(l)}]$, 
+        The upper bound is chosen as a tangent at an adaptive point $p \in [l_j^{(l)}, u_j^{(l)}]$, 
         while the lower bound is the secant line connecting the interval endpoints $(l_j^{(l)}, \sigma(l_j^{(l)}))$ and 
         $(u_j^{(l)}, \sigma(u_j^{(l)}))$.
     \item \textbf{Strictly Convex Region ($\mathcal{S}_l^- = \{j \mid l_j^{(l)} \le u_j^{(l)} \le 0\}$):} 
         The upper bound is the secant connecting the interval endpoints, whereas the lower bound is formed by 
-        a tangent at an adaptive point $d \in [l_j^{(l)}, u_j^{(l)}]$.
+        a tangent at an adaptive point $p \in [l_j^{(l)}, u_j^{(l)}]$.
     \item \textbf{Mixed Curvature with Inflection Point ($\mathcal{S}_l^\pm = \{j \mid l_j^{(l)} < 0 < u_j^{(l)}\}$):} 
         The upper bound is the tangent passing through the left boundary $(l_j^{(l)}, \sigma(l_j^{(l)}))$ with contact 
-        point $d \ge 0$, and the lower bound is the tangent passing through the right boundary $(u_j^{(l)}, \sigma(u_j^{(l)}))$ 
-        with contact point $d \le 0$.
+        point $p \ge 0$, and the lower bound is the tangent passing through the right boundary $(u_j^{(l)}, \sigma(u_j^{(l)}))$ 
+        with contact point $p \le 0$.
 \end{enumerate}
 
 \begin{figure}[htbp]
@@ -87,13 +87,13 @@ Only unstable neurons in $\mathcal{S}_l^\pm$ are relaxed using the triangle rela
 \end{equation}
 where $\alpha_{L,j}^{(l)} \in [0, 1]$ parameterizes the slope of the linear lower bound.
 
-By recursively applying these linear bounds through backward bound propagation from the output layer back to the network input 
-$x \in \mathcal{F}$, CROWN constructs an explicit linear bounding function:
+By recursively propagating these linear bounds backward to the network input, CROWN yields an explicit linear surrogate 
+$\psi(a^{(L)}(x)) \ge w_{\text{CROWN}}^\top x + b_{\text{CROWN}}$. Over the hyperrectangular domain $\mathcal{F}$, 
+its closed-form minimum defines the sound lower bound:
 \begin{equation}
-    \psi\!\left(a^{(L)}(x)\right) \ge a_{\text{CROWN}}^\top x + c_{\text{CROWN}}.
+    \underline{\psi}_{\text{CROWN}} = \min_{x \in \mathcal{F}} \left( w_{\text{CROWN}}^\top x + b_{\text{CROWN}} \right).
+    \label{eq:crown-closed-form}
 \end{equation}
-Since the output bound is linear in $x$, its minimum over a compact domain $\mathcal{F}$ can be evaluated analytically 
-in closed form, enabling fast, GPU-accelerated tensor computations instead of iterative linear programming.
 
 
 
@@ -104,17 +104,22 @@ heuristic rules~\cite{zhangEfficientNeuralNetwork2018}. For instance, for unstab
 $\alpha_{L,j}^{(l)} = 1$ if $u_j^{(l)} > |l_j^{(l)}|$ and $\alpha_{L,j}^{(l)} = 0$ otherwise, whereas for smooth activations 
 such as $\tanh$, fixed tangent points are selected.
 While computationally efficient, fixed rules often result in loose lower bounds, which may degrade verification tightness.
-$\alpha$-CROWN~\cite{xuFastCompleteEnabling2021} addresses this limitation by using the lower-bound slopes of all unstable 
-neurons across all layers as continuous optimizable parameters, denoted as 
-$\alpha \in [0, 1]^K$. 
-Therefore, the verification task is formulated as the maximization of the resulting lower bound $\mathcal{G}(\alpha)$:
+$\alpha$-CROWN~\cite{xuFastCompleteEnabling2021} addresses this limitation by considering relaxation parameters as 
+continuous optimizable parameters over all layers. For ReLU activations, these correspond to the lower-bound slopes
+$\alpha \in [0, 1]^K$ of all unstable neurons. More generally, this principle applies to any adjustable parameter 
+defining valid linear bounds for general activations.
+Consequently, the bounding coefficients become functions of $\alpha$, yielding the parameterized lower-bound objective:
+\begin{equation}
+    \mathcal{G}(\alpha) := \min_{x \in \mathcal{F}} \left( w(\alpha)^\top x + b(\alpha) \right).
+    \label{eq:alpha-crown-objective}
+\end{equation}
+The verification problem is then formulated as a maximization of this lower bound:
 \begin{equation}
     \label{eq:alpha-crown-opt}
-    \underline{\psi}^\star = \max_{\alpha \in [0, 1]^K} \mathcal{G}(\alpha) \le \min_{x \in \mathcal{F}} \psi(a^{(L)}).
+    \underline{\psi}^\star = \max_{\alpha \in [0, 1]^K} \mathcal{G}(\alpha) \;\le\; \psi^\star.
 \end{equation}
-Since the objective $\mathcal{G}(\alpha)$ is fully differentiable w.r.t. $\alpha$, 
-this constrained optimization problem can be solved efficiently using projected gradient ascent with the  
-Adam optimizer~\cite{kingmaAdamMethodStochastic2017} on the GPU. 
+Since $\mathcal{G}(\alpha)$ can be optimized efficiently using projected gradient methods, e.g. the 
+Adam optimizer~\cite{kingmaAdamMethodStochastic2017} on GPU. 
 Crucially, every intermediate configuration $\alpha \in [0, 1]^K$ defines a valid relaxation. 
-Therefore, early termination inherently ensures soundness while also providing significantly tighter bounds 
-than static heuristics.
+Therefore, early termination inherently ensures soundness while also providing possible tighter bounds 
+than static heuristics. 

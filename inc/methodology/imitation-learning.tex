@@ -9,8 +9,8 @@ By shifting the previously computed optimal sequence $(u_{i|k}^*)_{i=0}^{N-1}$ a
 $\pi_f(x_{N|k}^*)$, the optimization problem initializes from a feasible candidate trajectory. 
 This prevents the solver from getting stuck in local minima between adjacent sampling instances.
 Closed-loop trajectories $x_{k+1} = f(x_k, \pi_0(x_k))$ are initialized from states sampled across the mpc sampling
-set $\mathcal{X}_{\mathrm{MPC}} := \{ x \in \mathcal{X} \mid \underline{x}_{\mathrm{MPC}} \leq x \leq \overline{x}_{\mathrm{MPC}} \}$.
-However, the training set is defined as $\mathcal{X}_\pi := \{ x \in \mathcal{X} \mid \underline{x}_\pi \leq x \leq \overline{x}_\pi \}$. 
+set $\mathcal{X}_{\mathrm{MPC}} := \left\{ x \in \mathcal{X} \mid \underline{x}_{\mathrm{MPC}} \leq x \leq \overline{x}_{\mathrm{MPC}} \right\}$.
+However, the training set is defined as $\mathcal{X}_\pi := \left\{ x \in \mathcal{X} \mid \underline{x}_\pi \leq x \leq \overline{x}_\pi \right\}$. 
 Storing the visited states and their corresponding optimal control actions yields the dataset
 \begin{equation}
     \label{eq:dataset-definition}

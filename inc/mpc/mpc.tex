@@ -15,7 +15,7 @@ is solved at each time step $k$ given the current system state $x_k$~\citeSec{2.
     \label{eq:mpc-problem}
     \begin{aligned}
         \min_{(x_{i|k})_{i=0}^N, (u_{i|k})_{i=0}^{N-1}} \; 
-                        & & J(x_k, (u_{i|k})_{i=0}^{N-1}) &= \sum_{i=0}^{N-1} \ell(x_{i|k}, u_{i|k}) + V_f(x_{N|k}) \\
+                        & & J \left(x_k, (u_{i|k})_{i=0}^{N-1} \right) &= \sum_{i=0}^{N-1} \ell(x_{i|k}, u_{i|k}) + V_f(x_{N|k}) \\
         \text{s.t.} \;  & & x_{i+1|k}   &= f(x_{i|k}, u_{i|k}),     && i = 0, \dots, N-1, \\
                         & & x_{i|k}     &\in \mathcal{X},           && i = 0, \dots, N-1, \\
                         & & u_{i|k}     &\in \mathcal{U},           && i = 0, \dots, N-1, \\
@@ -29,7 +29,7 @@ $\mathcal{X}_f \subseteq \mathcal{X}$. To distinguish optimization from closed-l
 $x_{i|k}$ and $u_{i|k}$ denote the predicted state and input at horizon step $i$, initialized at sampling time $k$. 
 The sequences $(x_{i|k})_{i=0}^N$ and $(u_{i|k})_{i=0}^{N-1}$ serve as optimization variables constrained by the 
 sets $\mathcal{X}$ and $\mathcal{U}$~\citeSec{3.2}{gruneNonlinearModelPredictive2017}. Furthermore, the optimal value function is defined as 
-$V_N(x_k) := J(x_k, (u_{i\vert{}k}^*)_{i=0}^{N-1})$.
+$V_N(x_k) := J \left( x_k, (u_{i\vert{}k}^*)_{i=0}^{N-1} \right)$.
 
 For this work, the stage cost is chosen as the quadratic cost function with positive definite weighting matrices $Q \succ 0$ and $R \succ 0$, 
 which is defined as follows~\citeSec{1.3}{rawlingsModelPredictiveControl2020}:
@@ -54,7 +54,7 @@ the updated state~\citeSec{2.2,3.1}{rawlingsModelPredictiveControl2020,gruneNonl
 To establish recursive feasibility and closed-loop stability of nominal MPC, the optimal control problem \labelcref{eq:mpc-problem} 
 incorporates three central design ingredients: 
 the terminal constraint set $\mathcal{X}_f \subseteq \mathcal{X}$, an auxiliary local control law $\pi_f: \mathcal{X}_f \to \mathcal{U}$, 
-and the terminal cost function $V_f: \mathcal{X}_f \to \mathbb{R}_{\ge 0}$ 
+and the terminal cost function $V_f: \mathcal{X}_f \to \mathbb{R}_{\ge 0}$~
 \citeAsm{2.14,5.9}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}.
 
 Specifically, these terminal ingredients must satisfy state and input constraints, positive invariance of the terminal set, 
@@ -78,13 +78,13 @@ to be extended by the local control input $\pi_f(x_{N|k}^*)$. This yields a feas
 sampling step $k+1$, as further described in \cref{subsec:closed-loop-stability}~\citeSec{2.4.2}{rawlingsModelPredictiveControl2020}.
 The terminal cost decrease condition in \labelcref{eq:term-cost-decrease} acts as a local Lyapunov condition within $\mathcal{X}_f$. 
 While positive invariance ensures that the local trajectory remains in $\mathcal{X}_f$, the decrease condition requires 
-the terminal cost $V_f$ to decrease along the local closed-loop trajectory by at least the stage cost $\ell(x,\pi_f(x))$ 
+the terminal cost $V_f$ to decrease along the local closed-loop trajectory by at least the stage cost $\ell(x,\pi_f(x))$~
 \citeAsm{5.9}{gruneNonlinearModelPredictive2017}.
 
 The predictive mechanism and the geometric role of the terminal set are illustrated in \cref{fig:terminal-set-comparison}. 
 While intermediate predicted states are required to remain in the 
 safe state space $x_{i|k} \in \mathcal{X}$ for $i = 0, \dots, N-1$, the terminal constraint enforces $x_{N|k} \in \mathcal{X}_f$, where the local controller 
-satisfies the Lyapunov decrease condition in \labelcref{eq:term-cost-decrease} 
+satisfies the Lyapunov decrease condition in \labelcref{eq:term-cost-decrease}~
 \citeThm{2.19}{rawlingsModelPredictiveControl2020}.
 
 For nonlinear systems, the terminal ingredients are typically designed by using a linearized discrete-time model, 
@@ -103,7 +103,7 @@ Algebraic Riccati Equation (DARE)~\citeEq{1.18,5.23}{rawlingsModelPredictiveCont
     P = A^\top P A - A^\top P B \left(R + B^\top P B\right)^{-1} B^\top P A + Q.
 \end{equation}
 
-Using $P$, the local linear feedback law $\pi_f(x) = -K x$ is parameterized via the optimal Linear-Quadratic Regulator (LQR) gain 
+Using $P$, the local linear feedback law $\pi_f(x) = -K x$ is parameterized via the optimal Linear-Quadratic Regulator (LQR) gain~
 \citeEq{1.18,5.24}{rawlingsModelPredictiveControl2020,gruneNonlinearModelPredictive2017}:
 \begin{equation}
     \label{eq:lqr-feedback}
@@ -111,7 +111,7 @@ Using $P$, the local linear feedback law $\pi_f(x) = -K x$ is parameterized via 
 \end{equation}
 and the terminal cost function is specified quadratically as $V_f(x) = x^\top P x$.
 Accordingly, the terminal set $\mathcal{X}_f$ is defined in this specific case 
-as an ellipsoidal sub-level set of this cost function 
+as an ellipsoidal sub-level set of this cost function~
 \citeSec{3.5}{rawlingsModelPredictiveControl2020}:
 \begin{equation}
     \label{eq:terminal-ellipse}
@@ -181,16 +181,16 @@ Subtracting the optimal cost at step $k$ from the candidate cost at time step $k
 \begin{equation}
     \label{eq:cost-difference-derivation}
     \begin{aligned}
-        &J(x_{k+1}, (\tilde{u}_{i|k+1})_{i=0}^{N-1}) - V_N(x_k) \\
-        &\quad = \sum_{i=1}^{N-1} \ell(x_{i|k}^*, u_{i|k}^*) + \ell(x_{N|k}^*, \pi_f(x_{N|k}^*)) + V_f(f(x_{N|k}^*, \pi_f(x_{N|k}^*))) \\
+        &J \left( x_{k+1}, (\tilde{u}_{i|k+1})_{i=0}^{N-1} \right) - V_N(x_k) \\
+        &\quad = \sum_{i=1}^{N-1} \ell(x_{i|k}^*, u_{i|k}^*) + \ell(x_{N|k}^*, \pi_f(x_{N|k}^*)) + V_f \left( f(x_{N|k}^*, \pi_f(x_{N|k}^*)) \right) \\
         &\qquad - \big[ \ell(x_k, u_{0|k}^*) + \sum_{i=1}^{N-1} \ell(x_{i|k}^*, u_{i|k}^*) + V_f(x_{N|k}^*) \big] \\[1.5ex]
         &\quad = -\ell(x_k, u_{0|k}^*) + \underbrace{
             \big[ V_f(f(x_{N|k}^*, \pi_f(x_{N|k}^*))) - V_f(x_{N|k}^*) + \ell(x_{N|k}^*, \pi_f(x_{N|k}^*)) \big]
         }_{\leq 0 \text{ due to \labelcref{eq:term-cost-decrease}}}.
     \end{aligned}
 \end{equation}
-Applying the local Lyapunov decrease condition \labelcref{eq:term-cost-decrease} ensures that the bracketed term is non-positive 
-\citeAsm{5.9}{gruneNonlinearModelPredictive2017}. 
+Applying the local Lyapunov decrease condition \labelcref{eq:term-cost-decrease} ensures that the bracketed term is 
+non-positive~\citeAsm{5.9}{gruneNonlinearModelPredictive2017}. 
 Together with $V_N(x_{k+1}) \leq J(x_{k+1}, (\tilde{u}_{i|k+1})_{i=0}^{N-1})$, the optimal value function satisfies the 
 Lyapunov decrease condition along the nominal closed-loop trajectories~\citeLem{5.12}{gruneNonlinearModelPredictive2017}:
 \begin{equation}
