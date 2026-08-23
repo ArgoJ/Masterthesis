@@ -12,10 +12,12 @@ The verification problem is formulated as a constrained global minimization prob
     \quad \text{s.t.} 
     \quad z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)}, \quad a^{(l)} = \sigma^{(l)}\!\left(z^{(l)}\right), \quad a^{(0)} = x,  
 \end{equation}
-for all layers $l \in \{1, \dots, L\}$. 
+for all layers $l \in \{1, \dots, L\}$. Note that the network parameters $\{W^{(l)}, b^{(l)}\}_{l=1}^L$ are fixed during
+verification. Hence, for every input $x \in \mathcal{F}$, all intermediate variables $z^{(l)}(x)$ and $a^{(l)}(x)$ 
+are uniquely determined by the forward pass.
 
-The given condition is formally satisfied over the whole domain $\mathcal{F}$ if and only if the global minimum  
-satisfies $\psi^\star > 0$. Nonlinear activations functions result in nonconvexity, 
+The given condition is formally satisfied over the whole domain $\mathcal{F} \subset \mathbb{R}^{n_0}$ if and only if 
+the global minimum satisfies $\psi^\star > 0$. Nonlinear activation functions result in nonconvexity, 
 which makes it computationally difficult to determine the exact minimum $\psi^\star$. 
 In order to circumvent this computational limitation, incomplete verification methods approximate the nonlinearities 
 by convex relaxations.
@@ -35,34 +37,36 @@ enabling both fast standalone certification and efficient bounding in complete v
 \label{subsec:crown}
 While traditional incomplete verifiers rely on computationally expensive linear programs (LPs) solved over the entire network, 
 the CROWN framework~\cite{zhangEfficientNeuralNetwork2018} achieves significantly higher efficiency with backward linear bound 
-propagation. Given pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$ for each neuron $j$ in layer $l$, 
-CROWN upper- and lower-bounds any continuous or piecewise-linear activation function $\sigma(z_j^{(l)})$ over 
-this interval by linear bounding functions:
+propagation. To construct linear relaxations, intermediate pre-activation bounds $[l_j^{(l)}, u_j^{(l)}] \in \mathbb{R}$ are 
+required for each neuron $j$ in layer $l$, which are computed by using pre-activations as temporary verification objectives 
+within the bound propagation framework.
+Given these intermediate intervals, CROWN upper- and lower-bounds a wide range of continuous or piecewise-linear activation 
+function $\sigma(z_j^{(l)})$ over their respective intervals by linear bounding functions:
 \begin{equation}
     \alpha_{L,j}^{(l)} z_j^{(l)} + d_{L,j}^{(l)} 
     \;\le\; \sigma\!\left(z_j^{(l)}\right) \;\le\; 
     \alpha_{U,j}^{(l)} z_j^{(l)} + d_{U,j}^{(l)},
     \label{eq:crown-general-bounds}
 \end{equation}
-where $\alpha_{L,j}^{(l)}, \alpha_{U,j}^{(l)}$ denote the slopes and $d_{L,j}^{(l)}, d_{U,j}^{(l)}$ 
+where $\alpha_{L,j}^{(l)}, \alpha_{U,j}^{(l)} \in \mathbb{R}$ denote the slopes and $d_{L,j}^{(l)}, d_{U,j}^{(l)} \in \mathbb{R}$ 
 denote the intercepts of the bounding lines.
 
 For general nonlinear activations with a differentiable curvature, such as $\tanh$ or $\operatorname{sigmoid}$, 
 CROWN divides the neurons of layer $l$ into three distinct subsets based on the signs of their 
 pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$, as shown in \cref{fig:crown-relaxations}:
-\begin{enumerate}
-    \item \textbf{Strictly Concave Region ($\mathcal{S}_l^+ = \{j \mid 0 \le l_j^{(l)} \le u_j^{(l)}\}$):} 
+\begin{itemize}
+    \item \textbf{Strictly Concave Region ($\zeta_l^+ = \{j \mid 0 \le l_j^{(l)} \le u_j^{(l)}\}$):} 
         The upper bound is chosen as a tangent at an adaptive point $p \in [l_j^{(l)}, u_j^{(l)}]$, 
         while the lower bound is the secant line connecting the interval endpoints $(l_j^{(l)}, \sigma(l_j^{(l)}))$ and 
         $(u_j^{(l)}, \sigma(u_j^{(l)}))$.
-    \item \textbf{Strictly Convex Region ($\mathcal{S}_l^- = \{j \mid l_j^{(l)} \le u_j^{(l)} \le 0\}$):} 
+    \item \textbf{Strictly Convex Region ($\zeta_l^- = \{j \mid l_j^{(l)} \le u_j^{(l)} \le 0\}$):} 
         The upper bound is the secant connecting the interval endpoints, whereas the lower bound is formed by 
         a tangent at an adaptive point $p \in [l_j^{(l)}, u_j^{(l)}]$.
-    \item \textbf{Mixed Curvature with Inflection Point ($\mathcal{S}_l^\pm = \{j \mid l_j^{(l)} < 0 < u_j^{(l)}\}$):} 
+    \item \textbf{Mixed Curvature with Inflection Point ($\zeta_l^\pm = \{j \mid l_j^{(l)} < 0 < u_j^{(l)}\}$):} 
         The upper bound is the tangent passing through the left boundary $(l_j^{(l)}, \sigma(l_j^{(l)}))$ with contact 
         point $p \ge 0$, and the lower bound is the tangent passing through the right boundary $(u_j^{(l)}, \sigma(u_j^{(l)}))$ 
         with contact point $p \le 0$.
-\end{enumerate}
+\end{itemize}
 
 \begin{figure}[htbp]
     \centering
@@ -76,9 +80,9 @@ pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$, as shown in \cref{fig:crown-rela
 \end{figure}
 
 Piecewise-linear activations such as ReLU represent a special case within this 
-framework~\cite{zhangEfficientNeuralNetwork2018}. Stable neurons in $\mathcal{S}_l^+$ and $\mathcal{S}_l^-$ 
+framework~\cite{zhangEfficientNeuralNetwork2018}. Stable neurons in $\zeta_l^+$ and $\zeta_l^-$ 
 are evaluated exactly without relaxation, yielding $\sigma(z_j^{(l)}) = z_j^{(l)}$ and $\sigma(z_j^{(l)}) = 0$, respectively. 
-Only unstable neurons in $\mathcal{S}_l^\pm$ are relaxed using the triangle relaxation:
+Only unstable neurons in $\zeta_l^\pm$ are relaxed using the triangle relaxation:
 \begin{equation}
     \alpha_{L,j}^{(l)} z_j^{(l)} \;\le\; \left[z_j^{(l)}\right]_+
         \;\le\; 
@@ -87,39 +91,47 @@ Only unstable neurons in $\mathcal{S}_l^\pm$ are relaxed using the triangle rela
 \end{equation}
 where $\alpha_{L,j}^{(l)} \in [0, 1]$ parameterizes the slope of the linear lower bound.
 
-By recursively propagating these linear bounds backward to the network input, CROWN yields an explicit linear surrogate 
-$\psi(a^{(L)}(x)) \ge w_{\text{CROWN}}^\top x + b_{\text{CROWN}}$. Over the hyperrectangular domain $\mathcal{F}$, 
-its closed-form minimum defines the sound lower bound:
+By recursively propagating these linear bounds backward to the network input, CROWN constructs an affine function
 \begin{equation}
-    \underline{\psi}_{\text{CROWN}} = \min_{x \in \mathcal{F}} \left( w_{\text{CROWN}}^\top x + b_{\text{CROWN}} \right).
+    \underline{\psi}_{\mathrm{aff}}(x) := w_{\mathrm{CROWN}}^\top x + c_{\mathrm{CROWN}}
+    \le
+    \psi(a^{(L)}(x))
+    \qquad \forall x \in \mathcal{F}.
+\end{equation}
+Here, $w_{\mathrm{CROWN}} \in \mathbb{R}^{n_0}$ and $c_{\mathrm{CROWN}} \in \mathbb{R}$ are the coefficients of the 
+resulting input-dependent affine lower bound. 
+The certified lower bound is obtained by minimizing this affine surrogate over the input space:
+\begin{equation}
+    \underline{\psi}_{\mathrm{CROWN}}^\star = \min_{x \in \mathcal{F}} \underline{\psi}_{\mathrm{aff}}(x).
     \label{eq:crown-closed-form}
 \end{equation}
-
 
 
 \subsection{\texorpdfstring{$ \alpha $}{α}-CROWN}
 \label{subsec:alpha-crown}
 In the CROWN formulation, the lower bound slope $\alpha_{L,j}^{(l)}$ in \labelcref{eq:crown-general-bounds} is selected based on fixed 
 heuristic rules~\cite{zhangEfficientNeuralNetwork2018}. For instance, for unstable ReLU activations, standard heuristics assign 
-$\alpha_{L,j}^{(l)} = 1$ if $u_j^{(l)} > |l_j^{(l)}|$ and $\alpha_{L,j}^{(l)} = 0$ otherwise, whereas for smooth activations 
-such as $\tanh$, fixed tangent points are selected.
+$\alpha_{L,j}^{(l)} = 1$ if $u_j^{(l)} > |l_j^{(l)}|$ and $\alpha_{L,j}^{(l)} = 0$ otherwise. For smooth activations, 
+CROWN analogously selects activation-specific local linear bounds based on the corresponding pre-activation interval.
 While computationally efficient, fixed rules often result in loose lower bounds, which may degrade verification tightness.
 $\alpha$-CROWN~\cite{xuFastCompleteEnabling2021} addresses this limitation by considering relaxation parameters as 
 continuous optimizable parameters over all layers. For ReLU activations, these correspond to the lower-bound slopes
-$\alpha \in [0, 1]^K$ of all unstable neurons. More generally, this principle applies to any adjustable parameter 
+$\alpha \in [0, 1]^K$ of all unstable neurons, where $K = \sum_{l=1}^{L-1} |\zeta_l^\pm|$ denotes the total number of 
+unstable neurons in the network. More generally, this principle applies to any adjustable parameter 
 defining valid linear bounds for general activations.
 Consequently, the bounding coefficients become functions of $\alpha$, yielding the parameterized lower-bound objective:
 \begin{equation}
-    \mathcal{G}(\alpha) := \min_{x \in \mathcal{F}} \left( w(\alpha)^\top x + b(\alpha) \right).
+    \mathcal{G}(\alpha) = \min_{x \in \mathcal{F}} \left( w(\alpha)^\top x + c(\alpha) \right),
     \label{eq:alpha-crown-objective}
 \end{equation}
+where $w(\alpha) \in \mathbb{R}^{n_0}$ and $c(\alpha) \in \mathbb{R}$ denote the affine lower bound coefficients, respectively.
 The verification problem is then formulated as a maximization of this lower bound:
 \begin{equation}
     \label{eq:alpha-crown-opt}
-    \underline{\psi}^\star = \max_{\alpha \in [0, 1]^K} \mathcal{G}(\alpha) \;\le\; \psi^\star.
+    \underline{\psi}^\star_\alpha = \max_{\alpha \in [0, 1]^K} \mathcal{G}(\alpha) \;\le\; \psi^\star.
 \end{equation}
-Since $\mathcal{G}(\alpha)$ can be optimized efficiently using projected gradient methods, e.g. the 
-Adam optimizer~\cite{kingmaAdamMethodStochastic2017} on GPU. 
+The objective $\mathcal{G}(\alpha)$ can be optimized efficiently on GPUs using projected gradient-based methods, 
+such as projected Adam~\cite{kingmaAdamMethodStochastic2017}. 
 Crucially, every intermediate configuration $\alpha \in [0, 1]^K$ defines a valid relaxation. 
-Therefore, early termination inherently ensures soundness while also providing possible tighter bounds 
+Therefore, early stopping inherently ensures soundness while also providing potentially tighter bounds 
 than static heuristics. 
