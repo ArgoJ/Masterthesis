@@ -123,23 +123,30 @@ $\operatorname{sign}(\cdot)$ & Signum function \\
 % --- Chapter 5: Neural Network Verification Foundations ---
 \multicolumn{2}{@{}l}{\textit{Neural Network Verification (Foundations)}} \\
 \midrule
-$\mathcal{F}$ & Incomplete verification input domain \\
+$\mathcal{F}$ & Verification input domain \\
 $\underline{x}_F, \overline{x}_F$ & Lower and upper bounds of domain $\mathcal{F}$ \\
 $\psi(a^{(L)})$ & Scalar specification function \\
 $\psi^\star$ & Global minimum of specification function \\
 $\underline{\psi}$ & Guaranteed sound specification lower bound \\
-$\underline{\psi}^\star$ & Optimized lower bound via $\alpha$-CROWN \\
 $[l_j^{(l)}, u_j^{(l)}]$ & Pre-activation lower and upper bounds of neuron $j$ in layer $l$ \\
 $\alpha_{L,j}^{(l)}, \alpha_{U,j}^{(l)}$ & CROWN linear lower and upper bounding slopes \\
 $d_{L,j}^{(l)}, d_{U,j}^{(l)}$ & CROWN linear lower and upper bounding intercepts \\
 $\zeta_l^+, \zeta_l^-, \zeta_l^\pm$ & Strictly concave, convex, and mixed curvature neuron sets \\
-$a_{\text{CROWN}}, c_{\text{CROWN}}$ & Explicit CROWN linear bounding vector and constant \\
+$p$ & Adaptive tangent contact point \\
+$\underline{\psi}_{\mathrm{aff}}(x)$ & Affine lower bounding function \\
+$w_{\mathrm{CROWN}}, c_{\mathrm{CROWN}}$ & Explicit CROWN linear bounding vector and constant \\
+$\underline{\psi}_{\mathrm{CROWN}}^\star$ & Certified lower bound via CROWN \\
+$\alpha$ & Lower-bound relaxation slopes \\
+$K$ & Total number of unstable neurons \\
+$w(\alpha), c(\alpha)$ & Parameterized affine bounding vector and constant \\
 $\mathcal{G}(\alpha)$ & Lower bound objective function in $\alpha$-CROWN \\
-$K$ & Number of unstable neurons in $\alpha$-CROWN \\
-$\mathcal{Z}$ & Set of neuron split constraints \\
-$S^{(l)}$ & Diagonal neuron split indicator matrix \\
-$\beta^{(l)}, \beta$ & Lagrange multipliers for neuron split constraints \\
-$\underline{\psi}_\beta^\star$ & Optimized lower bound via $\beta$-CROWN \\
+$\underline{\psi}_\alpha^\star$ & Optimized lower bound via $\alpha$-CROWN \\
+$\underline{\psi}_{\mathrm{sub}}$ & Specification lower bound on BaB subdomain \\
+$\psi^\star_{\mathrm{sub}}$ & Minimum specification value on BaB subdomain \\
+$\mathcal{F}_{\mathrm{sub}}$ & Input subdomain in Branch-and-Bound \\
+$\beta$ & Lagrange multipliers for neuron split constraints \\
+$w(\alpha, \beta), c(\alpha, \beta)$ & Parameterized surrogate bounding vector and constant \\
+$\mathcal{G}(\alpha, \beta)$ & Joint lower bound objective function in $\alpha,\beta$-CROWN \\
 $\underline{\psi}_{\alpha,\beta}^\star$ & Jointly optimized lower bound via $\alpha,\beta$-CROWN \\
 \midrule
 
