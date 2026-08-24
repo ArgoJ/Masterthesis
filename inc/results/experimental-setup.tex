@@ -12,16 +12,14 @@ allowing us to analyze the performance of the proposed verification pipeline.
 \label{sec:double-integrator}
 
 \paragraph{System Dynamics and }
-The double integrator is a simple second-order linear system; therefore, it serves as the ideal baseline 
+The double integrator is a simple second-order linear system. Therefore, it serves as the ideal baseline 
 system in the learning and certification pipeline. Discretizing the continuous-time dynamics using the 
 explicit Euler method with a sampling time of $\Delta t = 0.1$, leads to the discrete-time state-space equation:
-
 \begin{equation}
     \label{eq:double-integrator}
     x_{k+1} = f_{\mathrm{DI}}(x_k, u_k) = \begin{bmatrix}1 & \Delta t \\
     0 & 1\end{bmatrix} x_k + \begin{bmatrix}0 \\ \Delta t\end{bmatrix} u_k
 \end{equation}
-
 where $x_k = \begin{bmatrix}p_k & v_k\end{bmatrix}^\top$ is the state vector containing the position and velocity of the system, 
 respectively, and $u_k$ denotes acceleration.
 
@@ -29,8 +27,24 @@ respectively, and $u_k$ denotes acceleration.
 \paragraph{Data Generation.}
 The MPC setup is formulated according to the problem in \labelcref{eq:mpc-problem} 
 subject to the double-integrator dynamics in \labelcref{eq:double-integrator}. 
-A prediction horizon of $N = 20$ steps is chosen, and the states and inputs are penalized using 
-the weighting matrices $Q = \operatorname{diag}(15, 1)$ and $R = 0.1$.
+Additionally, the stage state, terminal state and input constraint sets are given by 
+$\mathcal{X} = [\underline{x}, \overline{x}]$, $\mathcal{X}_f = [\underline{x}_f, \overline{x}_f]$ and 
+$\mathcal{U} = [\underline{u}, \overline{u}]$, with
+\begin{equation}
+    \underline{x} = \begin{bmatrix} -10 \\ -10 \end{bmatrix}, \qquad
+    \overline{x}  = \begin{bmatrix} 10 \\ 10 \end{bmatrix}, \qquad
+    \underline{x}_f = \begin{bmatrix} -5 \\ -5 \end{bmatrix}, \qquad
+    \overline{x}_f  = \begin{bmatrix} 5 \\ 5 \end{bmatrix}, \qquad
+    \underline{u} = -80, \qquad
+    \overline{u}  = 80.
+\end{equation}
+A prediction horizon of $N = 20$ steps is chosen, while the states and inputs are penalized using 
+the weighting matrices $Q = \operatorname{diag}(15, 1)$, $R = 0.1$ and $P = \left[[80.137, 12.4], [12.4, 6.504]\right]^\top$. 
+Note that the terminal weight matrix $P$ was computed with DARE, as described in \labelcref{eq:riccati-equation}. 
+
+Each MPC closed-loop trajectory was computed with \texttt{acados}~\cite{verschuerenAcadosModularOpensource2022} for a total of $k=40$ steps. 
+The actual solver settings selected for this problem, can be seen in \cref{abs:acados-settings}.
+
 
 
 \paragraph{Control Policy Training.}
