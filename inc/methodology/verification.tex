@@ -4,13 +4,13 @@
 This section adapts the search algorithm for the maximal certifiable sublevel set $\mathcal{V}_\rho$ 
 proposed in~\cite{yangLyapunovstableNeuralControl2024}. 
 Specifically, for a given target level $\rho > 0$, formal verification aims to certify that all states within 
-the candidate region $\mathcal{V}_\rho := \{ x \in \mathcal{B}_C \mid V_\phi(x) \le \rho \}$ satisfy controlled 
+the candidate region $\mathcal{V}_\rho := \{ x \in \mathcal{X}_C \mid V_\phi(x) \le \rho \}$ satisfy controlled 
 regional invariance and exponential decay:
 \begin{equation}
     \label{eq:lyapunov-certified-property}
     V_\phi(x) \le \rho \implies 
     \begin{cases} 
-        x^+ \in \mathcal{B}_C, \\ 
+        x^+ \in \mathcal{X}_C, \\ 
         V_\phi(x^+) \le (1 - \kappa) V_\phi(x),
     \end{cases}
 \end{equation}
@@ -19,28 +19,28 @@ one-step state transition.
 
 Before evaluating the stability conditions, the equilibrium $x^*$ must be explicitly excluded from the bounded 
 certification domain 
-$\mathcal{B}_C := \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \bar{x}_C \} \subseteq \mathcal{B}_V$. 
+$\mathcal{X}_C := \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \bar{x}_C \} \subseteq \mathcal{X}_V$. 
 By construction, $V_\phi(x^*) = 0$ and $x^+ = x^*$ hold at the equilibrium, 
 causing the strict positivity and strict decrease conditions to evaluate to false at this exact point. 
 Since these conditions are only required to hold for $x \neq x^*$, and positive definiteness is structurally 
 enforced by the network architecture, formal verification is instead performed over the punctured evaluation domain 
-$\mathcal{B}_{\mathrm{eval}} := \mathcal{B}_C \setminus \mathcal{B}_{\mathrm{hole}}$, where 
-$\mathcal{B}_{\mathrm{hole}}$ denotes a small hyper-rectangular region centered at $x^*$. 
-For the solver to handle the punctured certification domain, $\mathcal{B}_{\mathrm{eval}}$ is split into multiple subregions, 
+$\mathcal{X}_{\mathrm{eval}} := \mathcal{X}_C \setminus \mathcal{X}_{\mathrm{hole}}$, where 
+$\mathcal{X}_{\mathrm{hole}}$ denotes a small hyper-rectangular region centered at $x^*$. 
+For the solver to handle the punctured certification domain, $\mathcal{X}_{\mathrm{eval}}$ is split into multiple subregions, 
 as shown in \cref{fig:hole-exclusion}.
 
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/hole_exclusion.tex}
-    \caption{2D Hole exclusion example with $\mathcal{B}_{\mathrm{hole}} := \left\{ x \in \mathbb{R}^2 \;\mid\; \lVert x \rVert_\infty < 0.25 \right\}$.}
+    \caption{2D Hole exclusion example with $\mathcal{X}_{\mathrm{hole}} := \left\{ x \in \mathbb{R}^2 \;\mid\; \lVert x \rVert_\infty < 0.25 \right\}$.}
     \label{fig:hole-exclusion}
 \end{figure}
 
-To certify property \labelcref{eq:lyapunov-certified-property} over $\mathcal{B}_{\mathrm{eval}}$ using 
+To certify property \labelcref{eq:lyapunov-certified-property} over $\mathcal{X}_{\mathrm{eval}}$ using 
 $\alpha\beta$-CROWN~\cite{wang2021beta,xuFastCompleteEnabling2021}, 
 the implication is rewritten into a disjunctive formulation supported by the verifier: 
 a state must either lie outside $\mathcal{V}_\rho$ or satisfy all stability conditions inside 
-$\mathcal{B}_{\mathrm{eval}}$. The individual logical terms are defined as follows:
+$\mathcal{X}_{\mathrm{eval}}$. The individual logical terms are defined as follows:
 \begin{subequations}\label{eq:certification-specification}
     \begin{align}
         \Phi_{\mathrm{sub}}
@@ -73,13 +73,13 @@ To determine whether a candidate level $\rho$ is valid across the entire continu
 the global verification condition $\Psi(\rho)$ evaluates whether $\Phi(x; \rho)$ holds for all states:
 \begin{equation}
     \label{eq:domain-certification}
-    \Psi(\rho) \equiv \forall x \in \mathcal{B}_{\mathrm{eval}} : \Phi(x; \rho).
+    \Psi(\rho) \equiv \forall x \in \mathcal{X}_{\mathrm{eval}} : \Phi(x; \rho).
 \end{equation}
 
 The $\alpha\beta$-CROWN verifier evaluates $\Psi(\rho)$ iteratively within the scaling and bisection procedure 
 outlined in \cref{alg:search-and-bisect}.
 The search operates in two distinct phases: 
-First, a scaling phase exponentially expands or contracts $\rho$ by a factor $s > 1$ to bracket the valid sublevel set 
+First, a scaling phase exponentially expands or contracts $\rho$ by a factor $q > 1$ to bracket the valid sublevel set 
 boundary within an interval $[\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}]$.
 Second, a bisection phase narrows this interval until the gap falls below a tolerance $\varepsilon$. 
 Upon termination, the lower bound yields the maximum certified value $\rho^* \approx \rho_{\mathrm{lo}}$.
@@ -92,7 +92,7 @@ overhead on difficult verification problems.
     \caption{Certified Value Search via Scaling and Bisection}
     \label{alg:search-and-bisect}
     \SetAlgoLined
-    \KwIn{$\rho_0, \rho_{\min}$, evaluator $\Psi$, scale $s > 1$, tol $\varepsilon$, limits $N_{\mathrm{scale}}, N_{\mathrm{bisect}}$}
+    \KwIn{$\rho_0, \rho_{\min}$, evaluator $\Psi$, scale $q > 1$, tol $\varepsilon$, limits $N_{\mathrm{scale}}, N_{\mathrm{bisect}}$}
     \KwOut{Max certified value $\rho^*$}
 
     \BlankLine
@@ -103,13 +103,13 @@ overhead on difficult verification problems.
     \eIf{$\Psi(\rho)$}{
         \For{$k \leftarrow 1$ \KwTo $N_{\mathrm{scale}}$}{
             \If{$\neg \Psi(\rho)$}{\textbf{break}\;}
-            $\rho_{\mathrm{lo}} \leftarrow \rho;\quad \rho \leftarrow \rho \cdot s$\;
+            $\rho_{\mathrm{lo}} \leftarrow \rho;\quad \rho \leftarrow \rho \cdot q$\;
         }
         $\rho_{\mathrm{up}} \leftarrow \rho$\;
     }{
         \For{$k \leftarrow 1$ \KwTo $N_{\mathrm{scale}}$}{
             \If{$\Psi(\rho) \lor \rho = \rho_{\min}$}{\textbf{break}\;}
-            $\rho_{\mathrm{up}} \leftarrow \rho;\quad \rho \leftarrow \max(\rho_{\min}, \rho / s)$\;
+            $\rho_{\mathrm{up}} \leftarrow \rho;\quad \rho \leftarrow \max(\rho_{\min}, \rho / q)$\;
         }
         \If{$\neg \Psi(\rho)$}{\KwRet $0$\ \tcp*{No valid value $\ge \rho_{\min}$}}
         $\rho_{\mathrm{lo}} \leftarrow \rho$\;

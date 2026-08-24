@@ -77,14 +77,14 @@ training objective:
 
 
 \paragraph{Dataset and Primary Loss Function.}
-The training process uses a dataset $\mathcal{D} = \left\{ (x_i, y_i) \right\}_{i=1}^M$ containing $M$ 
+The training process uses a dataset $\mathcal{D} = \left\{ (x_i, y_i) \right\}_{i=1}^{|\mathcal{D}|}$ containing $|\mathcal{D}|$ 
 input-target pairs sampled across the domain. For a continuous regression tasks, a common loss term is the 
 mean squared error (MSE) evaluated over the training dataset:
 \begin{equation}
     \label{eq:mse-loss}
     \loss_{\mathrm{MSE}}(\mathcal{D}; \theta)
     =
-    \frac{1}{M}
+    \frac{1}{|\mathcal{D}|}
     \sum_{(x,y) \in \mathcal{D}}
     \left\|
         \pi_\theta(x) - y
@@ -103,10 +103,10 @@ augmented with weight regularization and auxiliary loss terms~\citeSec{3.7}{koll
     \label{eq:total-loss}
     \loss(\mathcal{D}; \theta) =
         \loss_{\mathrm{MSE}}(\mathcal{D}; \theta)
-        + \omega_{\mathrm{reg}} \loss_{\mathrm{reg}}(\theta)
-        + \omega_{\mathrm{aux}} \loss_{\mathrm{aux}}(\mathcal{D}; \theta).
+        + \lambda_{\mathrm{reg}} \loss_{\mathrm{reg}}(\theta)
+        + \lambda_{\mathrm{aux}} \loss_{\mathrm{aux}}(\mathcal{D}; \theta).
 \end{equation}
-where $\omega_{\mathrm{reg}}, \omega_{\mathrm{aux}} \geq 0$ are utilized as weights balancing prediction error, 
+where $\lambda_{\mathrm{reg}}, \lambda_{\mathrm{aux}} \geq 0$ are utilized as weights balancing prediction error, 
 parameter regularization, and constraint satisfaction.
 The regularization term $\loss_{\mathrm{reg}}$ constrains the network's parameter space, typically realized as an 
 $\ell_1$-norm ($\|\theta\|_1$) or $\ell_2$-norm ($\|\theta\|_2^2$) penalty. 
@@ -145,7 +145,7 @@ of the output-dependent loss terms. Adding the explicit derivative of the parame
 $\loss_{\mathrm{reg}}$ completes the total gradient evaluation:
 \begin{equation}
     \frac{\partial \loss}{\partial W^{(l)}} = \delta^{(l)} \left(a^{(l-1)}\right)^T + 
-        \omega_{\mathrm{reg}} \frac{\partial \loss_{\mathrm{reg}}}{\partial W^{(l)}}, \quad 
+        \lambda_{\mathrm{reg}} \frac{\partial \loss_{\mathrm{reg}}}{\partial W^{(l)}}, \quad 
     \frac{\partial \loss}{\partial b^{(l)}} = \delta^{(l)}.
 \end{equation}
 By reusing intermediate activations and sensitivities, backpropagation avoids redundant derivative 
@@ -155,51 +155,51 @@ through the network~\citeSec{3.4,2.3}{kollmannsbergerDeepLearningComputational20
 
 \paragraph{Optimization via Mini-Batch Gradient Descent.}
 While full-batch gradient descent evaluates the loss gradient over the entire dataset $\mathcal{D}$, 
-this can become computationally expensive and impractical for large dataset sizes $M$. 
+this can become computationally expensive and impractical for large dataset sizes $|\mathcal{D}|$. 
 Conversely, single-sample stochastic gradient descent (SGD) results in high variance of the parameter updates, 
 leading to erratic optimization trajectories. Mini-batch gradient solves this problem by dividing the 
 dataset into smaller subsets $\mathcal{B} \subset \mathcal{D}$ of size $|\mathcal{B}|$. For a mini-batch, 
 the loss $\loss(\mathcal{B}; \theta)$ is evaluated analogously to \cref{eq:total-loss}, 
 with $\mathcal{D}$ replaced by $\mathcal{B}$ in all data-dependent loss terms. 
-Typically, the mini-batch gradient $g$ has lower variance than the gradient obtained from a single sample, 
+Typically, the mini-batch gradient $\nabla_\theta \loss(\mathcal{B}; \theta)$ has lower variance than the gradient obtained from a single sample, 
 while mini-batch processing enables efficient parallelization on modern GPU hardware.
 During training, the parameters $\theta$ are iteratively updated following gradient descent, scaled by a 
-learning rate $\alpha > 0$. This update loop is inturn executed for a total of $E \in \mathbb{N}$ epochs~
+learning rate $\eta > 0$. This update loop is inturn executed for a total of $E \in \mathbb{N}$ epochs~
 \citeSec{2.6.1,2.6}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
 
 
 \paragraph{Adaptive Moment Estimation.}
 Although mini-batch gradient descent improves stability compared to SGD, its performance depends on 
-a static learning rate $\alpha$. In loss landscapes with noisy mini-batch gradients or challanging curvature, 
+a static learning rate $\eta$. In loss landscapes with noisy mini-batch gradients or challanging curvature, 
 a fixed learning rate can cause parameter updates to oscillate in steep directions while 
 making slow progress or none on plateaus~\citeSec{4.5.4}{aggarwalNeuralNetworksDeep2023}.
 
 To resolve these limitations, the Adaptive Moment Estimation (Adam) optimizer~\cite{kingmaAdamMethodStochastic2017} 
 computes individual, adaptive learning rates for each parameter by tracking exponential moving averages of both past 
-gradients $m_t$ and past squared gradients $v_t$~
+gradients $\mu_t$ and past squared gradients $\nu_t$~
 \citeSec{4.5.5.2}{aggarwalNeuralNetworksDeep2023}:
 \begin{subequations}
     \begin{align}
         \label{eq:adam-moments}
-        m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t \\
-        v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2,
+        \mu_t &= \beta_1 \mu_{t-1} + (1 - \beta_1) \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1}) \\
+        \nu_t &= \beta_2 \nu_{t-1} + (1 - \beta_2) \left(\nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})\right)^2,
     \end{align}
 \end{subequations}
-where $\beta_1, \beta_2 \in [0, 1)$ are the exponential decay rates, and $g_t^2$ denotes the element-wise 
-square of the current mini-batch gradient $g_t = \nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$. 
+where $\beta_1, \beta_2 \in [0, 1)$ are the exponential decay rates, and the square denotes the element-wise 
+square of the current mini-batch gradient $\nabla_\theta \loss(\mathcal{B}_t; \theta_{t-1})$. 
 
-Since $m_0$ and $v_0$ are initialized as zero vectors, both moments are biased towards zero. 
-This is counteracted by dynamic correction factors $\hat{m}_t$ and $\hat{v}_t$, 
+Since $\mu_0$ and $\nu_0$ are initialized as zero vectors, both moments are biased towards zero. 
+This is counteracted by dynamic correction factors $\hat{\mu}_t$ and $\hat{\nu}_t$, 
 which are applied at each timestep $t$:
 \begin{equation}
     \label{eq:adam-bias-correction}
-    \hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \qquad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}.
+    \hat{\mu}_t = \frac{\mu_t}{1 - \beta_1^t}, \qquad \hat{\nu}_t = \frac{\nu_t}{1 - \beta_2^t}.
 \end{equation}
 The network parameters are then updated element-wise according to:
 \begin{equation}
     \label{eq:adam-update}
-    \theta_t = \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon},
+    \theta_t = \theta_{t-1} - \eta \cdot \frac{\hat{\mu}_t}{\sqrt{\hat{\nu}_t} + \epsilon},
 \end{equation}
 where $\epsilon > 0$ is a small constant used for numerical stability. Following~\cite{kingmaAdamMethodStochastic2017}, 
-the default hyperparameters are chosen as $\alpha = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$, 
+the default hyperparameters are chosen as $\eta = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$, 
 providing robust convergence across various deep learning architectures. 

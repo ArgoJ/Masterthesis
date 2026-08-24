@@ -85,25 +85,24 @@ $y$ & Target output vector \\
 $\theta$ & Trainable network parameters \\
 $\theta^*$ & Optimal network parameters \\
 $\mathcal{D}$ & Training dataset \\
-$M$ & Training data size \\
 $\mathcal{B}$ & Mini-batch \\
 $\loss$ & Total training loss function \\
 $\loss_{\mathrm{MSE}}$ & Mean squared error loss \\
 $\loss_{\mathrm{reg}}$ & Regularization loss \\
 $\loss_{\mathrm{aux}}$ & Auxiliary loss \\
-$\omega_{\mathrm{reg}}$ & Regularization weight \\ 
-$\omega_{\mathrm{aux}}$ & Auxiliary weight \\
+$\lambda_{\mathrm{reg}}$ & Regularization weight \\ 
+$\lambda_{\mathrm{aux}}$ & Auxiliary weight \\
 $\delta^{(l)}$ & Loss sensitivity per layer \\
 $\delta^{(L)}$ & Loss sensitivity at last layer \\
 $\odot$ & Element-wise (Hadamard) product \\
-$g$ & Mini-batch loss gradient \\
-$\alpha$ & Learning rate \\
+$\nabla_\theta \loss$ & Loss gradient with respect to parameters \\
+$\eta$ & Learning rate \\
 $E$ & Total epoch count \\
 $t$ & Optimization timestep index \\
-$m_t$ & Biased first moment estimate \\
-$v_t$ & Biased second moment estimate \\
-$\hat{m}_t$ & Bias-corrected first moment estimate \\
-$\hat{v}_t$ & Bias-corrected second moment estimate \\
+$\mu_t$ & Biased first moment estimate \\
+$\nu_t$ & Biased second moment estimate \\
+$\hat{\mu}_t$ & Bias-corrected first moment estimate \\
+$\hat{\nu}_t$ & Bias-corrected second moment estimate \\
 $\beta_1, \beta_2$ & Moment exponential decay rates \\
 $\epsilon$ & Optimizer numerical stability constant \\
 $x_{\mathrm{adv}}^{(0)}$ & Initial adversarial candidate state \\
@@ -132,12 +131,12 @@ $[l_j^{(l)}, u_j^{(l)}]$ & Pre-activation lower and upper bounds of neuron $j$ i
 $\alpha_{L,j}^{(l)}, \alpha_{U,j}^{(l)}$ & CROWN linear lower and upper bounding slopes \\
 $d_{L,j}^{(l)}, d_{U,j}^{(l)}$ & CROWN linear lower and upper bounding intercepts \\
 $\zeta_l^+, \zeta_l^-, \zeta_l^\pm$ & Strictly concave, convex, and mixed curvature neuron sets \\
-$p$ & Adaptive tangent contact point \\
+$z^*$ & Adaptive tangent contact point \\
 $\underline{\psi}_{\mathrm{aff}}(x)$ & Affine lower bounding function \\
 $w_{\mathrm{CROWN}}, c_{\mathrm{CROWN}}$ & Explicit CROWN linear bounding vector and constant \\
 $\underline{\psi}_{\mathrm{CROWN}}^\star$ & Certified lower bound via CROWN \\
 $\alpha$ & Lower-bound relaxation slopes \\
-$K$ & Total number of unstable neurons \\
+$N_{\mathrm{unstable}}$ & Total number of unstable neurons \\
 $w(\alpha), c(\alpha)$ & Parameterized affine bounding vector and constant \\
 $\mathcal{G}(\alpha)$ & Lower bound objective function in $\alpha$-CROWN \\
 $\underline{\psi}_\alpha^\star$ & Optimized lower bound via $\alpha$-CROWN \\
@@ -174,11 +173,11 @@ $u_{\mathrm{scale}}$ & Input scaling vector \\
 $d(x)$ & Scaled equilibrium distance \\
 $w_x(x)$ & Behavioral cloning loss weight \\
 $w_{\min}$ & Baseline loss weight \\
-$\eta$ & Decay rate for state-dependent weight \\
+$\gamma$ & Decay rate for state-dependent weight \\
 $\loss_{\mathrm{BC}}$ & Behavioral cloning loss \\
 $\loss_f$ & Dynamics-aware constraint loss \\
-$\omega_{\mathrm{BC}}$ & Behavioral cloning loss weight \\
-$\omega_f$ & Dynamics-aware constraint loss weight \\
+$\lambda_{\mathrm{BC}}$ & Behavioral cloning loss weight \\
+$\lambda_f$ & Dynamics-aware constraint loss weight \\
 $\loss_\pi$ & Total imitation policy loss \\
 \midrule
 
@@ -205,7 +204,7 @@ $\varepsilon_{\mathrm{rel}}$ & Numerical stabilization constant \\
 $\loss_{\mathrm{dec}}$ & Relative Lyapunov decrease loss \\
 $S_{\mathrm{range}}$ & Domain range scaling matrix \\
 $\loss_{\mathrm{inv}}$ & Relative state-invariance loss \\
-$\omega_{\mathrm{inv}}$ & Relative state-invariance loss weight \\
+$\lambda_{\mathrm{inv}}$ & Relative state-invariance loss weight \\
 $\loss_{\mathrm{cond}}$ & Combined condition violation loss \\
 $w_\rho$ & Soft sublevel gating weight \\
 $s$ & Gate sharpness parameter \\
@@ -234,12 +233,12 @@ $\loss_{\mathrm{pol}}$ & Policy scaling loss \\
 $\ell_{R_\phi,0}$ & Initial matrix $R_\phi$ Frobenius norm \\
 $\loss_{R_\phi}$ & Matrix $R_\phi$ regularization loss \\
 $\loss_{\mathrm{total}}$ & Total combined Lyapunov loss \\
-$\omega_{\rho\mathrm{-gated}}$ & Soft-gated condition loss weight \\
-$\omega_{\mathrm{ROA}}$ & Region of Attraction expansion loss weight \\
-$\omega_{\mathrm{L}}$ & LIRPA loss weight \\
-$\omega_V$ & Lyapunov magnitude scaling loss weight \\
-$\omega_{\mathrm{pol}}$ & Policy scaling loss weight \\
-$\omega_R$ & Matrix $R$ regularization loss weight \\
+$\lambda_{\rho\mathrm{-gated}}$ & Soft-gated condition loss weight \\
+$\lambda_{\mathrm{ROA}}$ & Region of Attraction expansion loss weight \\
+$\lambda_{\mathrm{L}}$ & LIRPA loss weight \\
+$\lambda_V$ & Lyapunov magnitude scaling loss weight \\
+$\lambda_{\mathrm{pol}}$ & Policy scaling loss weight \\
+$\lambda_R$ & Matrix $R$ regularization loss weight \\
 $\mathcal{C}$ & Counterexample pool \\
 $\mathcal{S}$ & Explorative pool \\
 $\mathcal{B}_{\mathcal{S}}$ & Explorative pool candidate sample set \\
@@ -247,8 +246,8 @@ $N_{\mathcal{S}}$ & Explorative pool target size \\
 $x_{\mathrm{adv}}$ & Counterexample state \\
 $\tau$ & Counterexample age \\
 $\tau_{\max}$ & Maximum lifespan \\
-$m$ & Sublevel margin \\
-$\gamma$ & Overestimation factor \\
+$m_\rho$ & Sublevel margin \\
+$\chi$ & Overestimation factor \\
 $\tilde{\rho}$ & Estimated ROA boundary minimum \\
 $\upsilon$ & EMA decay rate \\
 $N_{\mathrm{outer}}$ & Outer epoch count \\
@@ -259,10 +258,10 @@ $N_{\mathrm{cex}}$ & Counterexample mining step interval \\
 % --- Chapter 6.3: Methodology - Formal Stability Verification ---
 \multicolumn{2}{@{}l}{\textit{Formal Stability Verification (Methodology)}} \\
 \midrule
-$\mathcal{B}_C$ & Formal verification domain \\
+$\mathcal{X}_C$ & Formal verification domain \\
 $\underline{x}_C, \bar{x}_C$ & Lower and upper bounds of verification domain \\
-$\mathcal{B}_{\mathrm{hole}}$ & Equilibrium exclusion region \\
-$\mathcal{B}_{\mathrm{eval}}$ & Punctured evaluation domain \\
+$\mathcal{X}_{\mathrm{hole}}$ & Equilibrium exclusion region \\
+$\mathcal{X}_{\mathrm{eval}}$ & Punctured evaluation domain \\
 $\Phi(x; \rho)$ & Verification specification formula \\
 $\Phi_{\mathrm{sub}}$ & Sublevel set exclusion predicate \\
 $\Phi_{\mathrm{pos}}$ & Positive definiteness predicate \\
@@ -271,6 +270,7 @@ $\Phi_{\mathrm{dec}}$ & Strict Lyapunov decrease predicate \\
 $\Psi(\rho)$ & Global domain verification condition \\
 $\rho_0$ & Initial sublevel search bound \\
 $\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}$ & Search interval lower and upper bounds \\
+$q$ & Exponential search scaling factor \\
 $N_{\mathrm{scale}}, N_{\mathrm{bisect}}$ & Scaling and bisection iteration limits \\
 $\rho^*$ & Maximal verified sublevel value \\
 \midrule
@@ -282,11 +282,10 @@ $\Delta t$ & Discrete simulation sampling time \\
 $f_{\mathrm{DI},d}$ & Discrete-time double integrator dynamics \\
 $f_{\mathrm{CP}}, f_{\mathrm{CP},d}$ & Continuous and discrete-time cartpole dynamics \\
 $p, v$ & Cart position and velocity states \\
-$\theta$ & Cartpole pendulum angle \\
-$\omega$ & Cartpole pendulum angular velocity \\
+$\varphi, \omega$ & Cartpole pendulum angle and angular velocity states \\
 $F$ & Control force applied to the cart \\
 $M$ & Cart mass \\
 $m$ & Pendulum mass \\
-$l$ & Pendulum length \\
+$l_p$ & Pendulum length \\
 $g$ & Acceleration due to gravity \\
 \end{longtable}

@@ -62,10 +62,10 @@ Using $S_x$, the normalized distance of a state $x$ from the equilibrium $x^*$ i
 To assign appropriate priority during behavioral cloning, a state-dependent weight is defined as
 \begin{equation}
     \label{eq:state-weight}
-    w_x(x) = w_{\min} + (1 - w_{\min}) \left( \frac{1}{1 + d(x)} \right)^\eta,
+    w_x(x) = w_{\min} + (1 - w_{\min}) \left( \frac{1}{1 + d(x)} \right)^\gamma,
 \end{equation}
 where $w_{\min} \in (0, 1)$ is the baseline weight for states far from the
-equilibrium and $\eta \geq 0$ controls the decay rate.
+equilibrium and $\gamma \geq 0$ controls the decay rate.
 
 \paragraph{State-Weighted Behavioral Cloning Loss} penalizes the squared normalized 
 Euclidean distance between the neural network policy and the expert targets. 
@@ -102,13 +102,13 @@ forcing the learned policy to stay inside the admissible set.
 
 \paragraph{Total Imitation Loss} is the combination of the state-weighted behavioral cloning 
 and dynamics-aware constraint losses resulting in a scalar objective. 
-Scaling each term by its respective weight, $\omega_{\mathrm{BC}}$ and $\omega_f$, 
+Scaling each term by its respective weight, $\lambda_{\mathrm{BC}}$ and $\lambda_f$, 
 yields the overall policy loss:
 \begin{equation}
     \label{eq:combined-policy-loss}
     \loss_\pi = 
-        \omega_{\mathrm{BC}} \loss_{\mathrm{BC}} + 
-        \omega_f \loss_f.
+        \lambda_{\mathrm{BC}} \loss_{\mathrm{BC}} + 
+        \lambda_f \loss_f.
 \end{equation}
 
 By minimizing $\loss_\pi$, the policy $\pi_\theta$ learns to mimic the expert policy $\pi_0$, 

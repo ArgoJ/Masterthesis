@@ -100,9 +100,9 @@ the relative state invariance loss from \labelcref{eq:rel-invariance},
     \label{eq:combined-condition-violation}
     \loss_{\mathrm{cond}} = 
         \loss_{\mathrm{dec}} + 
-        \omega_{\mathrm{inv}} \cdot \loss_{\mathrm{inv}},
+        \lambda_{\mathrm{inv}} \cdot \loss_{\mathrm{inv}},
 \end{equation}
-where $\omega_{\mathrm{inv}}$ is a hyperparameter balancing the relative importance of the two loss components.
+where $\lambda_{\mathrm{inv}}$ is a hyperparameter balancing the relative importance of the two loss components.
 However, to apply the $\rho$-gate appropriately, $\loss_{\mathrm{cond}}$ is weighted for each sample using the soft sublevel weight
 \begin{equation}
     \label{eq:rho-gate}
@@ -267,9 +267,9 @@ summing all previously defined weighted components, given by
 \begin{equation}
     \label{eq:combined-loss}
     \loss_{\mathrm{total}} = \sum_{m}
-        \omega_m \loss_m
+        \lambda_m \loss_m
 \end{equation}
-where the weights $\omega_m > 0$, with $m \in \{ \rho\mathrm{-gated},\;\mathrm{ROA},\;\mathrm{L},\;V,\;\mathrm{pol},\;R_\phi \}$ are 
+where the weights $\lambda_m > 0$, with $m \in \{ \rho\mathrm{-gated},\;\mathrm{ROA},\;\mathrm{L},\;V,\;\mathrm{pol},\;R_\phi \}$ are 
 hyperparameters that balance the relative importance of the individual loss components. 
 
 
@@ -319,7 +319,7 @@ As outlined in \cref{alg:state-pool-resample}, the explorative state pool $\math
 at each outer epoch to balance global exploration with local refinement. 
 First, candidate states $\mathcal{B}_{\mathcal{S}}$ are oversampled uniformly from the training domain $\mathcal{X}_V$. 
 From these candidates, $N_{\mathcal{S}}$ states are probabilistically sampled based on a sigmoid weighting function 
-centered around an expanded sublevel boundary $m \cdot \rho$ (with margin $m > 1$). 
+centered around an expanded sublevel boundary $m_\rho \cdot \rho$ (with margin $m_\rho > 1$). 
 This weighting smoothly penalizes states further outside the estimated region of attraction, 
 significantly reducing their likelihood of being selected.
 
@@ -327,7 +327,7 @@ significantly reducing their likelihood of being selected.
     \caption{Probabilistic Explorative State Pool Resampling}
     \label{alg:state-pool-resample}
 
-    \KwIn{Lyapunov function $V_\phi$, current ROA estimate $\rho$, margin $m$, sharpness $s$, target size $N_{\mathcal{S}}$}
+    \KwIn{Lyapunov function $V_\phi$, current ROA estimate $\rho$, margin $m_\rho$, sharpness $s$, target size $N_{\mathcal{S}}$}
     \KwOut{Updated state pool $\mathcal{S}$ of size $N_{\mathcal{S}}$}
 
     \BlankLine
@@ -335,7 +335,7 @@ significantly reducing their likelihood of being selected.
 
     \BlankLine
     For all $x \in \mathcal{B}_{\mathcal{S}}$, assign weight $w(x) \leftarrow \sigma \left(
-        s \, \frac{m \cdot \rho - V_\phi(x)}{\max(\rho, 10^{-9})}
+        s \, \frac{m_\rho \cdot \rho - V_\phi(x)}{\max(\rho, 10^{-9})}
     \right) + \varepsilon$\;
 
     \BlankLine
@@ -386,11 +386,11 @@ $c_j \in \{\underline{x}_j, \overline{x}_j\}$, the projection is defined element
 \end{equation}
 
 To encourage the region of attraction to expand during co-training, the estimated boundary minimum is intentionally 
-overestimated by applying a growth factor $\gamma > 1$:
+overestimated by applying a growth factor $\chi > 1$:
 \begin{equation}
     \label{eq:rho-estimation}
     \tilde{\rho} = \max \left( 
-        \rho_{\text{min}}, \gamma \cdot \min_{x \in \mathcal{B}_{\partial}} V_\phi(x) 
+        \rho_{\text{min}}, \chi \cdot \min_{x \in \mathcal{B}_{\partial}} V_\phi(x) 
     \right).
 \end{equation}
 
