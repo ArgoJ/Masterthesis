@@ -5,8 +5,8 @@
 \paragraph{Data Generation} uses the MPC expert policy $\pi_0$ defined in \cref{subsec:closed-loop-stability}.
 To ensure solver convergence and obtain consistent expert trajectories during data generation, 
 the shifted initialization is used~\citeSec{12.5}{gruneNonlinearModelPredictive2017}. 
-By shifting the previously computed optimal sequence $(u_{i|k}^*)_{i=0}^{N-1}$ and appending the local terminal controller 
-$\pi_f(x_{N|k}^*)$, the optimization problem initializes from a feasible candidate trajectory. 
+By shifting the previously computed optimal sequence $(u_{i|k}^\star)_{i=0}^{N-1}$ and appending the local terminal controller 
+$\pi_f(x_{N|k}^\star)$, the optimization problem initializes from a feasible candidate trajectory. 
 This prevents the solver from getting stuck in local minima between adjacent sampling instances.
 Closed-loop trajectories $x_{k+1} = f(x_k, \pi_0(x_k))$ are initialized from states sampled across the mpc sampling
 set $\mathcal{X}_{\mathrm{MPC}} := \left\{ x \in \mathcal{X} \mid \underline{x}_{\mathrm{MPC}} \leq x \leq \overline{x}_{\mathrm{MPC}} \right\}$.
@@ -20,20 +20,20 @@ where $x^{(i)} \in \mathcal{X}_\pi$ and $u^{(i)} = \pi_0(x^{(i)})$.
 
 
 \paragraph{Imitation Policy} follows the structure proposed in~\cite{yangLyapunovstableNeuralControl2024}, 
-as it enforces true control inputs at the equilibrium $\pi_\theta(x^*) = u^*$ and 
+as it enforces true control inputs at the equilibrium $\pi_\theta(x^\star) = u^\star$ and 
 satisfies the control input constraints $\underline{u} \leq \pi_\theta(x) \leq \overline{u}$ 
 by construction. The neural policy $\pi_\theta$ is visualized in \cref{fig:imitation-policy} and 
 formulated as 
 \begin{equation}
     \label{eq:policy-arch}
     \pi_\theta(x) = \clamp(
-            h_\theta(x) - h_\theta(x^*) + u^*, 
+            h_\theta(x) - h_\theta(x^\star) + u^\star, 
             \underline{u},
             \overline{u}
     ).
 \end{equation}
 where $h_\theta : \mathbb{R}^{n_x} \to \mathbb{R}^{n_u}$ is an unconstrained neural network, 
-$u^* \in \mathcal{U} $ represents the desired control action at the equilibrium $x^*$, 
+$u^\star \in \mathcal{U} $ represents the desired control action at the equilibrium $x^\star$, 
 and $\clamp(\cdot, \underline{\cdot}, \overline{\cdot})$ acts element-wise to enforce the input constraints.
 
 \begin{figure}[htbp]
@@ -53,10 +53,10 @@ the loss terms are normalized using strictly positive diagonal scaling matrices
     \quad \text{and} \quad
     S_u = \diag(u_{\mathrm{scale}}) \in \mathbb{R}^{n_u \times n_u}.
 \end{equation}
-Using $S_x$, the normalized distance of a state $x$ from the equilibrium $x^*$ is quantified with the $\ell_1$-norm as
+Using $S_x$, the normalized distance of a state $x$ from the equilibrium $x^\star$ is quantified with the $\ell_1$-norm as
 \begin{equation}
     \label{eq:state-distance}
-    d(x) = \frac{1}{n_x} \left\| S_x^{-1}(x - x^*) \right\|_1.
+    d(x) = \frac{1}{n_x} \left\| S_x^{-1}(x - x^\star) \right\|_1.
 \end{equation}
 
 To assign appropriate priority during behavioral cloning, a state-dependent weight is defined as
@@ -115,7 +115,7 @@ By minimizing $\loss_\pi$, the policy $\pi_\theta$ learns to mimic the expert po
 while penalizing state constraint violations in $\mathcal{X}_\pi$. 
 In combination with the policy architecture in \labelcref{eq:policy-arch}, $\pi_\theta$ satisfies the input constraints 
 $\underline{u} \leq \pi_\theta(x) \leq \overline{u}$ for all states $x \in \mathbb{R}^{n_x}$ and guarantees exact 
-equilibrium control $\pi_\theta(x^*) = u^*$. 
+equilibrium control $\pi_\theta(x^\star) = u^\star$. 
 Additionally, the state-dependent weighting in \labelcref{eq:state-weight} prioritizes approximation accuracy 
 near the equilibrium, which may be beneficial establishing Lyapunov stability.
 Now, this imitation learning pipeline establishes an accurate expert imitation, 

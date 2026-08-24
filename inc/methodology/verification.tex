@@ -17,15 +17,15 @@ regional invariance and exponential decay:
 where $\kappa \in (0, 1)$ specifies the targeted convergence rate and $x^+ = f(x, \pi_\theta(x))$ denotes the discrete 
 one-step state transition.
 
-Before evaluating the stability conditions, the equilibrium $x^*$ must be explicitly excluded from the bounded 
+Before evaluating the stability conditions, the equilibrium $x^\star$ must be explicitly excluded from the bounded 
 certification domain 
 $\mathcal{X}_C := \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \bar{x}_C \} \subseteq \mathcal{X}_V$. 
-By construction, $V_\phi(x^*) = 0$ and $x^+ = x^*$ hold at the equilibrium, 
+By construction, $V_\phi(x^\star) = 0$ and $x^+ = x^\star$ hold at the equilibrium, 
 causing the strict positivity and strict decrease conditions to evaluate to false at this exact point. 
-Since these conditions are only required to hold for $x \neq x^*$, and positive definiteness is structurally 
+Since these conditions are only required to hold for $x \neq x^\star$, and positive definiteness is structurally 
 enforced by the network architecture, formal verification is instead performed over the punctured evaluation domain 
 $\mathcal{X}_{\mathrm{eval}} := \mathcal{X}_C \setminus \mathcal{X}_{\mathrm{hole}}$, where 
-$\mathcal{X}_{\mathrm{hole}}$ denotes a small hyper-rectangular region centered at $x^*$. 
+$\mathcal{X}_{\mathrm{hole}}$ denotes a small hyper-rectangular region centered at $x^\star$. 
 For the solver to handle the punctured certification domain, $\mathcal{X}_{\mathrm{eval}}$ is split into multiple subregions, 
 as shown in \cref{fig:hole-exclusion}.
 
@@ -82,7 +82,7 @@ The search operates in two distinct phases:
 First, a scaling phase exponentially expands or contracts $\rho$ by a factor $q > 1$ to bracket the valid sublevel set 
 boundary within an interval $[\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}]$.
 Second, a bisection phase narrows this interval until the gap falls below a tolerance $\varepsilon$. 
-Upon termination, the lower bound yields the maximum certified value $\rho^* \approx \rho_{\mathrm{lo}}$.
+Upon termination, the lower bound yields the maximum certified value $\rho^\star \approx \rho_{\mathrm{lo}}$.
 Compared to the proposed formulation by Yang in~\cite{yangLyapunovstableNeuralControl2024}, 
 explicit iteration limits $N_{\mathrm{scale}}$ and $N_{\mathrm{bisect}}$ are integrated into both phases. 
 This caps the maximum number of verifier calls, effectively preventing excessive computational 
@@ -93,7 +93,7 @@ overhead on difficult verification problems.
     \label{alg:search-and-bisect}
     \SetAlgoLined
     \KwIn{$\rho_0, \rho_{\min}$, evaluator $\Psi$, scale $q > 1$, tol $\varepsilon$, limits $N_{\mathrm{scale}}, N_{\mathrm{bisect}}$}
-    \KwOut{Max certified value $\rho^*$}
+    \KwOut{Max certified value $\rho^\star$}
 
     \BlankLine
     $\rho \leftarrow \max(\rho_0, \rho_{\min})$\;

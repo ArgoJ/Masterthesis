@@ -93,21 +93,21 @@
     % 3.1 Soft Sublevel Weight (w_rho)
     \node[mathloss] (w_rho) at (-5.0, 0 |- Y_lcond) {
         \textbf{Soft Sublevel Weight}\\[4pt]
-        $\displaystyle w_{\rho} = \sigma \left( s \cdot \frac{\rho - V_\theta(x)}{\max (\rho, \varepsilon_{\text{rel}})} \right)$
+        $\displaystyle w_{\rho} = \sigma \left( s \cdot \frac{\rho - V_\phi(x)}{\max (\rho, \varepsilon_{\mathrm{rel}})} \right)$
     };
 
     % 3.2 Relative Decrease Loss (L_dec)
     \node[mathloss] (l_dec) at (-0.5, 0 |- Y_loss) {
-        \textbf{Rel. Decrease Loss} $\mathcal{L}_{\text{dec}}$\\[4pt]
-        $\displaystyle = \left[ \frac{(1 - \kappa) V_\theta(x) - V_\theta(x^+_V)}{\max(|V_\theta(x)|, \varepsilon_{\text{rel}})} \right]_+$
+        \textbf{Rel. Decrease Loss} $\mathcal{L}_{\mathrm{dec}}$\\[4pt]
+        $\displaystyle = \left[ \frac{(1 - \kappa) V_\phi(x) - V_\phi(x^+_V)}{\max(|V_\phi(x)|, \varepsilon_{\mathrm{rel}})} \right]_+$
     };
 
     % 3.3 Relative Invariance Loss (L_inv)
     \node[mathloss] (l_inv) at (4.5, 0 |- Y_loss) {
-        \textbf{Rel. Invariance Loss} $\mathcal{L}_{\text{inv}}$\\[4pt]
+        \textbf{Rel. Invariance Loss} $\mathcal{L}_{\mathrm{inv}}$\\[4pt]
         $\begin{aligned}
-            = & \left\| S_{\text{range}}^{-1} \big[ x^+_V - \bar{x}_V \big]_+ \right\|_1 \\[-2pt]
-            + & \left\| S_{\text{range}}^{-1} \big[ \underline{x}_V - x^+_V \big]_+ \right\|_1
+            = & \left\| S_{\mathrm{range}}^{-1} \big[ x^+_V - \bar{x}_V \big]_+ \right\|_1 \\[-2pt]
+            + & \left\| S_{\mathrm{range}}^{-1} \big[ \underline{x}_V - x^+_V \big]_+ \right\|_1
         \end{aligned}$
     };
 
@@ -124,11 +124,11 @@
     
     % -> zu w_rho
     \draw[arr] (tap_vx) -| (-4.5, 0 |- w_rho.north);
-    \node[val] at (-4.5, 0 |- w_rho.north) {$V_\theta(x)$};
+    \node[val] at (-4.5, 0 |- w_rho.north) {$V_\phi(x)$};
     
     % -> zu L_dec
     \draw[arr] (tap_vx) -| (-1.0, 0 |- l_dec.north);
-    \node[val] at (-1.0, 0 |- l_dec.north) {$V_\theta(x)$};
+    \node[val] at (-1.0, 0 |- l_dec.north) {$V_\phi(x)$};
 
     % -> zu L_inv
     \draw[bus] (tap_f) -- (4.5, 0 |- Y_split2);
@@ -137,7 +137,7 @@
 
     % V_theta(x_V^+) Routing
     \draw[arr] (net_v_xp.south) |- (0.0, 0 |- Y_split4) -- (0.0, 0 |- l_dec.north);
-    \node[val] at (0.0, 0 |- l_dec.north) {$V_\theta(x_V^+)$};
+    \node[val] at (0.0, 0 |- l_dec.north) {$V_\phi(x_V^+)$};
 
 
     % ==========================================
@@ -150,14 +150,14 @@
     
     % Routing L_inv -> Sum (mit Gewicht)
     \draw[bus] (l_inv.south) -- (4.5, 0 |- Y_sum_bus);
-    \node[weight] (w_inv) at (3.25, 0 |- Y_sum_bus) {$\omega_{\text{inv}}$};
+    \node[weight] (w_inv) at (3.25, 0 |- Y_sum_bus) {$\lambda_{\mathrm{inv}}$};
     \draw[arr] (4.5, 0 |- Y_sum_bus) -- (w_inv.east);
     \draw[arr] (w_inv.west) -- (sum_cond.east);
 
     % Combined Loss Box
     \node[mathloss, minimum height=1.0cm] (l_cond) at (2.0, 0 |- Y_lcond) {
         \textbf{Combined Condition Loss}\\[4pt]
-        $\displaystyle \mathcal{L}_{\text{cond}} = \mathcal{L}_{\text{dec}} + \omega_{\text{inv}} \cdot \mathcal{L}_{\text{inv}}$
+        $\displaystyle \mathcal{L}_{\mathrm{cond}} = \mathcal{L}_{\mathrm{dec}} + \lambda_{\mathrm{inv}} \cdot \mathcal{L}_{\mathrm{inv}}$
     };
     \draw[arr] (sum_cond.south) -- (l_cond.north);
 
@@ -167,7 +167,7 @@
     % ==========================================
     \node[mathloss, minimum height=1.2cm] (l_gated) at (-1.5, 0 |- Y_final) {
         \textbf{Combined $\rho$-Gated Condition Loss}\\[4pt]
-        $\displaystyle \mathcal{L}_{\rho\text{-gated}} = \frac{ \sum_{\mathcal{B}_{\rho}} w_{\rho} \mathcal{L}_{\text{cond}} }{ \sum_{\mathcal{B}_{\rho}} w_{\rho} }$
+        $\displaystyle \mathcal{L}_{\rho\mathrm{-gated}} = \frac{ \sum_{\mathcal{B}_{\rho}} w_{\rho} \mathcal{L}_{\mathrm{cond}} }{ \sum_{\mathcal{B}_{\rho}} w_{\rho} }$
     };
 
     % Zusammenführung von w_rho und L_cond
@@ -175,6 +175,6 @@
     \node[val] at (-2.5, 0 |- l_gated.north) {$w_\rho$};
     
     \draw[arr] (l_cond.south) |- (-0.5, 0 |- Y_merge) -- (-0.5, 0 |- l_gated.north);
-    \node[val] at (-0.5, 0 |- l_gated.north) {$\mathcal{L}_{\text{cond}}$};
+    \node[val] at (-0.5, 0 |- l_gated.north) {$\mathcal{L}_{\mathrm{cond}}$};
 
 \end{tikzpicture}

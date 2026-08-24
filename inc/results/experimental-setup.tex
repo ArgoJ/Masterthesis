@@ -1,9 +1,8 @@
 \section{System Modeling and Problem Formulation}
 \label{sec:system-modeling}
-
 For our experimental setup, two benchmark systems are selected: the double integrator and the cartpole. 
 These systems provide a good balance between simplicity and complexity 
-allowing us to certify the stability of the closed-loop system.
+allowing us to analyze the performance of the proposed verification pipeline.
 
 
 % ================================================================================
@@ -12,23 +11,36 @@ allowing us to certify the stability of the closed-loop system.
 \subsection{Double Integrator}
 \label{sec:double-integrator}
 
+\paragraph{System Dynamics and }
 The double integrator is a simple second-order linear system; therefore, it serves as the ideal baseline 
 system in the learning and certification pipeline. Discretizing the continuous-time dynamics using the 
 explicit Euler method with a sampling time of $\Delta t = 0.1$, leads to the discrete-time state-space equation:
 
 \begin{equation}
     \label{eq:double-integrator}
-    x_{k+1} = f_{\text{DI}}(x_k, u_k) = \begin{bmatrix}1 & \Delta t \\
+    x_{k+1} = f_{\mathrm{DI}}(x_k, u_k) = \begin{bmatrix}1 & \Delta t \\
     0 & 1\end{bmatrix} x_k + \begin{bmatrix}0 \\ \Delta t\end{bmatrix} u_k
 \end{equation}
 
 where $x_k = \begin{bmatrix}p_k & v_k\end{bmatrix}^\top$ is the state vector containing the position and velocity of the system, 
 respectively, and $u_k$ denotes acceleration.
 
-The \textit{MPC setup} is formulated according to the problem in \labelcref{eq:mpc-problem} 
+
+\paragraph{Data Generation.}
+The MPC setup is formulated according to the problem in \labelcref{eq:mpc-problem} 
 subject to the double-integrator dynamics in \labelcref{eq:double-integrator}. 
 A prediction horizon of $N = 20$ steps is chosen, and the states and inputs are penalized using 
 the weighting matrices $Q = \operatorname{diag}(15, 1)$ and $R = 0.1$.
+
+
+\paragraph{Control Policy Training.}
+
+
+\paragraph{Neural Lyapunov Function Training.}
+
+
+\paragraph{Verification Setup.}
+
 
 
 
@@ -38,31 +50,41 @@ the weighting matrices $Q = \operatorname{diag}(15, 1)$ and $R = 0.1$.
 \subsection{Cartpole}
 \label{sec:cartpole}
 
+\paragraph{System Dynamics}
 The inverted pendulum on a cart, commonly referred to as the cartpole system, is used as a nonlinear benchmark system in this work. 
 There are four states in the system: the cart position $p$, the cart velocity $v$, the pendulum angle $\varphi$, 
 and the pendulum angular velocity $\omega$. 
-Here, the state vector is defined as $x = \begin{bmatrix}p & v & \varphi & \omega\end{bmatrix}^\top$,
-and the input $u$ is the force $F$ applied to the cart. This leads to the following continuous-time dynamics of the cartpole system:
-
-\begin{equation}
-    \label{eq:cartpole-continuous}
-    f_{\text{CP}}(x, u) =
-    \begin{bmatrix}\dot{p} \\ \dot{v} \\ \dot{\varphi} \\ \dot{\omega}\end{bmatrix} = 
-    \begin{bmatrix}v \\ \frac{F + m l_p \omega^2 \sin(\varphi) - m g \sin(\varphi) \cos(\varphi)}{M + m - m \cos^2(\varphi)} \\ 
-    \omega \\ \frac{-F \cos(\varphi) - m l_p \omega^2 \sin(\varphi) \cos(\varphi) + (M + m) g \sin(\varphi)}{l_p (M + m - m \cos^2(\varphi))}\end{bmatrix}
-\end{equation}
-
-where $M = 1\,\text{kg}$ is the mass of the cart, $m = 0.1\,\text{kg}$ is the mass of the pendulum, $l_p = 0.8\,\text{m}$ is the length of the pendulum, 
-and $g = 9.81\,\text{m/s}^2$ is the acceleration due to gravity.  
-Discretizing the continuous-time dynamics using the explicit Euler method with a sampling time of $\Delta t = 0.05\,\text{s}$, 
+Here, the discrete-time state vector is defined as $x_k = \begin{bmatrix}p_k & v_k & \varphi_k & \omega_k\end{bmatrix}^\top$,
+and the control input $u_k$ is the force $F_k$ applied to the cart. 
+Discretizing the continuous-time dynamics using the explicit Euler method with a sampling time of $\Delta t = 0.05\,\text{s}$ 
 leads to the discrete-time state-space equation:
 
 \begin{equation}
     \label{eq:cartpole}
-    x_{k+1} = f_{\text{CP},d}(x_k, u_k) = x_k + \Delta t f_{\text{CP}}(x_k, u_k)
+    x_{k+1} = f_{\mathrm{CP}}(x_k, u_k) =
+    \begin{bmatrix}
+        p_k + \Delta t \, v_k \\[4pt]
+        v_k + \Delta t \, \frac{u_k + m l_p \omega_k^2 \sin(\varphi_k) - m g \sin(\varphi_k) \cos(\varphi_k)}{M + m - m \cos^2(\varphi_k)} \\[8pt]
+        \varphi_k + \Delta t \, \omega_k \\[4pt]
+        \omega_k + \Delta t \, \frac{-u_k \cos(\varphi_k) - m l_p \omega_k^2 \sin(\varphi_k) \cos(\varphi_k) + (M + m) g \sin(\varphi_k)}{l_p (M + m - m \cos^2(\varphi_k))}
+    \end{bmatrix}
 \end{equation}
 
+where $M = 1\,\text{kg}$ is the mass of the cart, $m = 0.1\,\text{kg}$ is the mass of the pendulum, $l_p = 0.8\,\text{m}$ is the length of the pendulum, 
+and $g = 9.81\,\text{m/s}^2$ is the acceleration due to gravity.
+
+
+\paragraph{Data Generation.}
 For the nonlinear benchmark, a prediction horizon of $N = 40$ stages is chosen. 
 The system states and control inputs are penalized within the optimization framework of \labelcref{eq:mpc-problem} 
 using the weighting matrices $Q = \operatorname{diag}(10,\, 1,\, 10,\, 0.01)$ and $R = 0.5$, respectively, 
 subject to the dynamics defined in \labelcref{eq:cartpole}.
+
+
+\paragraph{Control Policy Training.}
+
+
+\paragraph{Neural Lyapunov Function Training.}
+
+
+\paragraph{Verification Setup.}

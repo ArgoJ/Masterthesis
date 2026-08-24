@@ -23,7 +23,7 @@
     
     % Inputs (Links)
     \node[val] (x) at (0, 1.0) {$x$};
-    \node[val] (xstar) at (0, -0.6) {$x^*$};
+    \node[val] (xstar) at (0, -0.6) {$x^\star$};
 
     % Verzweigungspunkte
     \node[point] (fork_x) at (0.6, 1.0) {};
@@ -60,10 +60,10 @@
     % x speist VON LINKS in sum_x ein
     \draw[->] (fork_x) |- node[pos=0.92, above=1pt, font=\tiny\bfseries, text=navy] {$+$} (sum_x.west);
 
-    % Input x* Pfade
+    % Input x^\star Pfade
     \draw[-] (xstar) -- (fork_xstar);
     \draw[->] (fork_xstar) -- (f2);
-    % x* führt UNTEN HERUM und speist VON UNTEN in sum_x ein
+    % x^\star führt UNTEN HERUM und speist VON UNTEN in sum_x ein
     \draw[->] (fork_xstar) |- (3.8, -3.0) -- node[pos=0.7, left=1pt, font=\tiny\bfseries, text=navy] {$-$} (sum_x.south);
 
     % Term 1 Verbindungen (Oben)

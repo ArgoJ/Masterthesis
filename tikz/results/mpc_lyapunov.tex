@@ -858,7 +858,19 @@
     ticklabel style={color=black},
     point meta min=0.316018,
     point meta max=20641.6,
-    colorbar style={ytick={5000,10000,15000,20000}, ytick style={draw=black}, yticklabel style={color=black}},
+    colorbar style={
+        ytick={5000,10000,15000,20000},
+        ytick style={draw=black}, 
+        yticklabel style={color=black},
+        extra y ticks={1450},
+        extra y tick labels={$\rho$},
+        extra y tick style={
+            draw=red,
+            ytick style={draw=red, line width=1.5pt},
+            every tick/.style={draw=red, line width=1.5pt},
+            yticklabel style={color=red, font=\bfseries}
+        }
+    },
     colormap={plotly}{rgb255(0)=(68,1,84) rgb255(11)=(72,40,120) rgb255(22)=(62,73,137) rgb255(33)=(49,104,142) rgb255(44)=(38,130,142) rgb255(56)=(31,158,137) rgb255(67)=(53,183,121) rgb255(78)=(110,206,88) rgb255(89)=(181,222,43) rgb255(100)=(253,231,37)}
 ]
     \addplot graphics [xmin=-10.0, xmax=10.0, ymin=-10.0, ymax=10.0] {tikz/results/mpc_lyapunov_contour_bg.png};

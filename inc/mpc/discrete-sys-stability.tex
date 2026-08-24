@@ -25,16 +25,16 @@ numerical integration scheme, such as the forward Euler or a fourth-order Runge-
 To account for physical and operational limitations, the system states and control inputs are restricted to 
 constraint sets $\mathcal{X} := [\underline{x}, \overline{x}] \subseteq \mathbb{R}^{n_x}$ and 
 $\mathcal{U} := [\underline{u}, \overline{u}] \subseteq \mathbb{R}^{n_u}$. 
-Furthermore, without loss of generality, any equilibrium $(x^*, u^*)$ can be shifted to the origin 
-via deviation variables $\tilde{x} := x - x^*$ and $\tilde{u} := u - u^*$. For readability, 
+Furthermore, without loss of generality, any equilibrium $(x^\star, u^\star)$ can be shifted to the origin 
+via deviation variables $\tilde{x} := x - x^\star$ and $\tilde{u} := u - u^\star$. For readability, 
 the tilde notation is subsequently dropped, so that $x$ and $u$ represent the shifted variables, 
-assuming $(x^*, u^*) = (\mathbf{0}, \mathbf{0})$ throughout this work.
+assuming $(x^\star, u^\star) = (\mathbf{0}, \mathbf{0})$ throughout this work.
 
 
 \subsection{Lyapunov Stability}
 \label{subsec:lyapunov-stability}
 Consider the discrete-time closed-loop system under a state-feedback control policy 
-$\pi: \mathcal{X} \to \mathcal{U}$. The origin serves as an equilibrium point  $x^* = \mathbf{0}$ 
+$\pi: \mathcal{X} \to \mathcal{U}$. The origin serves as an equilibrium point  $x^\star = \mathbf{0}$ 
 satisfying $\pi(\mathbf{0}) = \mathbf{0}$ and $f(\mathbf{0}, \mathbf{0}) = \mathbf{0}$.
 Assuming the compact state constraint set $\mathcal{X}$ is positively forward invariant under $\pi$, 
 the origin is locally asymptotically stable in $\mathcal{X}$ if there exists a continuous, positive definite function 
@@ -48,4 +48,4 @@ $V: \mathcal{X} \to \mathbb{R}_{\ge 0}$ satisfying~\citeThm{2.13}{rawlingsModelP
     \end{aligned}
 \end{equation}
 Here, the decrease condition ensures that any trajectory starting in $\mathcal{X}$
-remains bounded within $\mathcal{X}$ and asymptotically converges towards the equilibrium $x^* = 0$.
+remains bounded within $\mathcal{X}$ and asymptotically converges towards the equilibrium $x^\star = 0$.

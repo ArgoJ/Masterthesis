@@ -56,16 +56,16 @@ CROWN divides the neurons of layer $l$ into three distinct subsets based on the 
 pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$, as shown in \cref{fig:crown-relaxations}:
 \begin{itemize}
     \item \textbf{Strictly Concave Region ($\zeta_l^+ = \{j \mid 0 \le l_j^{(l)} \le u_j^{(l)}\}$):} 
-        The upper bound is chosen as a tangent at an adaptive point $z^* \in [l_j^{(l)}, u_j^{(l)}]$, 
+        The upper bound is chosen as a tangent at an adaptive point $z^\star \in [l_j^{(l)}, u_j^{(l)}]$, 
         while the lower bound is the secant line connecting the interval endpoints $(l_j^{(l)}, \sigma(l_j^{(l)}))$ and 
         $(u_j^{(l)}, \sigma(u_j^{(l)}))$.
     \item \textbf{Strictly Convex Region ($\zeta_l^- = \{j \mid l_j^{(l)} \le u_j^{(l)} \le 0\}$):} 
         The upper bound is the secant connecting the interval endpoints, whereas the lower bound is formed by 
-        a tangent at an adaptive point $z^* \in [l_j^{(l)}, u_j^{(l)}]$.
+        a tangent at an adaptive point $z^\star \in [l_j^{(l)}, u_j^{(l)}]$.
     \item \textbf{Mixed Curvature with Inflection Point ($\zeta_l^\pm = \{j \mid l_j^{(l)} < 0 < u_j^{(l)}\}$):} 
         The upper bound is the tangent passing through the left boundary $(l_j^{(l)}, \sigma(l_j^{(l)}))$ with contact 
-        point $z^* \ge 0$, and the lower bound is the tangent passing through the right boundary $(u_j^{(l)}, \sigma(u_j^{(l)}))$ 
-        with contact point $z^* \le 0$.
+        point $z^\star \ge 0$, and the lower bound is the tangent passing through the right boundary $(u_j^{(l)}, \sigma(u_j^{(l)}))$ 
+        with contact point $z^\star \le 0$.
 \end{itemize}
 
 \begin{figure}[htbp]

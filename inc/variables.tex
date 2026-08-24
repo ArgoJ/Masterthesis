@@ -28,8 +28,8 @@ $u(t)$ & Continuous-time control input vector \\
 $u_k$ & Discrete-time control input vector \\
 $\tilde{x}$ & State deviation from equilibrium \\
 $\tilde{u}$ & Input deviation from equilibrium \\
-$x^*$ & System equilibrium point \\
-$u^*$ & Input reference at $x^*$ \\
+$x^\star$ & System equilibrium point \\
+$u^\star$ & Input reference at $x^\star$ \\
 $x_{k+1}$ & Discrete-time successor state \\
 $x^+$ & One-step successor state \\
 $\pi(x)$ & State-feedback policy \\
@@ -42,16 +42,15 @@ $f(x_k, u_k)$ & Discrete-time system dynamics \\
 \multicolumn{2}{@{}l}{\textit{Optimal Control \& Model Predictive Control (MPC)}} \\
 \midrule
 $N$ & Prediction horizon \\
-$J(x_k, (u_{i|k}))$ & Finite-horizon MPC cost objective function \\
+$J(x_k, (u_{i|k})_{i=0}^{N-1})$ & Finite-horizon MPC cost objective function \\
 $\ell(x, u)$ & Stage cost function \\
-$\ell^*(x_k)$ & Minimum stage cost function \\
 $V_f(x)$ & Terminal cost function \\
 $\mathcal{X}_f$ & Terminal constraint set \\
 $Q$ & State weighting matrix \\
 $R$ & Input weighting matrix \\
 $\pi_0(x)$ & Closed-loop MPC feedback policy \\
 $\pi_f(x)$ & Auxiliary local terminal control law \\
-$u_0^*$ & Optimal control input \\
+$u_{0|k}^\star$ & Optimal control input at time step $k$ \\
 $V_N(x)$ & Optimal value function \\
 $x_{i|k}, u_{i|k}$ & Predicted state and input at horizon step $i$ initialized at step $k$ \\
 $(\tilde{u}_{i|k+1})$ & Shifted candidate input sequence \\
@@ -60,7 +59,6 @@ $A$ & Linearized system state matrix \\
 $B$ & Linearized system input matrix \\
 $K$ & LQR feedback gain matrix \\
 $P$ & DARE solution matrix \\
-$\alpha_N$ & Relaxed Lyapunov decrease factor \\
 $\mathcal{X}_N$ & Feasible initial state set \\
 \midrule
 
@@ -83,7 +81,7 @@ $[z]_+$ & Rectified linear unit (ReLU) activation \\
 $\hat{y}$ & Network prediction vector \\
 $y$ & Target output vector \\
 $\theta$ & Trainable network parameters \\
-$\theta^*$ & Optimal network parameters \\
+$\theta^\star$ & Optimal network parameters \\
 $\mathcal{D}$ & Training dataset \\
 $\mathcal{B}$ & Mini-batch \\
 $\loss$ & Total training loss function \\
@@ -131,7 +129,7 @@ $[l_j^{(l)}, u_j^{(l)}]$ & Pre-activation lower and upper bounds of neuron $j$ i
 $\alpha_{L,j}^{(l)}, \alpha_{U,j}^{(l)}$ & CROWN linear lower and upper bounding slopes \\
 $d_{L,j}^{(l)}, d_{U,j}^{(l)}$ & CROWN linear lower and upper bounding intercepts \\
 $\zeta_l^+, \zeta_l^-, \zeta_l^\pm$ & Strictly concave, convex, and mixed curvature neuron sets \\
-$z^*$ & Adaptive tangent contact point \\
+$z^\star$ & Adaptive tangent contact point \\
 $\underline{\psi}_{\mathrm{aff}}(x)$ & Affine lower bounding function \\
 $w_{\mathrm{CROWN}}, c_{\mathrm{CROWN}}$ & Explicit CROWN linear bounding vector and constant \\
 $\underline{\psi}_{\mathrm{CROWN}}^\star$ & Certified lower bound via CROWN \\
@@ -139,14 +137,14 @@ $\alpha$ & Lower-bound relaxation slopes \\
 $N_{\mathrm{unstable}}$ & Total number of unstable neurons \\
 $w(\alpha), c(\alpha)$ & Parameterized affine bounding vector and constant \\
 $\mathcal{G}(\alpha)$ & Lower bound objective function in $\alpha$-CROWN \\
-$\underline{\psi}_\alpha^\star$ & Optimized lower bound via $\alpha$-CROWN \\
+$\underline{\psi}^\star_\alpha$ & Optimized lower bound via $\alpha$-CROWN \\
 $\underline{\psi}_{\mathrm{sub}}$ & Specification lower bound on BaB subdomain \\
 $\psi^\star_{\mathrm{sub}}$ & Minimum specification value on BaB subdomain \\
 $\mathcal{F}_{\mathrm{sub}}$ & Input subdomain in Branch-and-Bound \\
 $\beta$ & Lagrange multipliers for neuron split constraints \\
 $w(\alpha, \beta), c(\alpha, \beta)$ & Parameterized surrogate bounding vector and constant \\
 $\mathcal{G}(\alpha, \beta)$ & Joint lower bound objective function in $\alpha,\beta$-CROWN \\
-$\underline{\psi}_{\alpha,\beta}^\star$ & Jointly optimized lower bound via $\alpha,\beta$-CROWN \\
+$\underline{\psi}^\star_{\alpha,\beta}$ & Jointly optimized lower bound via $\alpha,\beta$-CROWN \\
 \midrule
 
 % --- Chapter 6.1: Methodology - Imitation Learning ---
@@ -233,12 +231,13 @@ $\loss_{\mathrm{pol}}$ & Policy scaling loss \\
 $\ell_{R_\phi,0}$ & Initial matrix $R_\phi$ Frobenius norm \\
 $\loss_{R_\phi}$ & Matrix $R_\phi$ regularization loss \\
 $\loss_{\mathrm{total}}$ & Total combined Lyapunov loss \\
+$\lambda_m, \loss_m$ & Generic indexed loss weight and component \\
 $\lambda_{\rho\mathrm{-gated}}$ & Soft-gated condition loss weight \\
 $\lambda_{\mathrm{ROA}}$ & Region of Attraction expansion loss weight \\
 $\lambda_{\mathrm{L}}$ & LIRPA loss weight \\
 $\lambda_V$ & Lyapunov magnitude scaling loss weight \\
 $\lambda_{\mathrm{pol}}$ & Policy scaling loss weight \\
-$\lambda_R$ & Matrix $R$ regularization loss weight \\
+$\lambda_{R_\phi}$ & Matrix $R_\phi$ regularization loss weight \\
 $\mathcal{C}$ & Counterexample pool \\
 $\mathcal{S}$ & Explorative pool \\
 $\mathcal{B}_{\mathcal{S}}$ & Explorative pool candidate sample set \\
@@ -252,7 +251,6 @@ $\tilde{\rho}$ & Estimated ROA boundary minimum \\
 $\upsilon$ & EMA decay rate \\
 $N_{\mathrm{outer}}$ & Outer epoch count \\
 $K_{\mathrm{steps}}$ & Inner mini-batch optimization steps per epoch \\
-$N_{\mathrm{cex}}$ & Counterexample mining step interval \\
 \midrule
 
 % --- Chapter 6.3: Methodology - Formal Stability Verification ---
@@ -272,15 +270,15 @@ $\rho_0$ & Initial sublevel search bound \\
 $\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}$ & Search interval lower and upper bounds \\
 $q$ & Exponential search scaling factor \\
 $N_{\mathrm{scale}}, N_{\mathrm{bisect}}$ & Scaling and bisection iteration limits \\
-$\rho^*$ & Maximal verified sublevel value \\
+$\rho^\star$ & Maximal verified sublevel value \\
 \midrule
 
 % --- Chapter 7: Benchmark Systems & Experimental Evaluation ---
 \multicolumn{2}{@{}l}{\textit{Benchmark Systems \& Experimental Evaluation}} \\
 \midrule
 $\Delta t$ & Discrete simulation sampling time \\
-$f_{\mathrm{DI},d}$ & Discrete-time double integrator dynamics \\
-$f_{\mathrm{CP}}, f_{\mathrm{CP},d}$ & Continuous and discrete-time cartpole dynamics \\
+$f_{\mathrm{DI}}$ & Discrete-time double integrator dynamics \\
+$f_{\mathrm{CP}}$ & Discrete-time cartpole dynamics \\
 $p, v$ & Cart position and velocity states \\
 $\varphi, \omega$ & Cartpole pendulum angle and angular velocity states \\
 $F$ & Control force applied to the cart \\
