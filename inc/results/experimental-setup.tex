@@ -1,8 +1,9 @@
 \section{System Modeling and Problem Formulation}
 \label{sec:system-modeling}
 For our experimental setup, two benchmark systems are selected: the double integrator and the cartpole. 
-These systems provide a good balance between simplicity and complexity 
-allowing us to analyze the performance of the proposed verification pipeline.
+While the double integrator allows for analyzing the pipeline on a low-dimensional reference system, 
+the cartpole acts as a challenging benchmark to stress-test the co-training and falsification loop.
+The hyperparameters reported below represent the most promising configurations identified during empirical tuning.
 
 
 % ================================================================================
@@ -31,8 +32,8 @@ Additionally, the stage state, terminal state and input constraint sets are give
 $\mathcal{X} = [\underline{x}, \overline{x}]$, $\mathcal{X}_f = [\underline{x}_f, \overline{x}_f]$ and 
 $\mathcal{U} = [\underline{u}, \overline{u}]$, with
 \begin{equation}
-    \underline{x} = \begin{bmatrix} -10 \\ -10 \end{bmatrix}, \qquad
-    \overline{x}  = \begin{bmatrix} 10 \\ 10 \end{bmatrix}, \qquad
+    \underline{x} = \underline{x}_{\mathrm{MPC}} = \begin{bmatrix} -10 \\ -10 \end{bmatrix}, \qquad
+    \overline{x}  = \overline{x}_{\mathrm{MPC}} = \begin{bmatrix} 10 \\ 10 \end{bmatrix}, \qquad
     \underline{x}_f = \begin{bmatrix} -5 \\ -5 \end{bmatrix}, \qquad
     \overline{x}_f  = \begin{bmatrix} 5 \\ 5 \end{bmatrix}, \qquad
     \underline{u} = -80, \qquad
@@ -42,18 +43,120 @@ A prediction horizon of $N = 20$ steps is chosen, while the states and inputs ar
 the weighting matrices $Q = \operatorname{diag}(15, 1)$, $R = 0.1$ and $P = \left[[80.137, 12.4], [12.4, 6.504]\right]^\top$. 
 Note that the terminal weight matrix $P$ was computed with DARE, as described in \labelcref{eq:riccati-equation}. 
 
-Each MPC closed-loop trajectory was computed with \texttt{acados}~\cite{verschuerenAcadosModularOpensource2022} for a total of $k=40$ steps. 
-The actual solver settings selected for this problem, can be seen in \cref{abs:acados-settings}.
-
+Each MPC closed-loop trajectory is computed with \texttt{acados}~\cite{verschuerenAcadosModularOpensource2022} for a total of $k=40$ steps. 
+Based on this setup, a total of 20{,}000 feasible trajectories are generated from uniformly sampled initial states, 
+enforcing a minimum Euclidean distance of $0.001$.
+The actual solver settings selected for this problem, can be seen in \cref{abs:acados-settings}. 
 
 
 \paragraph{Control Policy Training.}
+For the imitation policy as described in \labelcref{eq:policy-arch}, all hyperparameters used for the training 
+are summarized in \cref{tab:hp-im-di}. Since this is a linear system, a compact network architecture is sufficient. 
+An $80/20$ train-validation split is utilized to monitor generalization and drive the learning rate scheduler.
+To achieve smooth convergence at later training stages, a \texttt{ReduceLROnPlateau} scheduler halves 
+the learning rate whenever the validation loss fails to improve for five consecutive epochs. 
+In order to maintain imitation accuracy especially at equilibrium, the state dependent weight is chosen to be 
+$w_x(x) \in [0.5, 1]$.
+\begin{table}[htbp]
+    \centering
+    \caption{Imitation learning hyperparameter configuration for the double integrator.}
+    \label{tab:hp-im-di}
+    \begin{tabular}{llc}
+        \toprule
+        \textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Architecture}} \\
+        \midrule
+        Activation function & $\sigma$ & ReLU \\
+        Hidden layers & $L-1$ & $1$ \\
+        Neurons per hidden layer & $n_h$ & $24$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Training \& Optimization}} \\
+        \midrule
+        Epochs & $E$ & $1000$ \\
+        Learning rate & $\eta$ & $0.001$ \\
+        Batch size & $|\mathcal{B}_\pi|$ & $1024$ \\
+        Dataset split (Train / Val) & -- & $0.8 \, N_{\mathcal{D}}$ / $0.2 \, N_{\mathcal{D}}$ \\
+        Policy domain & $\mathcal{X}_\pi$ & $[-10, 10]^2$ \\
+        Reference decay rate & $\gamma$ & $1.0$ \\
+        Minimal state-dependent weight & $w_{\min}$ & $0.5$ \\
+        Weight decay & $\lambda_{\ell_2}$ & $0.0001$ \\
+        Behavioral cloning weight & $\lambda_{\mathrm{BC}}$ & $1.0$ \\
+        One-step invariance weight & $\lambda_f$ & $1.0$ \\
+        LR scheduler & -- & ReduceLROnPlateau \\
+        Scheduler parameters & -- & factor $= 0.5$, patience $= 5$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 
 \paragraph{Neural Lyapunov Function Training.}
+\todo{Missing explanation of general loss architecture.}
+To compute the LiRPA-condition loss $\loss_{\mathrm{L}}$, the state space $\mathcal{X}_V$ is partitioned into a uniform 
+$50 \times 50$ hyper-rectangular grid. 
+An origin exclusion region $\mathcal{X}_{\mathrm{excl}} = [-0.05, 0.05] \times [-0.15, 0.15]$ is applied to avoid numerical 
+singularities near the equilibrium, introducing additional cell splits along the exclusion boundaries, 
+as described in \cref{sec:formal-verification}. 
+
+\begin{table}[htbp]
+    \centering
+    \caption{Hyperparameter configuration for the falsification-guided co-training.}
+    \label{tab:hp-lyapunov-cotraining}
+    \begin{tabular}{llc}
+        \toprule
+        \textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{$V_\phi$ Architecture}} \\
+        \midrule
+        Activation function & $\sigma$ & ReLU \\
+        Hidden layers & $L-1$ & 1 \\
+        Neurons per hidden layer & $n_h$ & 24 \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Training \& Optimization}} \\
+        \midrule
+        Outer epochs & $N_{\mathrm{outer}}$ & $2000$ \\
+        Inner steps per outer epoch & $K_{\mathrm{steps}}$ & $10$ \\
+        Batch size & $|\mathcal{B}_\rho|$ & $2048$ \\
+        Lyapunov candidate learning rate & $\eta$ & $0.001$ \\
+        Policy learning rate & $\eta_{\pi}$ & $0.0001$ \\
+        Weight decay & $\lambda_{\ell_2}$ & $10^{-6}$ \\
+        Lyapunov domain & $\mathcal{X}_V$ & $[-10, 10]^2$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Loss Formulation \& Weights}} \\
+        \midrule
+        Condition loss weight & $\lambda_{\rho\mathrm{-gated}}$ & $500.0$ \\
+        Relative invariance weight & $\lambda_{\mathrm{inv}}$ & $1.0$ \\
+        ROA expansion weight & $\lambda_{\mathrm{ROA}}$ & $5.0$ \\
+        LiRPA condition weight & $\lambda_{\mathrm{L}}$ & $15.0$ \\
+        Policy regularization weight & $\lambda_{\mathrm{pol}}$ & $0.1$ \\
+        Lyapunov decrease rate & $\kappa$ & $0.01$ \\
+        Relative decrease denominator offset & $\varepsilon_{\mathrm{rel}}$ & $0.01$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Falsification \& Adversarial Replay Buffer}} \\
+        \midrule
+        PGD step size & $\alpha_{\mathrm{PGD}}$ & $0.001$ \\
+        PGD iterations & $I$ & $20$ \\
+        Counterexample maximum age & $\tau_{\max}$ & $5$ \\
+        Explorative pool size & $N_{\mathcal{S}}$ & $8192$ \\
+        Counterexample yield EMA decay rate & $\upsilon_{\mathcal{C}}$ & $0.8$ \\
+        Minimal counterexample batch fraction & $r_{\min}$ & $0.2$\\
+        Maximal counterexample batch fraction & $r_{\max}$ & $0.5$\\
+        \midrule
+        \multicolumn{3}{l}{\textbf{$\rho$-Sublevel Estimation}} \\
+        \midrule
+        Minimum sublevel bound & $\rho_{\mathrm{min}}$ & $10^{-6}$ \\
+        Sublevel growth factor & $\chi$ & $1.12$ \\
+        Gate sharpness & $s$ & $10.0$ \\
+        Exploration resample margin & $m_\rho$ & $1.5$ \\
+        EMA smoothing factor & $\upsilon_\rho$ & $0.8$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 
 
 \paragraph{Verification Setup.}
+
 
 
 
@@ -96,6 +199,39 @@ subject to the dynamics defined in \labelcref{eq:cartpole}.
 
 
 \paragraph{Control Policy Training.}
+
+\todo{put in actual hyperparameters}
+\begin{table}[htbp]
+    \centering
+    \caption{Imitation learning hyperparameter configuration for the cartpole.}
+    \label{tab:hp-lyap-cp}
+    \begin{tabular}{llc}
+        \toprule
+        \textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Architecture}} \\
+        \midrule
+        Activation function & $\sigma$ & ReLU \\
+        Hidden layers & $L-1$ & $1$ \\
+        Neurons per hidden layer & $n_h$ & $24$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Training \& Optimization}} \\
+        \midrule
+        Epochs & $E$ & $1000$ \\
+        Learning rate & $\eta$ & $0.001$ \\
+        Batch size & $|\mathcal{B}_\pi|$ & $1024$ \\
+        Dataset split (Train / Val) & -- & $0.8 \, N_{\mathcal{D}}$ / $0.2 \, N_{\mathcal{D}}$ \\
+        Reference decay rate & $\gamma$ & $1.0$ \\
+        Minimal state-dependent weight & $w_{\min}$ & $0.5$ \\
+        Weight decay & $\lambda_{\ell_2}$ & $0.0001$ \\
+        Behavioral cloning weight & $\lambda_{\mathrm{BC}}$ & $1.0$ \\
+        One-step invariance weight & $\lambda_f$ & $1.0$ \\
+        LR scheduler & -- & ReduceLROnPlateau \\
+        Scheduler parameters & -- & factor $= 0.5$, patience $= 5$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 
 
 \paragraph{Neural Lyapunov Function Training.}

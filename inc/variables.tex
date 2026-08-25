@@ -70,6 +70,7 @@ $l$ & Layer index \\
 $n_l$ & Layer $l$ neuron count \\
 $n_0$ & Input layer dimension \\
 $n_L$ & Output layer dimension \\
+$n_h$ & Number of hidden neurons \\
 $a^{(0)}$ & Network input vector \\
 $a^{(l)}$ & Layer activation vector \\
 $z^{(l)}$ & Layer pre-activation vector \\
@@ -170,7 +171,7 @@ $x_{\mathrm{scale}}$ & State scaling vector \\
 $u_{\mathrm{scale}}$ & Input scaling vector \\
 $d(x)$ & Scaled equilibrium distance \\
 $w_x(x)$ & Behavioral cloning loss weight \\
-$w_{\min}$ & Baseline loss weight \\
+$w_{\min}$ & Baseline behavioral cloning loss weight \\
 $\gamma$ & Decay rate for state-dependent weight \\
 $\loss_{\mathrm{BC}}$ & Behavioral cloning loss \\
 $\loss_f$ & Dynamics-aware constraint loss \\
@@ -245,10 +246,16 @@ $N_{\mathcal{S}}$ & Explorative pool target size \\
 $x_{\mathrm{adv}}$ & Counterexample state \\
 $\tau$ & Counterexample age \\
 $\tau_{\max}$ & Maximum lifespan \\
+$N_{\mathrm{mined}}$ & Number of newly mined counterexamples \\
+$r_{\mathrm{mine}}$ & Empirical counterexample mining yield \\
+$\tilde{r}_{\mathrm{mine}}$ & Smoothed counterexample yield EMA \\
+$\upsilon_{\mathcal{C}}$ & Counterexample yield EMA decay rate \\
+$r_{\mathcal{C}}$ & Effective counterexample batch fraction \\
+$r_{\min}, r_{\max}$ & Minimal and maximal counterexample batch fraction bounds \\
 $m_\rho$ & Sublevel margin \\
 $\chi$ & Overestimation factor \\
 $\tilde{\rho}$ & Estimated ROA boundary minimum \\
-$\upsilon$ & EMA decay rate \\
+$\upsilon_\rho$ & $\rho$ EMA decay rate \\
 $N_{\mathrm{outer}}$ & Outer epoch count \\
 $K_{\mathrm{steps}}$ & Inner mini-batch optimization steps per epoch \\
 \midrule

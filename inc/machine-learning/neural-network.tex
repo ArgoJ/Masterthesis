@@ -8,7 +8,8 @@ Multi-layer perceptrons (MLPs) are fully connected feed-forward networks that ma
 through $L-1$ hidden layers to an output layer~
 \citeSec{1.4,3.1}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
 Let $n_l \in \mathbb{N}$ denote the number of neurons in layer $l \in \{0, \dots, L\}$, where $n_0$ represents 
-the input dimension and $n_L$ the output dimension.
+the input dimension, $n_L$ the output dimension, and $n_h$ denotes the number of neurons per hidden layer, 
+with $n_l = n_h$ for all $l \in \{1, \dots, L-1\}$.
 For an input vector $x \in \mathbb{R}^{n_0}$, forward propagation is defined recursively for layers $l = 1, \dots, L$:
 \begin{equation}
     \label{eq:nn-forward}

@@ -346,10 +346,28 @@ significantly reducing their likelihood of being selected.
 \end{algorithm}
 
 The counterexample pool $\mathcal{C}$ stores the critical violations identified during the PGD falsification step. 
-A age-tracking mechanism limits sample lifespan, preventing overfitting outdated violations.
+An age-tracking mechanism limits sample lifespan, preventing overfitting outdated violations.
 Each injected counterexample is assigned an initial age $\tau = 0$, which is incremented after every subsequent falsification phase. 
 Once a counterexample reaches the maximum age $\tau_{\max}$, it is removed from the pool. 
 Consequently, the condition loss continuously penalizes recent violations while discarding resolved edge cases as the Lyapunov candidate evolves.
+
+During optimization, mini-batches $\mathcal{B}_\rho$ are sampled from the joint state distribution $\mathcal{S} \cup \mathcal{C}$, 
+where the proportion of counterexamples $r_{\mathcal{C}}$ is dynamically adapted based on the number of newly mined violations 
+$N_{\mathrm{mined}} \in \mathbb{N}_0$. To smooth out fluctuations between mining steps, the empirical mining yield 
+$r_{\mathrm{mine}} = N_{\mathrm{mined}} / N_{\mathcal{S}}$ is tracked using an exponential moving average (EMA):
+\begin{equation}
+    \label{eq:cex-fraction-ema}
+    \tilde{r}_{\mathrm{mine}} \leftarrow \upsilon_{\mathcal{C}} \, \tilde{r}_{\mathrm{mine}} + (1 - \upsilon_{\mathcal{C}}) \, r_{\mathrm{mine}},
+\end{equation}
+where $\upsilon_{\mathcal{C}} \in [0, 1)$ is the smoothing decay factor. 
+The effective batch fraction $r_{\mathcal{C}}$ is then calculated using linear interpolation:
+\begin{equation}
+    \label{eq:cex-fraction-interp}
+    r_{\mathcal{C}} = r_{\min} + \tilde{r}_{\mathrm{mine}} \cdot (r_{\max} - r_{\min}),
+\end{equation}
+where $r_{\min}$ and $r_{\max}$ denote the minimal and maximal possible counterexample proportion. 
+Each mini-batch $\mathcal{B}_\rho$ is then formed by drawing $\lfloor r_{\mathcal{C}} \, |\mathcal{B}_\rho| \rfloor$ 
+samples from the counterexample pool $\mathcal{C}$ and the remainder from $\mathcal{S}$.
 
 
 
@@ -404,9 +422,9 @@ Finally, to reduce fluctuations caused by changes in the estimated boundary mini
 the gating bound $\rho$ is updated using an exponential moving average (EMA):
 \begin{equation}
     \label{eq:rho-ema}
-    \rho \leftarrow \upsilon \rho + (1 - \upsilon) \tilde{\rho},
+    \rho \leftarrow \upsilon_\rho \rho + (1 - \upsilon) \tilde{\rho},
 \end{equation}
-where $\upsilon \in [0, 1)$ denotes the EMA decay rate.
+where $\upsilon_\rho \in [0, 1)$ denotes the EMA decay rate.
 
 
 
@@ -415,12 +433,12 @@ where $\upsilon \in [0, 1)$ denotes the EMA decay rate.
 
 The complete falsification-guided training procedure is illustrated in
 \cref{fig:train-flow}. It consists of an outer loop for data generation and an
-inner loop for network optimization. \newline
+inner loop for network optimization. 
 At the beginning of each outer epoch, boundary samples $\mathcal{B}_{\partial}$ are used to estimate 
 the current sublevel bound $\rho$, and the ROA shell batch $\mathcal{B}_{\mathrm{ROA}}$ is redrawn. 
 Based on the updated estimation of $\rho$, the active LiRPA regions are selected and PGD-based falsification 
 is performed within the corresponding sublevel set. The resulting counterexamples are added to $\mathcal{C}$, 
-after which the explorative state pool $\mathcal{S}$ is resampled. \newline
+after which the explorative state pool $\mathcal{S}$ is resampled. 
 The inner loop is executed $K_{\mathrm{steps}}$ times per outer epoch. At each step,  
 a mini-batch $\mathcal{B}_{\rho}$ is sampled from $\mathcal{S} \cup \mathcal{C}$ and 
 evaluated together with the active LiRPA regions, the ROA shell batch, and Sobol batches
@@ -445,8 +463,8 @@ attraction.
 
 After completion of the training procedure, the optimized parameters of the policy $\pi_V$ and the Lyapunov candidate $V_\phi$ 
 yield a candidate control-Lyapunov pair. 
-However, while falsification-guided adversarial training seeks to eliminate counterexamples over the trained state domain, 
+Although falsification-guided adversarial training aims to eliminate counterexamples within the trained state space, 
 it does not guarantee the complete absence of stability violations across the continuous state space. 
-To transition from empirical validation to a formal stability proof, the learned candidate pair $(\pi_V, V_\phi)$ 
+To move from empirical validation to a formal stability proof, the learned candidate pair $(\pi_V, V_\phi)$ 
 is subsequently subjected to formal neural network verification, as detailed in the following section.
 
