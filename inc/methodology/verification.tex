@@ -19,7 +19,7 @@ one-step state transition.
 
 Before evaluating the stability conditions, the equilibrium $x^\star$ must be explicitly excluded from the bounded 
 certification domain 
-$\mathcal{X}_C := \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \bar{x}_C \} \subseteq \mathcal{X}_V$. 
+$\mathcal{X}_C := \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \overline{x}_C \} \subseteq \mathcal{X}_V$. 
 By construction, $V_\phi(x^\star) = 0$ and $x^+ = x^\star$ hold at the equilibrium, 
 causing the strict positivity and strict decrease conditions to evaluate to false at this exact point. 
 Since these conditions are only required to hold for $x \neq x^\star$, and positive definiteness is structurally 
@@ -50,7 +50,7 @@ $\mathcal{X}_{\mathrm{eval}}$. The individual logical terms are defined as follo
             &\equiv V_\phi(x) > 0,
             \label{eq:positive-certification}\\
         \Phi_{\mathrm{inv}}
-            &\equiv \underline{x}_C \le x^+ \le \bar{x}_C,
+            &\equiv \underline{x}_C \le x^+ \le \overline{x}_C,
             \label{eq:invariance-certification}\\
         \Phi_{\mathrm{dec}}
             &\equiv (1 - \kappa) V_\phi(x) > V_\phi(x^+).

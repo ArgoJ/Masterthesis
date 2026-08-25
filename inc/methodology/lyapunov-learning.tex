@@ -1,11 +1,14 @@
 \section{Lyapunov Learning for Stability Certification}
 \label{sec:lyapunov-learning}
-To establish formal stability guarantees for learned controllers, 
-a neural Lyapunov candidate is trained alongside the policy.
-A falsification-guided framework is used to find stability violations and 
-therefore make the Lyapunov candidate a valid certificate for stability.
-\todo[inline]{lyapunov and imitation policy cotraining}
-
+To obtain a controller $\pi_\theta$ and a Lyapunov candidate $V_\phi$ suitable for formal verification, 
+a co-training scheme is utilized to train both models jointly. 
+Under this optimization, the controller learns to satisfy the Lyapunov conditions while maintaining near-baseline 
+performance through regularization against the initial imitation policy $\theta_0$, alongside a Frobenius norm penalty 
+on the candidate's linear term $R_\phi$ to prevent its collapse. 
+To address localized stability violations and shape a verifier-friendly loss landscape, 
+the framework combines an adversarial falsification loop that iteratively mines counterexamples with bound propagation losses, 
+while continuously expanding the estimated region of attraction $\mathcal{V}_\rho$. Each of the training components are described 
+in the following subsections.
 
 
 \subsection{Lyapunov Network Architecture}
@@ -81,12 +84,12 @@ Note that the decrease normalization can be omitted depending on the training co
 \paragraph{Relative State Invariance Loss} penalizes successor states
 leaving the Lyapunov training domain $\mathcal{X}_V $. 
 To evaluate the relative one-step state-constraint violation, the scaling matrix 
-$S_{\mathrm{range}} = \diag(\bar{x}_V - \underline{x}_V)$ is utilized.
+$S_{\mathrm{range}} = \diag(\overline{x}_V - \underline{x}_V)$ is utilized.
 The loss per sample for the next state $x^+_V$ is computed as
 \begin{equation}
     \label{eq:rel-invariance}
     \loss_{\mathrm{inv}} = \left\| 
-        S_{\mathrm{range}}^{-1} \big[ x^+_V - \bar{x}_V \big]_+ 
+        S_{\mathrm{range}}^{-1} \big[ x^+_V - \overline{x}_V \big]_+ 
     \right\|_1 + \left\| 
         S_{\mathrm{range}}^{-1} \big[ \underline{x}_V - x^+_V \big]_+ 
     \right\|_1.
