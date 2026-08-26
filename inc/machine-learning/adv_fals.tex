@@ -63,14 +63,14 @@ from $x + \mathcal{P}$ to prevent the optimization from getting stuck in subopti
     \label{eq:adversarial-update}
     x_{\mathrm{adv}}^{(j+1)}\leftarrow 
         \Pi_{x + \mathcal{P}} \left(
-            x_{\mathrm{adv}}^{(j)} + \alpha_{\mathrm{PGD}} \operatorname{sign} \left(
+            x_{\mathrm{adv}}^{(j)} + \eta_{\mathrm{PGD}} \operatorname{sign} \left(
                 \nabla_{x_{\mathrm{adv}}^{(j)}} \mathcal{J} \left(
                     x_{\mathrm{adv}}^{(j)}, y; \theta
                 \right)
             \right)
         \right),
 \end{equation}
-where $\alpha_{\mathrm{PGD}} > 0$ denotes the step size and $I \in \mathbb{N}$ represents the total number of iterations. 
+where $\eta_{\mathrm{PGD}} > 0$ denotes the step size and $I \in \mathbb{N}$ represents the total number of iterations. 
 Furthermore, $\Pi_{x + \mathcal{P}}(\cdot)$ projects the updated sample back onto the constraint set~
 \cite{madryDeepLearningModels2019}. This projection can be implemented by clipping 
 each input component to the interval $[x-\varepsilon_\delta,x+\varepsilon_\delta]$. 

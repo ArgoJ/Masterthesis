@@ -51,7 +51,8 @@ The actual solver settings selected for this problem, can be seen in \cref{abs:a
 
 \paragraph{Control Policy Training.}
 For the imitation policy as described in \labelcref{eq:policy-arch}, all hyperparameters used for the training 
-are summarized in \cref{tab:hp-im-di}. Since this is a linear system, a compact network architecture is sufficient. 
+are summarized in \cref{tab:hp-im-di}. Since the underlying system is linear, 
+a compact architecture for the inner network $h_\theta$ is sufficient. 
 An $80/20$ train-validation split is utilized to monitor generalization and drive the learning rate scheduler.
 To achieve smooth convergence at later training stages, a \texttt{ReduceLROnPlateau} scheduler halves 
 the learning rate whenever the validation loss fails to improve for five consecutive epochs. 
@@ -76,9 +77,9 @@ $w_x(x) \in [0.5, 1]$.
         Epochs & $E$ & $1000$ \\
         Learning rate & $\eta$ & $0.001$ \\
         Batch size & $|\mathcal{B}_\pi|$ & $1024$ \\
-        Dataset split (Train / Val) & -- & $0.8 \, N_{\mathcal{D}}$ / $0.2 \, N_{\mathcal{D}}$ \\
+        Dataset split (Train / Val) & -- & $0.8\,|\mathcal{D}_\pi| \;/\; 0.2\,|\mathcal{D}_\pi|$ \\
         Policy domain & $\mathcal{X}_\pi$ & $[-10, 10]^2$ \\
-        Reference decay rate & $\gamma$ & $1.0$ \\
+        Reference decay rate & $\gamma_x$ & $1.0$ \\
         Minimal state-dependent weight & $w_{\min}$ & $0.5$ \\
         Weight decay & $\lambda_{\ell_2}$ & $0.0001$ \\
         Behavioral cloning weight & $\lambda_{\mathrm{BC}}$ & $1.0$ \\
@@ -91,7 +92,15 @@ $w_x(x) \in [0.5, 1]$.
 
 
 \paragraph{Neural Lyapunov Function Training.}
-\todo{Missing explanation of general loss architecture.}
+Again, due to the underlying liniarity of the system, a compact inner neural network $g_\phi$ suffices to represent 
+the Lyapunov candidate, defined in \cref{eq:lyapunov-candidate}. 
+All corresponding hyperparameter are summarized in \cref{tab:hp-lyapunov-di}.
+The matrix $R_\phi$ is initialized from the Riccati solution and remains fixed throughout training. 
+Specifically, it is computed using the eigendecomposition of the symmetrized Riccati matrix 
+$P = V \Lambda V^\top$ as $R_\phi = \Lambda^{1/2} V^\top$, satisfying $P \approx R_\phi^\top R_\phi$. 
+Consequently, $R_\phi$ cannot collapse, which makes the Frobenius norm penalty irrelevant. 
+Due to this fixed linear term in $V_\phi$, the scaling penalty can be disabled, which allows for more flexible 
+optimization. 
 To compute the LiRPA-condition loss $\loss_{\mathrm{L}}$, the state space $\mathcal{X}_V$ is partitioned into a uniform 
 $50 \times 50$ hyper-rectangular grid. 
 An origin exclusion region $\mathcal{X}_{\mathrm{excl}} = [-0.05, 0.05] \times [-0.15, 0.15]$ is applied to avoid numerical 
@@ -101,7 +110,7 @@ as described in \cref{sec:formal-verification}.
 \begin{table}[htbp]
     \centering
     \caption{Hyperparameter configuration for the falsification-guided co-training.}
-    \label{tab:hp-lyapunov-cotraining}
+    \label{tab:hp-lyapunov-di}
     \begin{tabular}{llc}
         \toprule
         \textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
@@ -134,7 +143,7 @@ as described in \cref{sec:formal-verification}.
         \midrule
         \multicolumn{3}{l}{\textbf{Falsification \& Adversarial Replay Buffer}} \\
         \midrule
-        PGD step size & $\alpha_{\mathrm{PGD}}$ & $0.001$ \\
+        PGD step size & $\eta_{\mathrm{PGD}}$ & $0.001$ \\
         PGD iterations & $I$ & $20$ \\
         Counterexample maximum age & $\tau_{\max}$ & $5$ \\
         Explorative pool size & $N_{\mathcal{S}}$ & $8192$ \\
@@ -152,7 +161,6 @@ as described in \cref{sec:formal-verification}.
         \bottomrule
     \end{tabular}
 \end{table}
-
 
 
 \paragraph{Verification Setup.}

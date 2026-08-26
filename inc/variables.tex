@@ -108,7 +108,7 @@ $x_{\mathrm{adv}}^{(0)}$ & Initial adversarial candidate state \\
 $x_{\mathrm{adv}}^{(j)}$ & Adversarial candidate state at PGD step $j$ \\
 $j$ & PGD iteration index \\
 $I$ & Maximum PGD iteration count \\
-$\alpha_{\mathrm{PGD}}$ & PGD step size \\
+$\eta_{\mathrm{PGD}}$ & PGD step size \\
 $\delta$ & Adversarial perturbation vector \\
 $\varepsilon_\delta$ & Maximum perturbation magnitude \\
 $p$ & Norm order \\
@@ -172,7 +172,7 @@ $u_{\mathrm{scale}}$ & Input scaling vector \\
 $d(x)$ & Scaled equilibrium distance \\
 $w_x(x)$ & Behavioral cloning loss weight \\
 $w_{\min}$ & Baseline behavioral cloning loss weight \\
-$\gamma$ & Decay rate for state-dependent weight \\
+$\gamma_x$ & Decay rate for state-dependent weight \\
 $\loss_{\mathrm{BC}}$ & Behavioral cloning loss \\
 $\loss_f$ & Dynamics-aware constraint loss \\
 $\lambda_{\mathrm{BC}}$ & Behavioral cloning loss weight \\
@@ -220,7 +220,7 @@ $x_{\mathrm{center}}$ & Center state of LIRPA hyper-rectangular region \\
 $e_{V,\mathrm{lower}}$ & Signed Lyapunov decrease lower bound \\
 $\mathcal{M}_{\mathrm{L}}$ & Region LIRPA condition violation \\
 $w_{\mathrm{L}}$ & LIRPA region weight \\
-$\alpha_{\mathrm{L}}$ & LIRPA weight decay rate \\
+$\gamma_{\mathrm{L}}$ & LIRPA weight decay rate \\
 $N_{\mathrm{L}}$ & LIRPA region count \\
 $\loss_{\mathrm{L}}$ & LIRPA loss \\
 $\mathcal{B}_V$ & Lyapunov scaling Sobol sample batch \\

@@ -189,10 +189,10 @@ the region center $x_{\mathrm{center}}$ and the equilibrium $x^\star$:
 \begin{equation}
     \label{eq:lirpa-weight}
     w_{\mathrm{L}} = \exp \left(
-        - \alpha_{\mathrm{L}} \cdot \lVert x_{\mathrm{center}} - x^\star \rVert^2_2
+        - \gamma_{\mathrm{L}} \cdot \lVert x_{\mathrm{center}} - x^\star \rVert^2_2
     \right),
 \end{equation}
-where $\alpha_{\mathrm{L}} > 0$ is a hyperparameter controlling the decay rate of the weight.
+where $\gamma_{\mathrm{L}} > 0$ is a hyperparameter controlling the decay rate of the weight.
 Finally, the LIRPA-condition loss over $N_{\mathrm{L}}$ regions is computed as
 \begin{equation}
     \label{eq:relative-lirpa-condition-loss}
@@ -303,12 +303,12 @@ by iteratively updating candidate states along the sign of their loss gradient:
 \begin{equation}
     \label{eq:pgd-update-lyapunov}
     x_{\mathrm{adv}}^{(j+1)} \leftarrow \Pi_{\mathcal{X}_V} \left(
-        x_{\mathrm{adv}}^{(j)} + \alpha_{\mathrm{PGD}} \operatorname{sign} \left(
+        x_{\mathrm{adv}}^{(j)} + \eta_{\mathrm{PGD}} \operatorname{sign} \left(
             \nabla_{x_{\mathrm{adv}}^{(j)}} \mathcal{J}\left(x_{\mathrm{adv}}^{(j)}; \phi, \theta\right)
         \right)
     \right),
 \end{equation}
-where $\alpha_{\mathrm{PGD}} > 0$ denotes the step size and $\Pi_{\mathcal{X}_V}(\cdot)$ projects the updated 
+where $\eta_{\mathrm{PGD}} > 0$ denotes the step size and $\Pi_{\mathcal{X}_V}(\cdot)$ projects the updated 
 sample back onto the training domain bounds $\mathcal{X}_V$. 
 To retain the strongest violations and mitigate the effects of overshooting, the state yielding the 
 maximum objective value across all $I$ iterations is preserved for each candidate. 
