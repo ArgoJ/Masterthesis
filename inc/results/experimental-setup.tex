@@ -103,7 +103,7 @@ Due to this fixed linear term in $V_\phi$, the scaling penalty can be disabled, 
 optimization. 
 To compute the LiRPA-condition loss $\loss_{\mathrm{L}}$, the state space $\mathcal{X}_V$ is partitioned into a uniform 
 $50 \times 50$ hyper-rectangular grid. 
-An origin exclusion region $\mathcal{X}_{\mathrm{excl}} = [-0.05, 0.05] \times [-0.15, 0.15]$ is applied to avoid numerical 
+An origin exclusion region $\mathcal{X}_{\mathrm{hole}} = [-0.05, 0.05] \times [-0.15, 0.15]$ is applied to avoid numerical 
 singularities near the equilibrium, introducing additional cell splits along the exclusion boundaries, 
 as described in \cref{sec:formal-verification}. 
 
@@ -164,9 +164,41 @@ as described in \cref{sec:formal-verification}.
 
 
 \paragraph{Verification Setup.}
+To formally certify a region of attraction and compute the maximal certifiable sublevel set $\mathcal{V}_{\rho^\star}$, 
+the verification pipeline executes the scaling and bisection search in \cref{alg:search-and-bisect} using $\alpha,\beta$-CROWN. 
+All corresponding hyperparameters for the verification setup are listed in \cref{tab:hp-veri-di}.
 
-
-
+\begin{table}[htbp]
+    \centering
+    \caption{Formal verification hyperparameter configuration for the double integrator.}
+    \label{tab:hp-veri-di}
+    \begin{tabular}{llc}
+        \toprule
+        \textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Domain \& Stability Specification}} \\
+        \midrule
+        Lyapunov decrease rate & $\kappa$ & $0.01$ \\
+        Verification domain & $\mathcal{X}_C$ & $[-10, 10]^2$ \\
+        Origin exclusion region & $\mathcal{X}_{\mathrm{hole}}$ & $[-0.05, 0.05] \times [-0.15, 0.15]$ \\
+        LiRPA bounding method & -- & CROWN \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Scaling \& Bisection Search}} \\
+        \midrule
+        Minimum sublevel bound & $\rho_{\min}$ & $10^{-6}$ \\
+        Search scale factor & $q$ & $1.2$ \\
+        Maximal scaling steps & $N_{\mathrm{scale}}$ & $20$ \\
+        Maximal bisection steps & $N_{\mathrm{bisect}}$ & $40$ \\
+        Bisection tolerance & $\varepsilon_{\mathrm{bisect}}$ & $10^{-3}$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{$\alpha,\beta$-CROWN Verifier Settings}} \\
+        \midrule
+        Verifier batch size & $|\mathcal{B}_{\mathrm{ver}}|$ & $32$ \\
+        Input split partitions & $p_{\mathrm{split}}$ & $2$ \\
+        Verifier tolerance & $\varepsilon_{\mathrm{cond}}$ & $10^{-6}$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 
 % ================================================================================

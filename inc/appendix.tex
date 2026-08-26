@@ -12,4 +12,47 @@ state-action pairs are removed during preprocessing. The concatenated
 state-action vectors are normalized and mapped onto an adaptive voxel grid.
 For each occupied voxel, at most one representative pair is retained.
 
-\todo{settings for abcrown}
+\subsection{\texorpdfstring{$\alpha,\beta$}{α,β}-CROWN Verification Backend Configuration}
+\label{app:abcrown-config}
+To ensure reproducibility of the formal certification pipeline, the default configuration for the $\alpha,\beta$-CROWN verification backend is summarized in \cref{tab:app-abcrown-config}. 
+The backend utilizes input-space Branch-and-Bound (\texttt{input\_bab}) combined with CROWN linear bound propagation and Split-by-Score (\texttt{sb}) branching.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Detailed configuration parameters for the $\alpha,\beta$-CROWN verification backend.}
+    \label{tab:app-abcrown-config}
+    \begin{tabular}{lll}
+        \toprule
+        \textbf{Parameter} & \textbf{Configuration Key} & \textbf{Value} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{General Strategy}} \\
+        \midrule
+        Verifier mode & \texttt{general.complete\_verifier} & \texttt{input\_bab} \\
+        Incomplete verification pre-pass & \texttt{general.enable\_incomplete\_verification} & \texttt{False} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Bounding \& Solver}} \\
+        \midrule
+        Bound propagation method & \texttt{solver.bound\_prop\_method} & \texttt{crown} \\
+        Batch size (subdomains per GPU step) & \texttt{solver.batch\_size} & $32$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Branch-and-Bound (BaB)}} \\
+        \midrule
+        Branching heuristic & \texttt{bab.branching.method} & \texttt{sb} (Split-by-Score) \\
+        Input space splitting & \texttt{bab.branching.input\_split.enable} & \texttt{True} \\
+        Split partitions per dimension & \texttt{bab.branching.input\_split.split\_partitions} & $2$ \\
+        IBP intermediate enhancement & \texttt{bab.branching.input\_split.ibp\_enhancement} & \texttt{True} \\
+        Monotonic bound comparison & \texttt{bab.branching.input\_split.compare\_with\_old\_bounds} & \texttt{True} \\
+        Adversarial check in tree & \texttt{bab.branching.input\_split.adv\_check} & $-1$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Adversarial Falsification}} \\
+        \midrule
+        PGD attack scheduling & \texttt{attack.pgd\_order} & \texttt{before} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Termination \& Tolerances}} \\
+        \midrule
+        Decision threshold & \texttt{bab.decision\_thresh} & $-\varepsilon_{\mathrm{cond}} = -10^{-6}$ \\
+        Domain timeout limit & \texttt{bab.timeout} & $60.0\,\mathrm{s}$ \\
+        Maximal active domains & \texttt{bab.max\_domains} & $\infty$ (\texttt{None}) \\
+        \bottomrule
+    \end{tabular}
+\end{table}

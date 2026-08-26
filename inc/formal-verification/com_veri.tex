@@ -21,12 +21,12 @@ steps to yield a definitive decision~\cite{bunelUnifiedViewPiecewise2018,wang202
 \subsection{\texorpdfstring{$\alpha,\beta$}{α,β}-CROWN}
 \label{subsec:alpha-beta-crown}
 When applying Branch-and-Bound to neural networks with piecewise-linear activations such as ReLU, 
-each branching step results in split constraints for unstable neurons. This is done by either forcing 
-a neuron $j$ in layer $l$ into its active linear phase $z_j^{(l)} \ge 0$ or into its inactive phase 
-$z_j^{(l)} < 0$~\cite{wang2021beta}. While classical LP solvers handle these constraints without any problems, 
+each branching step results in split constraints for unstable neurons. Specifically, an unstable neuron 
+$j$ in layer $l$ is either forced into its active linear phase $z_j^{(l)} \ge 0$ or into its inactive phase 
+$z_j^{(l)} < 0$~\cite{wang2021beta}. While classical LP solvers handle these constraints natively, 
 they are computationally expensive and cannot be efficiently parallelized on GPUs~\cite{bunelUnifiedViewPiecewise2018}. 
 However, unlike LP solvers, standard linear bound propagation frameworks such as CROWN cannot incorporate constraints 
-on intermediate neurons, yielding loose bounds and unnecessary branching~\cite{xuFastCompleteEnabling2021,wang2021beta}.
+on intermediate neurons, yielding loose bounds and redundant branching~\cite{xuFastCompleteEnabling2021,wang2021beta}.
 
 To overcome this limitation, $\beta$-CROWN~\cite{wang2021beta} incorporates neuron split constraints directly into 
 backward bound propagation using Lagrangian relaxation. By assigning non-negative Lagrange multipliers $\beta \ge 0$ 
@@ -56,3 +56,15 @@ jointly optimizing over both the relaxation slopes $\alpha$ and the Lagrange mul
 Nonetheless, projected gradient-based optimizers can be effectively applied on GPUs to tighten the bounds. 
 Because any feasible configuration $\left( \alpha \in [0, 1]^{N_{\mathrm{unstable}}}, \beta \ge 0 \right)$ corresponds to a valid dual relaxation, 
 soundness is unconditionally preserved under early stopping, allowing fast and constraint-aware bounding in parallel.
+
+Beyond branching over activation spaces, $\alpha,\beta$-CROWN can also branch directly over the input domain.
+This input domain splitting is often more efficient for neural control systems with low-dimensional continuous state spaces. 
+Furthermore, gradient-based adversarial attacks, such as PGD, may also be applied prior to the Branch-and-Bound search to identify potential 
+counterexamples. If a counterexample is found, the Branch-and-Bound search is not needed and the verification terminates immediately. 
+
+In summary, the verification methods presented in this chapter provide a flexible range of trade-offs between computational speed and bounding precision. 
+CROWN offers efficient incomplete verification and can therefore be utilized in the Lyapunov co-training described in \cref{sec:lyapunov-learning}, 
+where its lower bounds are included in the LiRPA-condition loss. In contrast, complete $\alpha,\beta$-CROWN verification provides formal certification 
+by refining the verification domain. In the methodology presented in the following chapter, both approaches are combined: 
+CROWN is used during training to promote a verifier-friendly Lyapunov formulation, 
+while $\alpha,\beta$-CROWN is subsequently applied to formally certify the maximal region of attraction $\mathcal{V}_{\rho^\star}$.
