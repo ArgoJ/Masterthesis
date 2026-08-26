@@ -1,11 +1,11 @@
 \section{Adversarial Examples and Projected Gradient Methods}
 \label{sec:adversarial-examples}
-Deep neural networks are known to be vulnerable to small, intentionally crafted perturbations that drastically 
-affect model outputs or maximize loss metrics~\cite{szegedyIntriguingPropertiesNeural2014,goodfellowExplainingHarnessingAdversarial2015}. 
-This vulnerability arises from the fundamental difference between average-case and worst-case generalization: 
-Random sampling may fail to reliably expose inputs associated with large loss values, 
-whereas gradient-guided optimization explicitly searches for such directions~\citeSec{12.4}{aggarwalNeuralNetworksDeep2023}. 
-By applying gradient ascent directly to the inputs under the constraint of a bounded $\ell_p$-norm 
+Deep neural networks are known to be prone to small, intentionally crafted perturbations that significantly change the model 
+outputs or worsen the loss metrics~\cite{szegedyIntriguingPropertiesNeural2014,goodfellowExplainingHarnessingAdversarial2015}. 
+This vulnerability arises from the difference between the generalization of the average- and worst-case scenario. 
+In this context, random sampling of inputs associated with high loss values may not be reliably detected, 
+whereas gradient-based optimization actively searches for such directions~\citeSec{12.4}{aggarwalNeuralNetworksDeep2023}. 
+By applying gradient ascent to the inputs under the constraint of a bounded $\ell_p$-norm 
 $\|\delta\|_p \le \varepsilon_\delta$, the approach targets regions where the objective value is large.
 In neural control, adversarial search strategies can be adapted to serve as tools for empirical falsification. 
 The goal here is not to deceive a model, but rather to identify input configurations that
@@ -80,7 +80,7 @@ As a result, $x_{\mathrm{adv}}^{(j+1)}$ satisfies the perturbation constraint at
 \subsection{Adaptation to Neural Lyapunov Control}
 \label{subsec:pgd-lyapunov-control}
 
-When moving from conventional adversarial attacks to neural Lyapunov control, the adversary's objective fundamentally changes. 
+When moving from conventional adversarial attacks to neural Lyapunov control, the adversary's objective changes. 
 Rather than deceiving a classifier, the goal becomes to identify counterexample states $x_{\mathrm{adv}}$ 
 that violate control-theoretic guarantees, such as Lyapunov decrease \labelcref{eq:asymptotic-lyapunov-stability} 
 or domain invariance \labelcref{eq:term-positive-invariance}~\cite{yangLyapunovstableNeuralControl2024}.
