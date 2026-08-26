@@ -184,16 +184,17 @@
     1 0
 }\dataTraceFive
 
-\begin{tikzpicture}
+\begin{tikzpicture} %[trim axis left, trim axis right]
 \begin{axis}[
+    scale only axis,
     xlabel={$k$},
     ylabel={$\Delta V_k$},
     xmin=0,
     xmax=38,
     ymin=-72.3753,
     ymax=0.0176249,
-    width=0.85\textwidth,
-    height=6.5cm,
+    width=0.8\textwidth,
+    height=5cm,
     legend style={
         at={(0.5,-0.22)},
         anchor=north,

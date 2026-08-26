@@ -1,9 +1,17 @@
 \section{Linear System Results: Double Integrator}
 \label{sec:results-linear}
+
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/results/di_policy_error_bands.tex}
+    \caption{Double integrator error band. $x_\theta - x_{\mathrm{MPC}}$}
+\end{figure}
+
 \begin{figure}[htbp]
     \centering
     \input{tikz/results/di_cost_descent.tex}
-    \caption{Double integrator cost descent. $\Delta V = V_N(x_{k+1}) - V_N(x_k)$}
+    \caption{Double integrator cost descent $\Delta V = V_N(x^+) - V_N(x)$.}
 \end{figure}
 
 \begin{figure}[htbp]
