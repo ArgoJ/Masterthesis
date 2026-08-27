@@ -4,9 +4,9 @@
 % \usepackage{pgfplots}
 % \pgfplotsset{compat=1.18}
 % \usepgfplotslibrary{fillbetween}
+% \usepgfplotslibrary{groupplots}
 \definecolor{shapeColor1}{RGB}{128,128,128}
 \definecolor{shapeColor2}{RGB}{255,0,0}
-
 
 \pgfplotstableread{
     x y
@@ -29,6 +29,28 @@
     1.6 0.075745
     1.7 0.07322
     1.8 0.071439
+    1.9 0.0824328
+    2 0.0824064
+    2.1 0.076767
+    2.2 0.0748017
+    2.3 0.0665064
+    2.4 0.0554735
+    2.5 0.0460081
+    2.6 0.0367628
+    2.7 0.0280462
+    2.8 0.0204627
+    2.9 0.0142412
+    3 0.00936678
+    3.1 0.00570866
+    3.2 0.00309719
+    3.3 0.00133087
+    3.4 0.000869434
+    3.5 0.000853586
+    3.6 0.000811299
+    3.7 0.000776806
+    3.8 0.000793015
+    3.9 0.000778807
+    4 0.000696982
 }\dataMax
 
 \pgfplotstableread{
@@ -52,6 +74,28 @@
     1.6 -0.0716001
     1.7 -0.0730438
     1.8 -0.0737254
+    1.9 -0.0673964
+    2 -0.0673208
+    2.1 -0.0621166
+    2.2 -0.0593715
+    2.3 -0.0632055
+    2.4 -0.0602122
+    2.5 -0.0530617
+    2.6 -0.0442501
+    2.7 -0.0351888
+    2.8 -0.0267288
+    2.9 -0.0194215
+    3 -0.013463
+    3.1 -0.00883244
+    3.2 -0.00539018
+    3.3 -0.00294369
+    3.4 -0.00128955
+    3.5 -0.00117779
+    3.6 -0.00123897
+    3.7 -0.00116004
+    3.8 -0.00100687
+    3.9 -0.000826268
+    4 -0.000648432
 }\dataMin
 
 \pgfplotstableread{
@@ -75,6 +119,28 @@
     1.6 0.0022542
     1.7 0.00176393
     1.8 0.00127576
+    1.9 0.000830416
+    2 0.00041177
+    2.1 9.52711e-05
+    2.2 -0.00011796
+    2.3 -0.000256998
+    2.4 -0.000335294
+    2.5 -0.000368536
+    2.6 -0.000367865
+    2.7 -0.000342241
+    2.8 -0.000299536
+    2.9 -0.000250609
+    3 -0.000201724
+    3.1 -0.000158154
+    3.2 -0.000124291
+    3.3 -9.49918e-05
+    3.4 -7.09853e-05
+    3.5 -4.93024e-05
+    3.6 -3.13425e-05
+    3.7 -1.84787e-05
+    3.8 -8.89076e-06
+    3.9 -4.9175e-06
+    4 -2.84118e-07
 }\dataMean
 
 \pgfplotstableread{
@@ -98,8 +164,29 @@
     1.6 -1.83848e-05
     1.7 2.23794e-05
     1.8 -0.000155681
+    1.9 -0.000156779
+    2 -0.000151463
+    2.1 -0.000151838
+    2.2 -0.000112437
+    2.3 -0.000133396
+    2.4 -9.95865e-05
+    2.5 -8.71559e-05
+    2.6 -8.63893e-05
+    2.7 -6.82557e-05
+    2.8 -5.27729e-05
+    2.9 -4.63342e-05
+    3 -3.15262e-05
+    3.1 -2.3986e-05
+    3.2 -2.23549e-05
+    3.3 -2.41721e-05
+    3.4 -1.75783e-05
+    3.5 -1.58567e-05
+    3.6 -1.13615e-05
+    3.7 -9.71464e-06
+    3.8 -6.31469e-06
+    3.9 -4.84297e-06
+    4 -1.76585e-06
 }\dataMedian
-
 
 \pgfplotstableread{
     x y
@@ -122,6 +209,28 @@
     1.6 0.179763
     1.7 0.18026
     1.8 0.190433
+    1.9 0.169278
+    2 0.178129
+    2.1 0.169899
+    2.2 0.100185
+    2.3 0.0977874
+    2.4 0.0922715
+    2.5 0.0878821
+    2.6 0.0916977
+    2.7 0.0895291
+    2.8 0.0796701
+    2.9 0.0664757
+    3 0.0526948
+    3.1 0.0399162
+    3.2 0.028929
+    3.3 0.0200007
+    3.4 0.0130821
+    3.5 0.00795205
+    3.6 0.00431518
+    3.7 0.00186293
+    3.8 0.00176002
+    3.9 0.00185194
+    4 0.00173005
 }\dataMaxOne
 
 \pgfplotstableread{
@@ -145,6 +254,28 @@
     1.6 -0.163889
     1.7 -0.16823
     1.8 -0.177885
+    1.9 -0.176792
+    2 -0.185889
+    2.1 -0.195465
+    2.2 -0.125083
+    2.3 -0.124175
+    2.4 -0.116942
+    2.5 -0.113093
+    2.6 -0.100077
+    2.7 -0.0834778
+    2.8 -0.0692299
+    2.9 -0.0551991
+    3 -0.0422897
+    3.1 -0.0308726
+    3.2 -0.0213567
+    3.3 -0.0139697
+    3.4 -0.00848308
+    3.5 -0.00458736
+    3.6 -0.00195695
+    3.7 -0.00130132
+    3.8 -0.00128323
+    3.9 -0.00121567
+    4 -0.00117319
 }\dataMinOne
 
 \pgfplotstableread{
@@ -168,6 +299,28 @@
     1.6 -0.0044197
     1.7 -0.00538554
     1.8 -0.00437784
+    1.9 -0.00457118
+    2 -0.00380174
+    2.1 -0.00252825
+    2.2 -0.00173507
+    2.3 -0.00104569
+    2.4 -0.000520227
+    2.5 -0.000144612
+    2.6 0.000158031
+    2.7 0.00038233
+    2.8 0.000498223
+    2.9 0.000526014
+    3 0.000499146
+    3.1 0.000447584
+    3.2 0.000396019
+    3.3 0.000338975
+    3.4 0.000285038
+    3.5 0.000224864
+    3.6 0.000165636
+    3.7 0.000121505
+    3.8 8.36695e-05
+    3.9 6.57491e-05
+    4 4.46664e-05
 }\dataMeanOne
 
 \pgfplotstableread{
@@ -191,8 +344,29 @@
     1.6 -0.00126142
     1.7 -0.000937881
     1.8 -0.000576849
+    1.9 -0.000158915
+    2 3.71984e-05
+    2.1 7.14491e-05
+    2.2 0.000225545
+    2.3 0.000265735
+    2.4 0.000206287
+    2.5 0.000176541
+    2.6 0.000197311
+    2.7 0.000155342
+    2.8 0.00012957
+    2.9 0.000135756
+    3 0.000114737
+    3.1 9.76797e-05
+    3.2 0.000125958
+    3.3 0.000105385
+    3.4 0.000110185
+    3.5 0.000104928
+    3.6 9.43943e-05
+    3.7 8.89557e-05
+    3.8 7.39713e-05
+    3.9 5.53444e-05
+    4 5.08992e-05
 }\dataMedianOne
-
 
 \pgfplotstableread{
     x y
@@ -214,6 +388,28 @@
     1.5 1.61557
     1.6 1.17373
     1.7 1.17951
+    1.8 1.16435
+    1.9 0.951388
+    2 1.31959
+    2.1 0.953449
+    2.2 1.01511
+    2.3 0.570841
+    2.4 0.260586
+    2.5 0.183712
+    2.6 0.172415
+    2.7 0.166393
+    2.8 0.156737
+    2.9 0.139803
+    3 0.118635
+    3.1 0.0951589
+    3.2 0.0738705
+    3.3 0.0548658
+    3.4 0.0389571
+    3.5 0.0263041
+    3.6 0.0166865
+    3.7 0.00968885
+    3.8 0.00482888
+    3.9 0.00201129
 }\dataMaxTwo
 
 \pgfplotstableread{
@@ -236,6 +432,28 @@
     1.5 -1.19433
     1.6 -1.46149
     1.7 -1.25029
+    1.8 -1.38808
+    1.9 -1.29357
+    2 -1.53259
+    2.1 -1.34811
+    2.2 -0.756729
+    2.3 -0.384758
+    2.4 -0.156877
+    2.5 -0.144097
+    2.6 -0.143926
+    2.7 -0.13119
+    2.8 -0.131944
+    2.9 -0.137809
+    3 -0.127786
+    3.1 -0.109872
+    3.2 -0.0892835
+    3.3 -0.0691859
+    3.4 -0.0513005
+    3.5 -0.0363686
+    3.6 -0.0245226
+    3.7 -0.01554
+    3.8 -0.00902021
+    3.9 -0.00450314
 }\dataMinTwo
 
 \pgfplotstableread{
@@ -258,6 +476,28 @@
     1.5 -0.0130687
     1.6 -0.00965842
     1.7 0.010077
+    1.8 -0.00184334
+    1.9 0.0076944
+    2 0.0127349
+    2.1 0.00798349
+    2.2 0.00689373
+    2.3 0.00525468
+    2.4 0.00375615
+    2.5 0.00302642
+    2.6 0.00223854
+    2.7 0.0011459
+    2.8 0.000236752
+    2.9 -0.000324418
+    3 -0.000624063
+    3.1 -0.000778759
+    3.2 -0.000845015
+    3.3 -0.000854348
+    3.4 -0.00078281
+    3.5 -0.00066117
+    3.6 -0.000558982
+    3.7 -0.000447735
+    3.8 -0.000386147
+    3.9 -0.000310785
 }\dataMeanTwo
 
 \pgfplotstableread{
@@ -280,8 +520,29 @@
     1.5 -0.00231194
     1.6 -0.000184107
     1.7 0.000585199
+    1.8 -0.0012308
+    1.9 0.00047741
+    2 0.000710841
+    2.1 0.000569366
+    2.2 5.77877e-05
+    2.3 -0.000131396
+    2.4 -0.000185469
+    2.5 -0.00030688
+    2.6 -0.000344357
+    2.7 -0.000268701
+    2.8 -0.000309102
+    2.9 -0.000277422
+    3 -0.000261834
+    3.1 -0.000311915
+    3.2 -0.000317573
+    3.3 -0.00035711
+    3.4 -0.000396388
+    3.5 -0.000361704
+    3.6 -0.0003483
+    3.7 -0.00034755
+    3.8 -0.000337904
+    3.9 -0.000317786
 }\dataMedianTwo
-
 
 \begin{tikzpicture}
 \begin{groupplot}[
@@ -295,8 +556,8 @@
     height=3.2cm,
     scale only axis,
     xmin=0,
-    xmax=1.8,
-    xtick={0,0.5,1,1.5}
+    xmax=4,
+    xtick={0,1,2,3,4}
 ]
 \nextgroupplot[
     ylabel={$\Delta x$},
@@ -312,28 +573,26 @@
     \addlegendentry{mean}
     \addplot+[name path=dataMedian, line width=2pt, color=blue, mark=none] table {\dataMedian};
     \addlegendentry{median}
-
 \nextgroupplot[
     ylabel={$\Delta v$},
     ymin=-0.601987,
     ymax=0.528259
 ]
-    \addplot+[name path=dataMax1, line width=1.5pt, color=red, mark=none, forget plot] table {\dataMaxOne};
-    \addplot+[name path=dataMin1, line width=1.5pt, color=red, mark=none, forget plot] table {\dataMinOne};
-    \addplot[fill=shapeColor2, fill opacity=0.25, draw=none, forget plot] fill between[of=dataMax1 and dataMin1];
-    \addplot+[name path=dataMean1, dashed, line width=2pt, color=black, mark=none, forget plot] table {\dataMeanOne};
-    \addplot+[name path=dataMedian1, line width=2pt, color=blue, mark=none, forget plot] table {\dataMedianOne};
-
+    \addplot+[name path=dataMaxOne, line width=1.5pt, color=red, mark=none, forget plot] table {\dataMaxOne};
+    \addplot+[name path=dataMinOne, line width=1.5pt, color=red, mark=none, forget plot] table {\dataMinOne};
+    \addplot[fill=shapeColor2, fill opacity=0.25, draw=none, forget plot] fill between[of=dataMaxOne and dataMinOne];
+    \addplot+[name path=dataMeanOne, dashed, line width=2pt, color=black, mark=none, forget plot] table {\dataMeanOne};
+    \addplot+[name path=dataMedianOne, line width=2pt, color=blue, mark=none, forget plot] table {\dataMedianOne};
 \nextgroupplot[
     xlabel={$t$},
     ylabel={$\Delta u$},
     ymin=-5.44329,
     ymax=7.02479
 ]
-    \addplot+[name path=dataMax2, line width=1.5pt, const plot, color=red, mark=none, forget plot] table {\dataMaxTwo};
-    \addplot+[name path=dataMin2, line width=1.5pt, const plot, color=red, mark=none, forget plot] table {\dataMinTwo};
-    \addplot[fill=shapeColor2, fill opacity=0.25, draw=none, forget plot] fill between[of=dataMax2 and dataMin2];
-    \addplot+[name path=dataMean2, dashed, line width=2pt, const plot, color=black, mark=none, forget plot] table {\dataMeanTwo};
-    \addplot+[name path=dataMedian2, line width=2pt, const plot, color=blue, mark=none, forget plot] table {\dataMedianTwo};
+    \addplot+[name path=dataMaxTwo, line width=1.5pt, const plot, color=red, mark=none, forget plot] table {\dataMaxTwo};
+    \addplot+[name path=dataMinTwo, line width=1.5pt, const plot, color=red, mark=none, forget plot] table {\dataMinTwo};
+    \addplot[fill=shapeColor2, fill opacity=0.25, draw=none, forget plot] fill between[of=dataMaxTwo and dataMinTwo];
+    \addplot+[name path=dataMeanTwo, dashed, line width=2pt, const plot, color=black, mark=none, forget plot] table {\dataMeanTwo};
+    \addplot+[name path=dataMedianTwo, line width=2pt, const plot, color=blue, mark=none, forget plot] table {\dataMedianTwo};
 \end{groupplot}
 \end{tikzpicture}
