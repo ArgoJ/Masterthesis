@@ -1,222 +1,52 @@
 \section{System Modeling and Problem Formulation}
 \label{sec:system-modeling}
-For our experimental setup, two benchmark systems are selected: the double integrator and the cartpole. 
-While the double integrator allows for analyzing the pipeline on a low-dimensional reference system, 
-the cartpole acts as a challenging benchmark to stress-test the co-training and falsification loop.
-The hyperparameters reported below represent the most promising configurations identified during empirical tuning.
+For our experimental evaluation, two benchmark systems are selected: the double integrator and the cartpole. 
+While the double integrator serves as a low-dimensional linear reference baseline, 
+the cartpole represents a nonlinear benchmark to stress-test the co-training and falsification loop.
+In the following, both system models and their optimization problems are formulated, followed by the shared implementation pipeline and 
+the corresponding hyperparameter configurations.
 
 
 % ================================================================================
-% Double Integrator
+% Benchmark Systems
 % ================================================================================
-\subsection{Double Integrator}
-\label{sec:double-integrator}
+\subsection{Benchmark Systems}
+\label{subsec:benchmark-systems}
 
-\paragraph{System Dynamics.}
-The double integrator is a simple second-order linear system. Therefore, it serves as the ideal baseline 
+\paragraph{Double Integrator.}
+The double integrator is a simple second-order linear system. Therefore, it serves as an ideal baseline 
 system in the learning and certification pipeline. Discretizing the continuous-time dynamics using the 
-explicit Euler method with a sampling time of $\Delta t = 0.1$, leads to the discrete-time state-space equation:
+explicit Euler method with a sampling time of $\Delta t = 0.1\,\text{s}$ leads to the discrete-time state-space equation:
 \begin{equation}
     \label{eq:double-integrator}
     x_{k+1} = f_{\mathrm{DI}}(x_k, u_k) = \begin{bmatrix}1 & \Delta t \\
-    0 & 1\end{bmatrix} x_k + \begin{bmatrix}0 \\ \Delta t\end{bmatrix} u_k
+    0 & 1\end{bmatrix} x_k + \begin{bmatrix}0 \\ \Delta t\end{bmatrix} u_k,
 \end{equation}
 where $x_k = \begin{bmatrix}p_k & v_k\end{bmatrix}^\top$ is the state vector containing the position and velocity of the system, 
-respectively, and $u_k$ denotes acceleration.
+and $u_k$ denotes the applied force. 
+The state, terminal, and input bounds are chosen as:
+\begin{equation*}
+    \underline{x} = \underline{x}_{\mathrm{MPC}} = \begin{bmatrix} -10 \\ -10 \end{bmatrix}, \quad
+    \overline{x}  = \overline{x}_{\mathrm{MPC}} = \begin{bmatrix} 10 \\ 10 \end{bmatrix}, \quad
+    \underline{x}_f = \begin{bmatrix} -5 \\ -5 \end{bmatrix}, \quad
+    \overline{x}_f  = \begin{bmatrix} 5 \\ 5 \end{bmatrix}, \quad
+    \underline{u} = -10, \quad
+    \overline{u}  = 10.
+\end{equation*}
+For data generation, the optimal control problem in \labelcref{eq:mpc-problem} is solved with a prediction horizon of $N = 20$ stages. 
+States and control inputs are penalized using the weighting matrices $Q = \operatorname{diag}(15, 1)$ and $R = 0.1$. 
+The terminal weight matrix $P = \begin{bmatrix} 80.137 & 12.4 \\ 12.4 & 6.504 \end{bmatrix}$ is computed from the discrete algebraic Riccati equation (DARE), 
+as described in \labelcref{eq:riccati-equation}. 
 
 
-\paragraph{Data Generation.}
-The MPC setup is formulated according to the problem in \labelcref{eq:mpc-problem} 
-subject to the double-integrator dynamics in \labelcref{eq:double-integrator}. 
-Additionally, the stage state, terminal state and input constraint sets are given by 
-$\mathcal{X} = [\underline{x}, \overline{x}]$, $\mathcal{X}_f = [\underline{x}_f, \overline{x}_f]$ and 
-$\mathcal{U} = [\underline{u}, \overline{u}]$, with
-\begin{equation}
-    \underline{x} = \underline{x}_{\mathrm{MPC}} = \begin{bmatrix} -10 \\ -10 \end{bmatrix}, \qquad
-    \overline{x}  = \overline{x}_{\mathrm{MPC}} = \begin{bmatrix} 10 \\ 10 \end{bmatrix}, \qquad
-    \underline{x}_f = \begin{bmatrix} -5 \\ -5 \end{bmatrix}, \qquad
-    \overline{x}_f  = \begin{bmatrix} 5 \\ 5 \end{bmatrix}, \qquad
-    \underline{u} = -80, \qquad
-    \overline{u}  = 80.
-\end{equation}
-A prediction horizon of $N = 20$ steps is chosen, while the states and inputs are penalized using 
-the weighting matrices $Q = \operatorname{diag}(15, 1)$, $R = 0.1$ and $P = \left[[80.137, 12.4], [12.4, 6.504]\right]^\top$. 
-Note that the terminal weight matrix $P$ was computed with DARE, as described in \labelcref{eq:riccati-equation}. 
-
-Each MPC closed-loop trajectory is computed with \texttt{acados}~\cite{verschuerenAcadosModularOpensource2022} for a total of $k=40$ steps. 
-Based on this setup, a total of 20{,}000 feasible trajectories are generated from uniformly sampled initial states, 
-enforcing a minimum Euclidean distance of $0.001$.
-The actual solver settings selected for this problem, can be seen in \cref{abs:di-acados-settings}. 
-
-
-\paragraph{Control Policy Training.}
-For the imitation policy as described in \labelcref{eq:policy-arch}, all hyperparameters used for the training 
-are summarized in \cref{tab:hp-im-di}. Since the underlying system is linear, 
-a compact architecture for the inner network $h_\theta$ is sufficient. 
-An $80/20$ train-validation split is utilized to monitor generalization and drive the learning rate scheduler.
-To achieve smooth convergence at later training stages, a \texttt{ReduceLROnPlateau} scheduler halves 
-the learning rate whenever the validation loss fails to improve for five consecutive epochs. 
-In order to maintain imitation accuracy especially at equilibrium, the state dependent weight is chosen to be 
-$w_x(x) \in [0.5, 1]$.
-\begin{table}[htbp]
-    \centering
-    \caption{Imitation learning hyperparameter configuration for the double integrator.}
-    \label{tab:hp-im-di}
-    \begin{tabular}{llc}
-        \toprule
-        \textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
-        \midrule
-        \multicolumn{3}{l}{\textbf{Architecture}} \\
-        \midrule
-        Activation function & $\sigma$ & ReLU \\
-        Hidden layers & $L-1$ & $1$ \\
-        Neurons per hidden layer & $n_h$ & $24$ \\
-        \midrule
-        \multicolumn{3}{l}{\textbf{Training \& Optimization}} \\
-        \midrule
-        Epochs & $E$ & $1000$ \\
-        Learning rate & $\eta$ & $0.001$ \\
-        Batch size & $|\mathcal{B}_\pi|$ & $1024$ \\
-        Dataset split (Train / Val) & -- & $0.8\,|\mathcal{D}_\pi| \;/\; 0.2\,|\mathcal{D}_\pi|$ \\
-        Policy domain & $\mathcal{X}_\pi$ & $[-10, 10]^2$ \\
-        Reference decay rate & $\gamma_x$ & $1.0$ \\
-        Minimal state-dependent weight & $w_{\min}$ & $0.5$ \\
-        Weight decay & $\lambda_{\ell_2}$ & $0.0001$ \\
-        Behavioral cloning weight & $\lambda_{\mathrm{BC}}$ & $1.0$ \\
-        One-step invariance weight & $\lambda_f$ & $1.0$ \\
-        LR scheduler & -- & ReduceLROnPlateau \\
-        Scheduler parameters & -- & factor $= 0.5$, patience $= 5$ \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-
-\paragraph{Neural Lyapunov Function Training.}
-Again, due to the underlying liniarity of the system, a compact inner neural network $g_\phi$ suffices to represent 
-the Lyapunov candidate, defined in \cref{eq:lyapunov-candidate}. 
-All corresponding hyperparameter are summarized in \cref{tab:hp-lyapunov-di}.
-The matrix $R_\phi$ is initialized from the Riccati solution and remains fixed throughout training. 
-Specifically, it is computed using the eigendecomposition of the symmetrized Riccati matrix 
-$P = V \Lambda V^\top$ as $R_\phi = \Lambda^{1/2} V^\top$, satisfying $P \approx R_\phi^\top R_\phi$. 
-Consequently, $R_\phi$ cannot collapse, which makes the Frobenius norm penalty irrelevant. 
-Due to this fixed linear term in $V_\phi$, the scaling penalty can be disabled, which allows for more flexible 
-optimization. 
-To compute the LiRPA-condition loss $\loss_{\mathrm{L}}$, the state space $\mathcal{X}_V$ is partitioned into a uniform 
-$50 \times 50$ hyper-rectangular grid. 
-An origin exclusion region $\mathcal{X}_{\mathrm{hole}} = [-0.05, 0.05] \times [-0.15, 0.15]$ is applied to avoid numerical 
-singularities near the equilibrium, introducing additional cell splits along the exclusion boundaries, 
-as described in \cref{sec:formal-verification}. 
-
-\begin{table}[htbp]
-    \centering
-    \caption{Hyperparameter configuration for the falsification-guided co-training.}
-    \label{tab:hp-lyapunov-di}
-    \begin{tabular}{llc}
-        \toprule
-        \textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
-        \midrule
-        \multicolumn{3}{l}{\textbf{$V_\phi$ Architecture}} \\
-        \midrule
-        Activation function & $\sigma$ & ReLU \\
-        Hidden layers & $L-1$ & 1 \\
-        Neurons per hidden layer & $n_h$ & 24 \\
-        \midrule
-        \multicolumn{3}{l}{\textbf{Training \& Optimization}} \\
-        \midrule
-        Outer epochs & $N_{\mathrm{outer}}$ & $2000$ \\
-        Inner steps per outer epoch & $K_{\mathrm{steps}}$ & $10$ \\
-        Batch size & $|\mathcal{B}_\rho|$ & $2048$ \\
-        Lyapunov candidate learning rate & $\eta$ & $0.001$ \\
-        Policy learning rate & $\eta_{\pi}$ & $0.0001$ \\
-        Weight decay & $\lambda_{\ell_2}$ & $10^{-6}$ \\
-        Lyapunov domain & $\mathcal{X}_V$ & $[-10, 10]^2$ \\
-        \midrule
-        \multicolumn{3}{l}{\textbf{Loss Formulation \& Weights}} \\
-        \midrule
-        Condition loss weight & $\lambda_{\rho\mathrm{-gated}}$ & $500.0$ \\
-        Relative invariance weight & $\lambda_{\mathrm{inv}}$ & $1.0$ \\
-        ROA expansion weight & $\lambda_{\mathrm{ROA}}$ & $5.0$ \\
-        LiRPA condition weight & $\lambda_{\mathrm{L}}$ & $15.0$ \\
-        Policy regularization weight & $\lambda_{\mathrm{pol}}$ & $0.1$ \\
-        Lyapunov decrease rate & $\kappa$ & $0.01$ \\
-        Relative decrease denominator offset & $\varepsilon_{\mathrm{rel}}$ & $0.01$ \\
-        \midrule
-        \multicolumn{3}{l}{\textbf{Falsification \& Adversarial Replay Buffer}} \\
-        \midrule
-        PGD step size & $\eta_{\mathrm{PGD}}$ & $0.001$ \\
-        PGD iterations & $I$ & $20$ \\
-        Counterexample maximum age & $\tau_{\max}$ & $5$ \\
-        Explorative pool size & $N_{\mathcal{S}}$ & $8192$ \\
-        Counterexample yield EMA decay rate & $\upsilon_{\mathcal{C}}$ & $0.8$ \\
-        Minimal counterexample batch fraction & $r_{\min}$ & $0.2$\\
-        Maximal counterexample batch fraction & $r_{\max}$ & $0.5$\\
-        \midrule
-        \multicolumn{3}{l}{\textbf{$\rho$-Sublevel Estimation}} \\
-        \midrule
-        Minimum sublevel bound & $\rho_{\mathrm{min}}$ & $10^{-6}$ \\
-        Sublevel growth factor & $\chi$ & $1.12$ \\
-        Gate sharpness & $s$ & $10.0$ \\
-        Exploration resample margin & $m_\rho$ & $1.5$ \\
-        EMA smoothing factor & $\upsilon_\rho$ & $0.8$ \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-
-\paragraph{Verification Setup.}
-To formally certify a region of attraction and compute the maximal certifiable sublevel set $\mathcal{V}_{\rho^\star}$, 
-the verification pipeline executes the scaling and bisection search in \cref{alg:search-and-bisect} using $\alpha,\beta$-CROWN. 
-All corresponding hyperparameters for the verification setup are listed in \cref{tab:hp-veri-di}.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Formal verification hyperparameter configuration for the double integrator.}
-    \label{tab:hp-veri-di}
-    \begin{tabular}{llc}
-        \toprule
-        \textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
-        \midrule
-        \multicolumn{3}{l}{\textbf{Domain \& Stability Specification}} \\
-        \midrule
-        Lyapunov decrease rate & $\kappa$ & $0.01$ \\
-        Verification domain & $\mathcal{X}_C$ & $[-10, 10]^2$ \\
-        Origin exclusion region & $\mathcal{X}_{\mathrm{hole}}$ & $[-0.05, 0.05] \times [-0.15, 0.15]$ \\
-        LiRPA bounding method & -- & CROWN \\
-        \midrule
-        \multicolumn{3}{l}{\textbf{Scaling \& Bisection Search}} \\
-        \midrule
-        Minimum sublevel bound & $\rho_{\min}$ & $10^{-6}$ \\
-        Search scale factor & $q$ & $1.2$ \\
-        Maximal scaling steps & $N_{\mathrm{scale}}$ & $20$ \\
-        Maximal bisection steps & $N_{\mathrm{bisect}}$ & $40$ \\
-        Bisection tolerance & $\varepsilon_{\mathrm{bisect}}$ & $10^{-3}$ \\
-        \midrule
-        \multicolumn{3}{l}{\textbf{$\alpha,\beta$-CROWN Verifier Settings}} \\
-        \midrule
-        Verifier batch size & $|\mathcal{B}_{\mathrm{ver}}|$ & $32$ \\
-        Input split partitions & $p_{\mathrm{split}}$ & $2$ \\
-        Verifier tolerance & $\varepsilon_{\mathrm{cond}}$ & $10^{-6}$ \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-
-% ================================================================================
-% Cartpole
-% ================================================================================
-\subsection{Cartpole}
-\label{sec:cartpole}
-
-
-\paragraph{System Dynamics}
-The inverted pendulum on a cart, commonly referred to as the cartpole system, is used as a nonlinear benchmark system in this work. 
+\paragraph{Cartpole.}
+The inverted pendulum on a cart, commonly referred to as the cartpole system, is an underactuated nonlinear system. 
 There are four states in the system: the cart position $p$, the cart velocity $v$, the pendulum angle $\varphi$, 
 and the pendulum angular velocity $\omega$. 
 Here, the discrete-time state vector is defined as $x_k = \begin{bmatrix}p_k & v_k & \varphi_k & \omega_k\end{bmatrix}^\top$,
 and the control input $u_k$ is the force $F_k$ applied to the cart. 
 Discretizing the continuous-time dynamics using the explicit Euler method with a sampling time of $\Delta t = 0.05\,\text{s}$ 
 leads to the discrete-time state-space equation:
-
 \begin{equation}
     \label{eq:cartpole}
     x_{k+1} = f_{\mathrm{CP}}(x_k, u_k) =
@@ -226,81 +56,204 @@ leads to the discrete-time state-space equation:
         \varphi_k + \Delta t \, \omega_k \\[4pt]
         \omega_k + \Delta t \, \frac{-u_k \cos(\varphi_k) - m l_p \omega_k^2 
         \sin(\varphi_k) \cos(\varphi_k) + (M + m) g \sin(\varphi_k)}{l_p (M + m - m \cos^2(\varphi_k))}
-    \end{bmatrix}
+    \end{bmatrix},
 \end{equation}
-
 where $M = 1\,\text{kg}$ is the mass of the cart, $m = 0.1\,\text{kg}$ is the mass of the pendulum, $l_p = 0.8\,\text{m}$ is the length of the pendulum, 
-and $g = 9.81\,\text{m/s}^2$ is the acceleration due to gravity.
-
-
-\paragraph{Data Generation.}
-The MPC formulation for the cartpole benchmark follows the optimal control problem in \labelcref{eq:mpc-problem} 
-with a prediction horizon of $N = 40$ stages, subject to the nonlinear dynamics defined in \labelcref{eq:cartpole}. 
-State deviations and control inputs are penalized using the stage weighting matrices $Q = \operatorname{diag}(10,\, 1,\, 10,\, 0.01)$ 
-and $R = 0.5$, respectively. 
-The stage state, terminal state, and input constraint sets are defined as 
-$\mathcal{X} = [\underline{x}, \overline{x}]$, $\mathcal{X}_f = [\underline{x}_f, \overline{x}_f]$, and 
-$\mathcal{U} = [\underline{u}, \overline{u}]$, with
-\begin{equation}
+and $g = 9.81\,\text{m/s}^2$ is the gravitational acceleration. 
+The corresponding state, terminal, and input bounds are defined as:
+\begin{equation*}
     \underline{x} = \underline{x}_f = \begin{bmatrix} -2 \\ -10 \\ -3\pi \\ -10 \end{bmatrix}, \qquad
     \overline{x}  = \overline{x}_f = \begin{bmatrix} 2 \\ 10 \\ 3\pi \\ 10 \end{bmatrix}, \qquad
     \underline{u} = -80, \qquad
     \overline{u}  = 80.
-\end{equation} 
+\end{equation*} 
 Instead of sampling initial states uniformly across the entire state space $\mathcal{X}$, trajectories are 
-initialized from a restricted sampling domain $\mathcal{X}_{\mathrm{MPC}} = [\underline{x}_{\mathrm{MPC}}, \overline{x}_{\mathrm{MPC}}]$ with
-\begin{equation}
+initialized from a smaller sampling domain $\mathcal{X}_{\mathrm{MPC}} := [\underline{x}_{\mathrm{MPC}}, \overline{x}_{\mathrm{MPC}}]$ with
+\begin{equation*}
     \underline{x}_{\mathrm{MPC}} = \begin{bmatrix} -2 \\ -10 \\ -\pi \\ -10 \end{bmatrix}, \qquad
     \overline{x}_{\mathrm{MPC}} = \begin{bmatrix} 2 \\ 10 \\ \pi \\ 10 \end{bmatrix}.
-\end{equation} 
+\end{equation*} 
+The cartpole MPC setup uses a prediction horizon of $N = 40$ stages, with weighting matrices 
+$Q = \operatorname{diag}(10,\, 1,\, 10,\, 0.01)$ and $R = 0.5$. Furthermore, the 
+terminal cost weight  is set to 
+\begin{equation*}
+    P =
+    \begin{bmatrix}
+        2112.121 & 957.461 & -3343.435 & -882.157 \\
+        957.461 & 699.028 & -2562.405 & -682.313 \\
+        -3343.435 & -2562.405 & 10833.55 & 2785.542 \\
+        -882.157 & -682.312846 & 2785.542 & 737.426 
+    \end{bmatrix}
+\end{equation*}
 
-Each MPC closed-loop trajectory is again computed using \texttt{acados}~\cite{verschuerenAcadosModularOpensource2022} over $k=200$ steps. 
-Under this configuration, a total of 20{,}000 feasible trajectories are generated by uniformly sampling initial states from $\mathcal{X}_{\mathrm{MPC}}$ 
-with an enforced state-wise minimum Euclidean distance of $\begin{bmatrix} 0.01 & 0.001 & 0.001 & 0.001\end{bmatrix}^\top$.
-The solver parameters for this setup are listed in \cref{abs:cp-acados-settings}. 
+
+% ================================================================================
+% Experimental Pipeline and Training Setup
+% ================================================================================
+\subsection{Experimental Pipeline and Training Setup}
+\label{subsec:experimental-pipeline}
+
+\paragraph{Expert Data Generation.}
+The closed-loop expert trajectories are computed using the open-source framework \texttt{acados}~\cite{verschuerenAcadosModularOpensource2022}, 
+by solving the MPC optimization problem in \labelcref{eq:mpc-problem}. 
+For both systems, a dataset $\mathcal{D}_\pi$ of 20{,}000 feasible trajectories is generated by uniformly sampling 
+initial states from $\mathcal{X}_{\mathrm{MPC}}$. 
+To ensure distinct data points, a state-wise minimum Euclidean distance filter is enforced between initial samples: 
+$0.001$ for the double integrator, and $\begin{bmatrix} 0.01 & 0.001 & 0.001 & 0.001\end{bmatrix}^\top$ for the cartpole. 
+Each closed-loop system is simulated over $k = 40$ steps for the double integrator and 
+$k = 200$ steps for the cartpole to capture full stabilization and swing-up behaviors. 
+The detailed solver configurations are shown in \cref{abs:di-acados-settings,abs:cp-acados-settings}.
 
 
-\paragraph{Control Policy Training.}
-Since the cartpole is a nonlinear system, the selected model $h_\theta$ needs to be slightly bigger than for the linear problem
-to regularize well on the data. To this end, the model has two hidden layers, each with $24$ neurons. However, most of the other 
-hyperparameters are the same as for the linear system in \cref{tab:hp-im-di}. The entire training hyperparameters for the cartpole 
-can thus be seen in \cref{tab:hp-im-cp}.
-
+\todo{Put in actual cartpole values}
+\paragraph{Imitation Policy Training.}
+The imitation policy $\pi_\theta$ is based on the architecture defined in \labelcref{eq:policy-arch}, 
+where an inner network $h_\theta$ is combined with state-wise clamping to ensure constraint satisfaction. 
+An $80/20$ train-validation split is utilized to monitor generalization and drive the learning rate scheduler. 
+Optimization is performed using Adam with a \texttt{ReduceLROnPlateau} scheduler that reduces the learning rate 
+whenever the validation loss fails to improve for a given patience. 
+To preserve imitation accuracy close to the origin, a state-dependent loss weighting $w_x(x) \in [w_{\min}, 1]$ is applied. 
+Whereas only one hidden layer with 24 neurons is sufficient for the double integrator, 
+the cartpole uses two hidden layers with 24 neurons each to be able to learn its nonlinearity. 
+In addition, \cref{tab:hp-imitation} lists all imitation learning hyperparameters for both systems.
 
 \begin{table}[htbp]
     \centering
-    \caption{Imitation learning hyperparameter configuration for the cartpole.}
-    \label{tab:hp-im-cp}
-    \begin{tabular}{llc}
+    \caption{Imitation learning hyperparameter configuration for both benchmark systems.}
+    \label{tab:hp-imitation}
+    \begin{tabular}{llcc}
         \toprule
-        \textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
+        \textbf{Parameter} & \textbf{Symbol} & \textbf{Double Integrator} & \textbf{Cartpole} \\
         \midrule
-        \multicolumn{3}{l}{\textbf{Architecture}} \\
+        \multicolumn{4}{l}{\textbf{Architecture}} \\
         \midrule
-        Activation function & $\sigma$ & ReLU \\
-        Hidden layers & $L-1$ & $1$ \\
-        Neurons per hidden layer & $n_h$ & $24$ \\
+        Activation & $\sigma$ & \multicolumn{2}{c}{ReLU} \\
+        Hidden layers & $L-1$ & $1$ & $2$ \\
+        Hidden neurons & $n_h$ & \multicolumn{2}{c}{$24$} \\
         \midrule
-        \multicolumn{3}{l}{\textbf{Training \& Optimization}} \\
+        \multicolumn{4}{l}{\textbf{Training \& Optimization}} \\
         \midrule
-        Epochs & $E$ & $200$ \\
-        Learning rate & $\eta$ & $0.001$ \\
-        Batch size & $|\mathcal{B}_\pi|$ & $512$ \\
-        Dataset split (Train / Val) & -- & $0.8 \, N_{\mathcal{D}}$ / $0.2 \, N_{\mathcal{D}}$ \\
-        Reference decay rate & $\gamma$ & $1.2$ \\
-        Minimal state-dependent weight & $w_{\min}$ & $0.5$ \\
-        Weight decay & $\lambda_{\ell_2}$ & $0.0001$ \\
-        Behavioral cloning weight & $\lambda_{\mathrm{BC}}$ & $0.5$ \\
-        One-step invariance weight & $\lambda_f$ & $5$ \\
-        LR scheduler & -- & ReduceLROnPlateau \\
-        Scheduler parameters & -- & factor $= 0.5$, patience $= 4$ \\
+        Epochs & $E$ & $1000$ & $200$ \\
+        Learning rate & $\eta$ & \multicolumn{2}{c}{$0.001$} \\
+        Batch size & $|\mathcal{B}_\pi|$ & $1024$ & $512$ \\
+        Dataset split & -- & \multicolumn{2}{c}{$0.8\,|\mathcal{D}_\pi| \;/\; 0.2\,|\mathcal{D}_\pi|$} \\
+        Policy domain & $\mathcal{X}_\pi$ & $[-10, 10]^2$ & \begin{tabular}{@{}c@{}} $[-2, 2] \times [-10, 10]$ \\ $\times\, [-3\pi, 3\pi] \times [-10, 10]$ \end{tabular} \\
+        Ref. decay rate & $\gamma$ & $1.0$ & $1.2$ \\
+        Min. state weight & $w_{\min}$ & \multicolumn{2}{c}{$0.5$} \\
+        Weight decay & $\lambda_{\ell_2}$ & \multicolumn{2}{c}{$0.0001$} \\
+        BC loss weight & $\lambda_{\mathrm{BC}}$ & $1.0$ & $0.5$ \\
+        Invariance weight & $\lambda_f$ & $1.0$ & $5.0$ \\
+        LR scheduler & -- & \multicolumn{2}{c}{ReduceLROnPlateau} \\
+        Scheduler params & -- & factor $= 0.5$, patience $= 5$ & factor $= 0.5$, patience $= 4$ \\
         \bottomrule
     \end{tabular}
 \end{table}
 
 
+\paragraph{Neural Lyapunov Function Co-Training.}
+The Lyapunov candidate $V_\phi(x)$ formulated in \labelcref{eq:lyapunov-candidate} combines an inner network $g_\phi$ 
+with a positive definite quadratic term $(\varepsilon I + R_\phi^\top R_\phi)(x - x^\star)$. 
+The matrix $R_\phi$ is initialized from the discrete algebraic Riccati equation (DARE) solution matrix $P$ 
+of the linearized dynamics at the origin using the eigendecomposition $P = V \Lambda V^\top$ as $R_\phi = \Lambda^{1/2} V^\top$. 
+For the double integrator, $R_\phi$ remains fixed throughout training, which eliminates the need for penalty terms related 
+to the Frobenius norm and scaling. 
+Conversely, for the cartpole, $g_\phi$ is parameterized with two hidden layers of 24 neurons each and $R_\phi$ is not fixed. 
+To compute the LiRPA-condition loss $\loss_{\mathrm{L}}$, the state space $\mathcal{X}_V$ is partitioned into a uniform hyper-rectangular grid. 
+The exclusion region $\mathcal{X}_{\mathrm{hole}}$, further defined in \cref{sec:formal-verification}, is used to avoid numerical issues near equilibrium.
+Additionally, the co-training and falsification hyperparameters are listed in \cref{tab:hp-lyapunov}.
 
-\paragraph{Neural Lyapunov Function Training.}
+\begin{table}[htbp]
+    \centering
+    \caption{Hyperparameter configuration for the falsification-guided co-training.}
+    \label{tab:hp-lyapunov}
+    \begin{tabular}{llcc}
+        \toprule
+        \textbf{Parameter} & \textbf{Symbol} & \textbf{Double Integrator} & \textbf{Cartpole} \\
+        \midrule
+        \multicolumn{4}{l}{\textbf{$V_\phi$ Architecture}} \\
+        \midrule
+        Activation & $\sigma$ & \multicolumn{2}{c}{ReLU} \\
+        Hidden layers & $L-1$ & $1$ & $2$ \\
+        Hidden neurons & $n_h$ & \multicolumn{2}{c}{$24$} \\
+        \midrule
+        \multicolumn{4}{l}{\textbf{Training \& Optimization}} \\
+        \midrule
+        Outer epochs & $N_{\mathrm{outer}}$ & \multicolumn{2}{c}{$2000$} \\
+        Inner steps / epoch & $K_{\mathrm{steps}}$ & \multicolumn{2}{c}{$10$} \\
+        Batch size & $|\mathcal{B}_\rho|$ & \multicolumn{2}{c}{$2048$} \\
+        Lyapunov LR & $\eta$ & \multicolumn{2}{c}{$0.001$} \\
+        Policy LR & $\eta_{\pi}$ & \multicolumn{2}{c}{$0.0001$} \\
+        Weight decay & $\lambda_{\ell_2}$ & \multicolumn{2}{c}{$10^{-6}$} \\
+        Lyapunov domain & $\mathcal{X}_V$ & $[-10, 10]^2$ & \begin{tabular}{@{}c@{}} $[-2, 2] \times [-10, 10]$ \\ $\times\, [-3\pi, 3\pi] \times [-10, 10]$ \end{tabular} \\
+        \midrule
+        \multicolumn{4}{l}{\textbf{Loss Formulation \& Weights}} \\
+        \midrule
+        $\rho$-gated loss weight & $\lambda_{\rho\mathrm{-gated}}$ & \multicolumn{2}{c}{$500.0$} \\
+        Invariance loss weight & $\lambda_{\mathrm{inv}}$ & \multicolumn{2}{c}{$1.0$} \\
+        ROA loss weight & $\lambda_{\mathrm{ROA}}$ & \multicolumn{2}{c}{$5.0$} \\
+        LiRPA loss weight & $\lambda_{\mathrm{L}}$ & \multicolumn{2}{c}{$15.0$} \\
+        Policy reg. weight & $\lambda_{\mathrm{pol}}$ & \multicolumn{2}{c}{$0.1$} \\
+        Decrease rate & $\kappa$ & \multicolumn{2}{c}{$0.01$} \\
+        Rel. decrease offset & $\varepsilon_{\mathrm{rel}}$ & \multicolumn{2}{c}{$0.01$} \\
+        \midrule
+        \multicolumn{4}{l}{\textbf{Falsification \& Adversarial Replay Buffer}} \\
+        \midrule
+        PGD step size & $\eta_{\mathrm{PGD}}$ & \multicolumn{2}{c}{$0.001$} \\
+        PGD iterations & $I$ & \multicolumn{2}{c}{$20$} \\
+        Max. buffer age & $\tau_{\max}$ & \multicolumn{2}{c}{$5$} \\
+        Exploration pool size & $N_{\mathcal{S}}$ & \multicolumn{2}{c}{$8192$} \\
+        Yield EMA decay & $\upsilon_{\mathcal{C}}$ & \multicolumn{2}{c}{$0.8$} \\
+        Min. CE batch fraction & $r_{\min}$ & \multicolumn{2}{c}{$0.2$}\\
+        Max. CE batch fraction & $r_{\max}$ & \multicolumn{2}{c}{$0.5$}\\
+        \midrule
+        \multicolumn{4}{l}{\textbf{$\rho$-Sublevel Estimation}} \\
+        \midrule
+        Min. sublevel bound & $\rho_{\mathrm{min}}$ & \multicolumn{2}{c}{$10^{-6}$} \\
+        Sublevel growth factor & $\chi$ & \multicolumn{2}{c}{$1.12$} \\
+        Gate sharpness & $s$ & \multicolumn{2}{c}{$10.0$} \\
+        Resample margin & $m_\rho$ & \multicolumn{2}{c}{$1.5$} \\
+        EMA smoothing factor & $\upsilon_\rho$ & \multicolumn{2}{c}{$0.8$} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 
-\paragraph{Verification Setup.}
+\paragraph{Formal Verification Setup.}
+To formally certify the region of attraction and compute the maximal certifiable sublevel set $\mathcal{V}_{\rho^\star}$, 
+the verification pipeline uses the scaling and bisection search in \cref{alg:search-and-bisect}, which relies on 
+$\alpha,\beta$-CROWN~\cite{wang2021beta,xuFastCompleteEnabling2021}. 
+As described in \cref{sec:formal-verification}, the verification is performed over the punctured state space 
+$\mathcal{X}_{\mathrm{eval}} = \mathcal{X}_C \setminus \mathcal{X}_{\mathrm{hole}}$. 
+All verifier settings and hyperparameter choices are listed in \cref{tab:hp-verification}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Formal verification hyperparameter configuration for both benchmark systems.}
+    \label{tab:hp-verification}
+    \begin{tabular}{llcc}
+        \toprule
+        \textbf{Parameter} & \textbf{Symbol} & \textbf{Double Integrator} & \textbf{Cartpole} \\
+        \midrule
+        \multicolumn{4}{l}{\textbf{Domain \& Stability Specification}} \\
+        \midrule
+        Decrease rate & $\kappa$ & \multicolumn{2}{c}{$0.01$} \\
+        Verification domain & $\mathcal{X}_C$ & $[-10, 10]^2$ & \begin{tabular}{@{}c@{}} $[-2, 2] \times [-10, 10]$ \\ $\times\, [-3\pi, 3\pi] \times [-10, 10]$ \end{tabular} \\
+        Origin exclusion & $\mathcal{X}_{\mathrm{hole}}$ & $[-0.05, 0.05] \times [-0.15, 0.15]$ & \begin{tabular}{@{}c@{}} $[-0.01, 0.01] \times$ \\ $[-0.001, 0.001]^3$ \end{tabular} \\
+        Bounding method & -- & \multicolumn{2}{c}{CROWN} \\
+        \midrule
+        \multicolumn{4}{l}{\textbf{Scaling \& Bisection Search}} \\
+        \midrule
+        Min. sublevel bound & $\rho_{\min}$ & \multicolumn{2}{c}{$10^{-6}$} \\
+        Scale factor & $q$ & \multicolumn{2}{c}{$1.2$} \\
+        Max. scaling steps & $N_{\mathrm{scale}}$ & \multicolumn{2}{c}{$20$} \\
+        Max. bisection steps & $N_{\mathrm{bisect}}$ & \multicolumn{2}{c}{$40$} \\
+        Bisection tolerance & $\varepsilon_{\mathrm{bisect}}$ & \multicolumn{2}{c}{$10^{-3}$} \\
+        \midrule
+        \multicolumn{4}{l}{\textbf{$\alpha,\beta$-CROWN Verifier Settings}} \\
+        \midrule
+        Batch size & $|\mathcal{B}_{\mathrm{ver}}|$ & \multicolumn{2}{c}{$32$} \\
+        Input partitions & $p_{\mathrm{split}}$ & \multicolumn{2}{c}{$2$} \\
+        Verifier tolerance & $\varepsilon_{\mathrm{cond}}$ & \multicolumn{2}{c}{$10^{-6}$} \\
+        \bottomrule
+    \end{tabular}
+\end{table}

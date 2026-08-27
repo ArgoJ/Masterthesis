@@ -19,8 +19,8 @@ is obtained by approximating the continuous dynamics using a numerical integrati
 Here, $k \in \mathbb{N}_0$ denotes the discrete time step index, such that $x_k := x(k T_s) \in \mathbb{R}^{n_x}$ and 
 $u_k := u(k T_s) \in \mathbb{R}^{n_u}$ represent the state and control input at time step $k$. 
 The discrete-time function $f: \mathbb{R}^{n_x} \times \mathbb{R}^{n_u} \to \mathbb{R}^{n_x}$ is evaluated using a 
-numerical integration scheme, such as the forward Euler or a fourth-order Runge-Kutta (RK4) method~
-\cite{butcherNumericalMethodsOrdinary2016}.
+numerical integration scheme, such as the forward Euler or a fourth-order Runge-Kutta (RK4) 
+method~\cite{butcherNumericalMethodsOrdinary2016}.
 
 To account for physical and operational limitations, the system states and control inputs are restricted to 
 constraint sets $\mathcal{X} := [\underline{x}, \overline{x}] \subseteq \mathbb{R}^{n_x}$ and 
