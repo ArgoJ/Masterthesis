@@ -233,7 +233,7 @@ with a specified probability at each optimization step.
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/box_sobol_sampling.tex}
-    \caption[Sobol sequence illustration]{Comparisson of Sobol and uniform sampling in two dimensions.}
+    \caption[Sobol sequence illustration]{Comparison of Sobol and uniform sampling in two dimensions.}
     \label{fig:sobol-sampling}
 \end{figure}
 
@@ -242,8 +242,8 @@ with a specified probability at each optimization step.
 to the output of the original imitation controller $\pi$, which is based on the MPC teacher. 
 A quasi-Monte Carlo batch $\mathcal{B}_{\mathrm{pol}} \subset \mathcal{X}_V$ is sampled using a 
 low-discrepancy Sobol sequence~\cite{joeConstructingSobolSequences2008}. 
-To prevent overfitting to a static set of states, this batch also is resampled from $\mathcal{X}_V$ 
-with a given probability each optimization step. 
+To prevent overfitting to a static set of states, this batch is also resampled from $\mathcal{X}_V$ 
+with a given probability at each optimization step. 
 The normalized deviation between the learned policy and the imitation controller over this batch is formulated as
 \begin{equation}
     \label{eq:policy-scaling-loss}
@@ -346,7 +346,7 @@ significantly reducing their likelihood of being selected.
 \end{algorithm}
 
 The counterexample pool $\mathcal{C}$ stores the critical violations identified during the PGD falsification step. 
-An age-tracking mechanism limits sample lifespan, preventing overfitting outdated violations.
+An age-tracking mechanism limits sample lifespan, preventing overfitting to outdated violations.
 Each injected counterexample is assigned an initial age $\tau = 0$, which is incremented after every subsequent falsification phase. 
 Once a counterexample reaches the maximum age $\tau_{\max}$, it is removed from the pool. 
 Consequently, the condition loss continuously penalizes recent violations while discarding resolved edge cases as the Lyapunov candidate evolves.

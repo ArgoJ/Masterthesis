@@ -115,9 +115,9 @@ While $\ell_1$-regularization promotes sparse parameter representations, $\ell_2
 penalizes large parameter magnitudes and can improve numerical stability and generalization. 
 In practice, these penalties are applied exclusively to the network's weight matrices $W \subset \theta$, 
 leaving bias vectors $b$ unpenalized.~\citeSec{3.7.2}{kollmannsbergerDeepLearningComputational2021}.
-Alongside regularization penalties, the auxiliary loss $\loss_{\mathrm{aux}}$ incorporates domain knowledge into the 
-optimization process, such as differential equations or Lyapunov conditions~
-\citeSec{5}{kollmannsbergerDeepLearningComputational2021},~\cite{yangLyapunovstableNeuralControl2024}. 
+Alongside regularization penalties, the auxiliary loss $\loss_{\mathrm{aux}}$ incorporates domain knowledge, such as differential 
+equations or Lyapunov conditions~\citeSec{5}{kollmannsbergerDeepLearningComputational2021},~\cite{yangLyapunovstableNeuralControl2024}, 
+into the optimization process. 
 Enforcing these properties during training helps the network learn the desired physically sound solutions.
 
 
@@ -158,20 +158,20 @@ through the network~\citeSec{3.4,2.3}{kollmannsbergerDeepLearningComputational20
 While full-batch gradient descent evaluates the loss gradient over the entire dataset $\mathcal{D}$, 
 this can become computationally expensive and impractical for large dataset sizes $|\mathcal{D}|$. 
 Conversely, single-sample stochastic gradient descent (SGD) results in high variance of the parameter updates, 
-leading to erratic optimization trajectories. Mini-batch gradient solves this problem by dividing the 
+leading to erratic optimization trajectories. Mini-batch gradient descent solves this problem by dividing the 
 dataset into smaller subsets $\mathcal{B} \subset \mathcal{D}$ of size $|\mathcal{B}|$. For a mini-batch, 
 the loss $\loss(\mathcal{B}; \theta)$ is evaluated analogously to \cref{eq:total-loss}, 
 with $\mathcal{D}$ replaced by $\mathcal{B}$ in all data-dependent loss terms. 
 Typically, the mini-batch gradient $\nabla_\theta \loss(\mathcal{B}; \theta)$ has lower variance than the gradient obtained from a single sample, 
 while mini-batch processing enables efficient parallelization on modern GPU hardware.
 During training, the parameters $\theta$ are iteratively updated following gradient descent, scaled by a 
-learning rate $\eta > 0$. This update loop is inturn executed for a total of $E \in \mathbb{N}$ epochs~
+learning rate $\eta > 0$. This update loop is in turn executed for a total of $E \in \mathbb{N}$ epochs~
 \citeSec{2.6.1,2.6}{aggarwalNeuralNetworksDeep2023,kollmannsbergerDeepLearningComputational2021}.
 
 
 \paragraph{Adaptive Moment Estimation.}
 Although mini-batch gradient descent improves stability compared to SGD, its performance depends on 
-a static learning rate $\eta$. In loss landscapes with noisy mini-batch gradients or challanging curvature, 
+a static learning rate $\eta$. In loss landscapes with noisy mini-batch gradients or challenging curvature, 
 a fixed learning rate can cause parameter updates to oscillate in steep directions while 
 making slow progress or none on plateaus~\citeSec{4.5.4}{aggarwalNeuralNetworksDeep2023}.
 
