@@ -87,6 +87,40 @@
   langid = {english}
 }
 
+@article{diehlRealTimeIterationScheme2005,
+  title = {A {{Real-Time Iteration Scheme}} for {{Nonlinear Optimization}} in {{Optimal Feedback Control}}},
+  author = {Diehl, Moritz and Bock, Hans Georg and Schlöder, Johannes P.},
+  date = {2005-01},
+  journaltitle = {SIAM Journal on Control and Optimization},
+  shortjournal = {SIAM J. Control Optim.},
+  volume = {43},
+  number = {5},
+  pages = {1714--1736},
+  issn = {0363-0129, 1095-7138},
+  doi = {10.1137/S0363012902400713},
+  url = {https://epubs.siam.org/doi/10.1137/S0363012902400713},
+  urldate = {2026-08-28},
+  abstract = {An efficient Newton-type scheme for the approximate on-line solution of optimization problems as they occur in optimal feedback control is presented. The scheme allows a fast reaction to disturbances by delivering approximations of the exact optimal feedback control which are iteratively refined during the runtime of the controlled process. The contractivity of this real-time iteration scheme is proven, and a bound on the loss of optimality---compared with the theoretical optimal solution---is given. The robustness and excellent real-time performance of the method is demonstrated in a numerical experiment, the control of an unstable system, namely, an airborne kite that shall fly loops.},
+  langid = {english}
+}
+
+@inproceedings{ghezziImitationLearningNonlinear2023,
+  title = {Imitation {{Learning}} from {{Nonlinear MPC}} via the {{Exact Q-Loss}} and Its {{Gauss-Newton Approximation}}},
+  booktitle = {{{IEEE Conference}} on {{Decision}} and {{Control}}},
+  author = {Ghezzi, Andrea and Hoffman, Jasper and Frey, Jonathan and Boedecker, Joschka and Diehl, Moritz},
+  date = {2023},
+  volume = {62},
+  pages = {4766--4771},
+  issn = {2576-2370},
+  doi = {10.1109/CDC49753.2023.10383323},
+  url = {https://ieeexplore.ieee.org/document/10383323},
+  urldate = {2026-08-28},
+  abstract = {This work presents a novel loss function for learning nonlinear Model Predictive Control policies via Imitation Learning. Standard approaches to Imitation Learning neglect information about the expert and generally adopt a loss function based on the distance between expert and learned controls. In this work, we present a loss based on the Q-function directly embedding the performance objectives and constraint satisfaction of the associated Optimal Control Problem (OCP). However, training a Neural Network with the Q-loss requires solving the associated OCP for each new sample. To alleviate the computational burden, we derive a second Q-loss based on the Gauss-Newton approximation of the OCP resulting in a faster training time. We validate our losses against Behavioral Cloning, the standard approach to Imitation Learning, on the control of a nonlinear system with constraints. The final results show that the Q-function-based losses significantly reduce the amount of constraint violations while achieving comparable or better closed-loop costs.},
+  eventtitle = {2023 62nd {{IEEE Conference}} on {{Decision}} and {{Control}} ({{CDC}})},
+  keywords = {Behavioral sciences,Cloning,Costs,Nonlinear systems,Optimal control,Reinforcement learning,Training},
+  file = {C:\Users\josua\Zotero\storage\PFHICAN5\10383323.html}
+}
+
 @inproceedings{goodfellowExplainingHarnessingAdversarial2015,
   title = {Explaining and {{Harnessing Adversarial Examples}}},
   booktitle = {International {{Conference}} on {{Learning Representations}}},
@@ -115,6 +149,44 @@
   langid = {english},
   pagetotal = {456},
   file = {C:\Users\josua\Zotero\storage\MR5CNCTZ\Grüne und Pannek - 2017 - Nonlinear Model Predictive Control Theory and Algorithms.pdf}
+}
+
+@article{hertneckLearningApproximateModel2018,
+  title = {Learning an {{Approximate Model Predictive Controller}} with {{Guarantees}}},
+  author = {Hertneck, Michael and Köhler, Johannes and Trimpe, Sebastian and Allgöwer, Frank},
+  date = {2018},
+  journaltitle = {IEEE Control Systems Letters},
+  shortjournal = {IEEE Control Syst. Lett.},
+  volume = {2},
+  eprint = {1806.04167},
+  eprinttype = {arXiv},
+  eprintclass = {eess.SY},
+  pages = {543--548},
+  issn = {2475-1456},
+  doi = {10.1109/LCSYS.2018.2843682},
+  url = {http://arxiv.org/abs/1806.04167},
+  urldate = {2026-08-28},
+  abstract = {A supervised learning framework is proposed to approximate a model predictive controller (MPC) with reduced computational complexity and guarantees on stability and constraint satisfaction. The framework can be used for a wide class of nonlinear systems. Any standard supervised learning technique (e.g. neural networks) can be employed to approximate the MPC from samples. In order to obtain closed-loop guarantees for the learned MPC, a robust MPC design is combined with statistical learning bounds. The MPC design ensures robustness to inaccurate inputs within given bounds, and Hoeffding's Inequality is used to validate that the learned MPC satisfies these bounds with high confidence. The result is a closed-loop statistical guarantee on stability and constraint satisfaction for the learned MPC. The proposed learning-based MPC framework is illustrated on a nonlinear benchmark problem, for which we learn a neural network controller with guarantees.},
+  keywords = {Computer Science - Machine Learning,Electrical Engineering and Systems Science - Systems and Control},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\6Q8NEMTF\\Hertneck et al. - 2018 - Learning an Approximate Model Predictive Controller with Guarantees.pdf;C\:\\Users\\josua\\Zotero\\storage\\F9X8AEZC\\1806.html}
+}
+
+@article{hewingLearningBasedModelPredictive2020,
+  title = {Learning-{{Based Model Predictive Control}}: {{Toward Safe Learning}} in {{Control}}},
+  shorttitle = {Learning-{{Based Model Predictive Control}}},
+  author = {Hewing, Lukas and Wabersich, Kim P. and Menner, Marcel and Zeilinger, Melanie N.},
+  date = {2020},
+  journaltitle = {Annual Review of Control, Robotics, and Autonomous Systems},
+  shortjournal = {Annu. Rev. Control Robot. Auton. Syst.},
+  volume = {3},
+  pages = {269--296},
+  publisher = {Annual Review},
+  issn = {2573-5144},
+  doi = {10.1146/annurev-control-090419-075625},
+  url = {https://www.annualreviews.org/content/journals/10.1146/annurev-control-090419-075625},
+  urldate = {2026-08-28},
+  abstract = {Recent successes in the field of machine learning, as well as the availability of increased sensing and computational capabilities in modern control systems, have led to a growing interest in learning and data-driven control techniques. Model predictive control (MPC), as the prime methodology for constrained control, offers a significant opportunity to exploit the abundance of data in a reliable manner, particularly while taking safety constraints into account. This review aims at summarizing and categorizing previous research on learning-based MPC, i.e., the integration or combination of MPC with learning methods, for which we consider three main categories. Most of the research addresses learning for automatic improvement of the prediction model from recorded data. There is, however, also an increasing interest in techniques to infer the parameterization of the MPC controller, i.e., the cost and constraints, that lead to the best closed-loop performance. Finally, we discuss concepts that leverage MPC to augment learning-based controllers with constraint satisfaction properties.},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\5JKTJHPU\\Hewing et al. - 2020 - Learning-Based Model Predictive Control Toward Safe Learning in Control.pdf;C\:\\Users\\josua\\Zotero\\storage\\I6LXFDUN\\annurev-control-090419-075625.html}
 }
 
 @online{huangBranchBoundMixed2021,
@@ -148,6 +220,23 @@
   url = {http://epubs.siam.org/doi/10.1137/070709359},
   urldate = {2026-08-03},
   langid = {english}
+}
+
+@article{kargEfficientRepresentationApproximation2020,
+  title = {Efficient {{Representation}} and {{Approximation}} of {{Model Predictive Control Laws}} via {{Deep Learning}}},
+  author = {Karg, Benjamin and Lucia, Sergio},
+  date = {2020},
+  journaltitle = {IEEE Transactions on Cybernetics},
+  shortjournal = {IEEE Trans. Cybern.},
+  volume = {50},
+  pages = {3866--3878},
+  issn = {2168-2275},
+  doi = {10.1109/TCYB.2020.2999556},
+  url = {https://ieeexplore.ieee.org/document/9123670},
+  urldate = {2026-08-28},
+  abstract = {We show that artificial neural networks with rectifier units as activation functions can exactly represent the piecewise affine function that results from the formulation of model predictive control (MPC) of linear time-invariant systems. The choice of deep neural networks is particularly interesting as they can represent exponentially many more affine regions compared to networks with only one hidden layer. We provide theoretical bounds on the minimum number of hidden layers and neurons per layer that a neural network should have to exactly represent a given MPC law. The proposed approach has a strong potential as an approximation method of predictive control laws, leading to a better approximation quality and significantly smaller memory requirements than previous approaches, as we illustrate via simulation examples. We also suggest different alternatives to correct or quantify the approximation error. Since the online evaluation of neural networks is extremely simple, the approximated controllers can be deployed on low-power embedded devices with small storage capacity, enabling the implementation of advanced decision-making strategies for complex cyber-physical systems with limited computing capabilities.},
+  keywords = {Biological neural networks,Embedded systems,Machine learning,Memory management,neural networks,Neurons,Optimization,predictive control,Predictive control},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\CMWNQC7K\\Karg und Lucia - 2020 - Efficient Representation and Approximation of Model Predictive Control Laws via Deep Learning.pdf;C\:\\Users\\josua\\Zotero\\storage\\2GQR2AZP\\9123670.html}
 }
 
 @inproceedings{katzReluplexEfficientSMT2017,
@@ -285,6 +374,21 @@
   file = {C:\Users\josua\Zotero\storage\73QFQQEE\Rawlings et al. - 2020 - Model predictive control theory, computation and design.pdf}
 }
 
+@article{reiterSynthesisOfMPC2026,
+  title = {Synthesis of Model Predictive Control and Reinforcement Learning: {{Survey}} and Classification},
+  author = {Reiter, Rudolf and Hoffmann, Jasper and Reinhardt, Dirk and Messerer, Florian and Baumgärtner, Katrin and Sawant, Shambhuraj and Bödecker, Joschka and Diehl, Moritz and Gros, Sebastien},
+  date = {2026},
+  journaltitle = {Annual Reviews in Control},
+  shortjournal = {Annu. Rev. Control},
+  volume = {61},
+  pages = {101045},
+  issn = {1367-5788},
+  doi = {10.1016/j.arcontrol.2026.101045},
+  url = {https://www.sciencedirect.com/science/article/pii/S1367578826000015},
+  abstract = {model predictive control (MPC) and reinforcement learning (RL) are two successful control techniques for Markov decision processes. Both approaches are derived from similar fundamental principles, and both are widely used in practical applications, including robotics, process control, energy systems, and autonomous driving. Despite their similarities, MPC and RL follow distinct paradigms that emerged from diverse communities and different requirements. Various technical discrepancies, particularly the role of an environment model as part of the algorithm, lead to methodologies with nearly complementary advantages. Due to their orthogonal benefits, research interest in combination methods has recently increased significantly, resulting in a large and growing set of complex ideas that leverage MPC and RL. This work illuminates the differences, similarities, and fundamentals that enable various combination algorithms and categorizes existing work accordingly. Particularly, we focus on the versatile actor–critic RL approach as a basis for our categorization and examine how the online optimization approach of MPC can be used to improve the overall closed-loop performance of a policy.},
+  keywords = {Approximate dynamic programming,Model predictive control,Reinforcement learning}
+}
+
 @inproceedings{salman2019convex,
   title = {A Convex Relaxation Barrier to Tight Robustness Verification of Neural Networks},
   booktitle = {Advances in {{Neural Information Processing Systems}}},
@@ -347,14 +451,25 @@
   file = {C\:\\Users\\josua\\Zotero\\storage\\WPYKKTUR\\Tjeng et al. - 2019 - Evaluating Robustness of Neural Networks with Mixed Integer Programming.pdf;C\:\\Users\\josua\\Zotero\\storage\\SQ5MEQ88\\1711.html}
 }
 
+@legislation{VerordnungEU20242024,
+  title = {Regulation ({{EU}}) 2024/1689 of 13 {{June}} 2024 {{Laying}} down {{Harmonised Rules}} on {{Artificial Intelligence}} ({{Artificial Intelligence Act}})},
+  shorttitle = {{{EU AI Act}}},
+  author = {{European Parliament and Council of the European Union}},
+  date = {2024},
+  journaltitle = {OJ L 2024/1689},
+  url = {http://data.europa.eu/eli/reg/2024/1689/oj},
+  urldate = {2026-08-28},
+  langid = {english},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\ZMM44C82\\European Parliament and Council of the European Union - 2024 - Regulation (EU) 20241689 of 13 June 2024 Laying down Harmonised Rules on Artificial Intelligence (A.pdf;C\:\\Users\\josua\\Zotero\\storage\\UVWNBXYA\\oj.html}
+}
+
 @article{verschuerenAcadosModularOpensource2022,
   title = {Acados—a Modular Open-Source Framework for Fast Embedded Optimal Control},
   author = {Verschueren, Robin and Frison, Gianluca and Kouzoupis, Dimitris and Frey, Jonathan and family=Duijkeren, given=Niels, prefix=van, useprefix=false and Zanelli, Andrea and Novoselnik, Branimir and Albin, Thivaharan and Quirynen, Rien and Diehl, Moritz},
-  date = {2022-03-01},
+  date = {2022},
   journaltitle = {Mathematical Programming Computation},
   shortjournal = {Math. Program. Comput.},
   volume = {14},
-  number = {1},
   pages = {147--183},
   issn = {1867-2957},
   doi = {10.1007/s12532-021-00208-8},
