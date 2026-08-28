@@ -2,72 +2,82 @@
 \label{ch:intro}
 
 The use of autonomous cyber-physical systems in safety-critical areas requires control architectures that combine high flexibility,
-real-time capability, and strict safety guarantees. During the last decades, Model Predictive Control (MPC) has been well studied 
-and is established as a method for constrained multivariable optimal control, offering deterministic satisfaction of the constraints. 
+real-time capability, and strict safety guarantees. Model Predictive Control (MPC) is well-established for constrained multivariable optimal control, 
+offering systematic and provable constraint satisfaction under nominal model assumptions. 
 Furthermore, MPC provides well-understood stability guarantees for the closed-loop system, based on Lyapunov 
 theory~\cite{gruneNonlinearModelPredictive2017,rawlingsModelPredictiveControl2020}. 
 Even though numerical solvers become increasingly efficient, real-time execution of nonlinear MPC requires a significant amount of 
 computational power, which is especially limiting for embedded systems.
-To overcome this computational limitation neural control policies have proven to be a strong alternative. 
-In particular, approaches based on imitative or Reinforcement Learning enable highly efficient computation during inference, 
-due to a simple forward pass~\cite{kargEfficientRepresentationApproximation2020,hertneckLearningApproximateModel2018,hewingLearningBasedModelPredictive2020}.  
-Furthermore, recent literature has increasingly focused on the synergistic synthesis of MPC and Reinforcement Learning~\cite{reiterSynthesisOfMPC2026}.
+To address this computational limitation, neural control policies synthesized using Imitation or Reinforcement Learning offer highly efficient inference 
+during a forward pass~\cite{kargEfficientRepresentationApproximation2020,hertneckLearningApproximateModel2018,hewingLearningBasedModelPredictive2020}, 
+motivating recent interest in synergistic MPC-learning frameworks~\cite{reiterSynthesisOfMPC2026}.
 
-Despite their remarkable performance on high-dimensional and nonlinear tasks, the practical application of trained neural
-control strategies in safety-critical areas remains severely limited. In industrial and public applications, deployment does not fail
-due to lack of performance, but rather due to the absence of formal, verifiable guarantees regarding closed-loop stability,
+Despite their remarkable performance on high-dimensional and nonlinear tasks, the implementation of trained neural
+control strategies in safety-critical areas remains severely limited. In industrial and public applications, deployment rarely fail
+due to lack of performance, but rather due to the absence of rigorous, verifiable guarantees regarding closed-loop stability,
 forward invariance, and robustness~\cite{yangLyapunovstableNeuralControl2024}. 
-Conventional neural networks function as black-box function approximators that generalize well on average,
-but are known to be vulnerable to out-of-distribution shifts, domain violations, and 
-adversarial perturbations~\cite{aggarwalNeuralNetworksDeep2023,zhangEfficientNeuralNetwork2018,goodfellowExplainingHarnessingAdversarial2015}. 
+Standard neural networks generalize well on average, but are vulnerable to out-of-distribution shifts, 
+domain violations, and adversarial 
+perturbations~\cite{aggarwalNeuralNetworksDeep2023,zhangEfficientNeuralNetwork2018,goodfellowExplainingHarnessingAdversarial2015,szegedyIntriguingPropertiesNeural2014}. 
 
-Given these vulnerabilities, the lack of formal guarantees is no longer just a theoretical problem, as lawmakers and regulatory agencies
-around the world are shifting from general guidelines to binding technical requirements. 
+Consequently, formal guarantees are no longer just a theoretical problem, as lawmakers and regulatory agencies
+around the world are shifting towards binding technical requirements. 
 Under the European Union's Artificial Intelligence Act (Regulation (EU) 2024/1689), autonomous and safety-critical control systems 
-fall into the category of \textit{High-Risk AI}, which legally imposes strict requirements on risk management, deterministic robustness, and 
-verifiable system reliability throughout the entire lifecycle~\cite{VerordnungEU20242024}. 
-Crucially, while regulatory authorities establish these requirements, they deliberately do not prescribe any specific
-mathematical or algorithmic methods for compliance. This work addresses this methodological gap by proposing a deterministic,
-GPU-accelerated framework for training and formally certifying neural imitation controllers using learned neural Lyapunov functions.
+fall into the category of \textit{High-Risk AI}, which imposes strict regulatory requirements on risk management, system robustness and 
+verifiable reliability~\cite{VerordnungEU20242024}. 
+Since the regulatory frameworks requires compliance without prescribing specific algorithmic solutions, this work addresses this gap by 
+proposing an integrated, GPU-accelerated framework for training and formally verifying neural imitation policies using learned Lyapunov candidates.
 
-\subsection*{State of the Art}
+\section*{State of the Art}
 \label{sec:intro-sota}
 
+In control theory, the stability of a closed-loop system is typically proven using Lyapunov stability theory, which requires finding a scalar, 
+energy-like function $V(x)$ that is positive definite and strictly decreasing along non-equilibrium closed-loop 
+trajectories over a Lyapunov sublevel set $\mathcal{V}_\rho$, which provides a certified inner approximation of the 
+ROA~\cite{gruneNonlinearModelPredictive2017,rawlingsModelPredictiveControl2020}. 
+However, for nonlinear systems controlled by neural policies, it is difficult to construct these Lyapunov certificates and formally verify the 
+Lyapunov conditions across a continuous state space. Recent research has therefore focused on the joint synthesis of neural Lyapunov
+functions and neural controllers, coupled with formal verification
+methods~\cite{yangLyapunovstableNeuralControl2024}.
+To verify these stability properties, established verification frameworks rely on general-purpose Satisfiability Modulo Theories 
+(SMT)~\cite{katzReluplexEfficientSMT2017} or Mixed-Integer Linear Programming (MILP)~\cite{tjengEvaluatingRobustnessNeural2019} solvers. 
+While mathematically sound, they scale poorly with increasing state-space dimensionality and network depth, which 
+makes the formal verification of nonlinear closed-loop systems on larger domains challenging~\cite{bunelUnifiedViewPiecewise2018,xuFastCompleteEnabling2021}.
+To address these computational constraints, recent advances in formal verification methods introduce complete, GPU-accelerated bound propagation using 
+$\alpha,\beta$-CROWN~\cite{wang2021beta,xuFastCompleteEnabling2021}. 
+By combining linear bound propagation with Branch-and-Bound verification, $\alpha,\beta$-CROWN can substantially accelerate complete verification 
+relative to classical LP-based branch-and-bound baselines, enabling formal certification for broader classes of closed-loop neural control 
+benchmarks~\cite{yangLyapunovstableNeuralControl2024}.
 
-\subsection*{Contributions of this Work}
+\section*{Contributions of this Work}
 \label{subsec:intro-contributions}
 
 In contrast to prior work focusing on learning certified neural controllers from scratch, this thesis establishes an integrated framework 
 for learning imitation policies from nominal MPC experts, followed by learning a corresponding Lyapunov candidate to formally verify the converged policy. 
-
-A Dataset generated with an MPC expert is used to optimize a constrained policy architecture that enforces control input bounds 
+A dataset generated with an MPC expert is used to optimize a constrained policy architecture that enforces control input bounds 
 $\underline{u} \le \pi_\theta(x) \le \overline{u}$ and satisfies the equilibrium constraint $\pi_\theta(x^\star) = u^\star$ by construction. 
 The optimization penalizes deviations with state-dependent weights prioritizing accuracy near the origin, while promoting forward invariance 
-using a one-step dynamics-aware loss on the unconstrained policy terms. Building upon the converged imitation policy, 
+using a one-step dynamics-aware loss. Building upon the converged imitation policy, 
 the policy is refined while simultaneously learning a structurally positive definite neural Lyapunov candidate $V_\phi(x)$.
-The optimization objective incorporates a soft $\rho$-gated Lyapunov condition and state invariance loss, augmented by LiRPA 
-bound propagation penalties as well as scaling and regularization terms to shape a verifier-friendly loss landscape.
+The optimization objective incorporates a soft $\rho$-gated Lyapunov condition and state invariance loss, augmented by LiRPA bound propagation 
+penalties to shape a verifier-friendly loss landscape.
 To compute the gated loss, the sublevel bound $\rho$ is dynamically estimated along the domain boundary using $\ell_\infty$-Projected Gradient Descent (PGD). 
-Simultaneously, adversarial mining using PGD actively searches for stability counterexamples, which are maintained in an age-tracked 
-replay buffer and fed back into training to systematically eliminate localized condition violations.
+Simultaneously, adversarial mining using PGD actively searches for stability counterexamples, which are maintained in a 
+replay buffer and fed back into training to actively address localized condition violations.
 For rigorous guarantees, a formal certification pipeline based on the complete $\alpha,\beta$-CROWN verifier utilizes a scaling and 
 bisection search algorithm to soundly compute the maximal certified sublevel value $\rho^*$~\cite{yangLyapunovstableNeuralControl2024}. 
 Formulating the stability criteria as a disjunctive logical specification over a punctured state space enables the solver to formally certify 
-positive definiteness, regional forward invariance, and exponential Lyapunov decrease. The resulting closed-loop trajectories closely 
-follow the MPC expert with high fidelity, while providing certified stability over a formally verified Region of Attraction.
+positive definiteness, regional forward invariance, and exponential Lyapunov decrease.
 
-\subsection*{Overview}
+\section*{Overview}
 \label{subsec:intro-overview}
 
 The remainder of this thesis consists of seven chapters, with \cref{ch:optimal-control} presenting the theoretical foundations for Lyapunov stability 
 as well as for model predictive control (MPC) under constraints and closed-loop stability. This is followed by \cref{ch:ml}, which explains the 
 fundamentals of neural networks, in particular multilayer perceptrons, efficient optimization, and backpropagation, as well as adversarial attacks 
-using Projected Gradient Descent (PGD). \Cref{ch:formal-verification} provides an overview of the mathematical principles of formal neural network 
-verification using $\alpha,\beta$-CROWN. Here, the incomplete linear bound propagation methods, which may yield inconclusive results due to relaxation errors, 
-are presented, as well as a complete Branch-and-Bound (BaB) method using Lagrangian relaxations combined with incomplete verification methods. 
-The proposed framework is detailed in \cref{ch:methods}, clarifying the imitation policy architecture and loss. It introduces the 
-neural Lyapunov learning pipeline, describing the Lyapunov candidate architecture, the used loss formulations and data handling, as well as the verified 
-sublevel set search. \Cref{ch:results} shows the experiments conducted on the linear double integrator and nonlinear cartpole as benchmarks. 
-To this end, both the experimental setups and the resulting imitation and verification performance are presented for each system. 
-\Cref{ch:discussion} discusses the results examining trade-offs and challenges. Finally, \cref{ch:conclusion} summarizes the essence
-of this work and outlines further research recommendations for certified neural control.
+using Projected Gradient Descent (PGD). \Cref{ch:formal-verification} covers formal neural network verification using $\alpha,\beta$-CROWN, 
+contrasting incomplete linear bound propagation with complete Branch-and-Bound methods.
+\Cref{ch:methods} details the proposed framework, covering the constrained imitation architecture, the Lyapunov learning pipeline, and 
+the verified sublevel set search. \Cref{ch:results} evaluates the framework on a linear double integrator and a nonlinear cartpole benchmark,
+including their setup. In \Cref{ch:discussion}, the resulting trade-offs and scalability limits are analyzed. 
+Finally, \cref{ch:conclusion} summarizes the essence of this work and outlines further research recommendations for certified neural control.

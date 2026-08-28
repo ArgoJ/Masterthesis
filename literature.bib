@@ -1,3 +1,20 @@
+@article{abateFormalSynthesisLyapunov2021,
+  title = {Formal {{Synthesis}} of {{Lyapunov Neural Networks}}},
+  author = {Abate, Alessandro and Ahmed, Daniele and Giacobbe, Mirco and Peruffo, Andrea},
+  date = {2021},
+  journaltitle = {IEEE Control Systems Letters},
+  shortjournal = {IEEE Control Syst. Lett.},
+  volume = {5},
+  pages = {773--778},
+  issn = {2475-1456},
+  doi = {10.1109/LCSYS.2020.3005328},
+  url = {https://ieeexplore.ieee.org/document/9126840},
+  urldate = {2026-08-28},
+  abstract = {We propose an automatic and formally sound method for synthesising Lyapunov functions for the asymptotic stability of autonomous non-linear systems. Traditional methods are either analytical and require manual effort or are numerical but lack of formal soundness. Symbolic computational methods for Lyapunov functions, which are in between, give formal guarantees but are typically semi-automatic because they rely on the user to provide appropriate function templates. We propose a method that finds Lyapunov functions fully automatically-using machine learning-while also providing formal guarantees-using satisfiability modulo theories (SMT). We employ a counterexample-guided approach where a numerical learner and a symbolic verifier interact to construct provably correct Lyapunov neural networks (LNNs). The learner trains a neural network that satisfies the Lyapunov criteria for asymptotic stability over a samples set; the verifier proves via SMT solving that the criteria are satisfied over the whole domain or augments the samples set with counterexamples. Our method supports neural networks with polynomial activation functions and multiple depth and width, which display wide learning capabilities. We demonstrate our method over several non-trivial benchmarks and compare it favourably against a numerical optimisation-based approach, a symbolic template-based approach, and a cognate LNN-based approach. Our method synthesises Lyapunov functions faster and over wider spatial domains than the alternatives, yet providing stronger or equal guarantees.},
+  keywords = {Asymptotic stability,Biological neural networks,Computer-aided control design,Lyapunov methods,neural networks,Neurons,Numerical stability,Stability analysis},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\46LPSGP5\\Abate et al. - 2021 - Formal Synthesis of Lyapunov Neural Networks.pdf;C\:\\Users\\josua\\Zotero\\storage\\25GER2HS\\9126840.html}
+}
+
 @book{aggarwalNeuralNetworksDeep2023,
   title = {Neural Networks and Deep Learning: A Textbook},
   shorttitle = {Neural Networks and Deep Learning},
@@ -85,6 +102,18 @@
   doi = {10.1002/9781119121534},
   isbn = {978-1-119-12153-4},
   langid = {english}
+}
+
+@inproceedings{changNeuralLyap2019,
+  title = {Neural Lyapunov Control},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
+  author = {Chang, Ya-Chien and Roohi, Nima and Gao, Sicun},
+  editor = {Wallach, H. and Larochelle, H. and Beygelzimer, A. and family=Buc, given=F., prefix=dAlché-, useprefix=true and Fox, E. and Garnett, R.},
+  date = {2019},
+  volume = {32},
+  publisher = {Curran Associates, Inc.},
+  url = {https://proceedings.neurips.cc/paper_files/paper/2019/file/2647c1dba23bc0e0f9cdf75339e120d2-Paper.pdf},
+  eventtitle = {33th {{Conference}} on {{Neural Information Processing Systems}}}
 }
 
 @article{diehlRealTimeIterationScheme2005,
