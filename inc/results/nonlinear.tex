@@ -7,3 +7,15 @@
     \input{tikz/results/cartpole/cp_policy_error_bands.tex}
     \caption{Cartpole error band. $x_\theta - x_{\mathrm{MPC}}$}
 \end{figure}
+
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/results/cartpole/cp_cotraining_traces.tex}
+    \caption[Cartpole co-training convergence traces]{
+        Co-training progression for the cartpole system, showing the gated condition loss $\loss_{\rho\mathrm{-gated}}$ on the top left 
+        and the ROA loss $\loss_{\mathrm{ROA}}$ on the bottom left over inner optimization steps, alongside 
+        the mined counterexamples $N_{\mathrm{mined}}$ on the top right and the estimated sublevel set bound $\tilde{\rho}$ on the bottom right 
+        over outer epochs.}
+    \label{fig:cp-cotraining-traces}
+\end{figure}
