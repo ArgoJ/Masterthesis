@@ -1,13 +1,18 @@
 \section{Nonlinear System Results: Cartpole}
 \label{sec:results-nonlinear}
 
-
+Compared to the linear double integrator, controlling the nonlinear cartpole system presents a significantly more challenging benchmark. 
+The inverted pendulum dynamics are open-loop unstable around the upright equilibrium $\varphi^\star = 0$, 
+and the strong nonlinear coupling terms between the cart acceleration and the pendulum states amplify small control deviations. 
+To evaluate the approximation accuracy of the learned imitation policy compared to the MPC expert, the closed-loop tracking 
+error trajectories over validation rollouts are illustrated in \cref{fig:cp-policy-error-bands}. 
 \begin{figure}[htbp]
     \centering
     \input{tikz/results/cartpole/cp_policy_error_bands.tex}
-    \caption{Cartpole error band. $x_\theta - x_{\mathrm{MPC}}$}
+    \caption[Closed-loop cartpole error bands]{
+        Closed-loop trajectory tracking error between the learned imitation policy and the MPC expert for the cartpole system, showing the error envelopes and the mean over time.}
+    \label{fig:cp-policy-error-bands}
 \end{figure}
-
 
 \begin{figure}[htbp]
     \centering
