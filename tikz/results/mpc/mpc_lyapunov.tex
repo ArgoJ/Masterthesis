@@ -844,10 +844,10 @@
 
 \begin{tikzpicture}
 \begin{axis}[
-    xlabel={$x$},
+    xlabel={$p\,[\text{m}]$},
     xmin=-10.0,
     xmax=10.0,
-    ylabel={$v$},
+    ylabel={$v\,[\text{m/s}]$},
     ymin=-10.0,
     ymax=10.0,
     view={0}{90},
@@ -873,7 +873,7 @@
     },
     colormap={plotly}{rgb255(0)=(68,1,84) rgb255(11)=(72,40,120) rgb255(22)=(62,73,137) rgb255(33)=(49,104,142) rgb255(44)=(38,130,142) rgb255(56)=(31,158,137) rgb255(67)=(53,183,121) rgb255(78)=(110,206,88) rgb255(89)=(181,222,43) rgb255(100)=(253,231,37)}
 ]
-    \addplot graphics [xmin=-10.0, xmax=10.0, ymin=-10.0, ymax=10.0] {tikz/results/mpc_lyapunov_contour_bg.png};
+    \addplot graphics [xmin=-10.0, xmax=10.0, ymin=-10.0, ymax=10.0] {tikz/results/mpc/mpc_lyapunov_contour_bg.png};
     \addplot+[mark=none, color=black, solid, line width=0.8pt, forget plot] table {\dataVNXLine};
     \addplot+[mark=none, color=black, solid, line width=0.8pt, forget plot] table {\dataVNXLineOne};
     \addplot+[mark=none, color=black, solid, line width=0.8pt, forget plot] table {\dataVNXLineTwo};

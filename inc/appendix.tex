@@ -12,47 +12,82 @@ state-action pairs are removed during preprocessing. The concatenated
 state-action vectors are normalized and mapped onto an adaptive voxel grid.
 For each occupied voxel, at most one representative pair is retained.
 
-\subsection{\texorpdfstring{$\alpha,\beta$}{α,β}-CROWN Verification Backend Configuration}
-\label{app:abcrown-config}
-To ensure reproducibility of the formal certification pipeline, the default configuration for the $\alpha,\beta$-CROWN verification backend is summarized in \cref{tab:app-abcrown-config}. 
-The backend utilizes input-space Branch-and-Bound (\texttt{input\_bab}) combined with CROWN linear bound propagation and Split-by-Score (\texttt{sb}) branching.
+\subsection{\texorpdfstring{\texttt{acados}}{acados} OCP Solver Configuration}
+\label{app:acados-config}
+For generating the expert MPC trajectories, the optimal control problems are solved using \texttt{acados}~\cite{verschuerenAcadosModularOpensource2022}. 
+\Cref{tab:app-acados-config} summarizes the underlying NLP and QP solver options as well as the integrator configuration.
 
 \begin{table}[htbp]
     \centering
-    \caption{Detailed configuration parameters for the $\alpha,\beta$-CROWN verification backend.}
-    \label{tab:app-abcrown-config}
-    \begin{tabular}{lll}
+    \caption{Configuration options for the \texttt{acados} OCP solver.}
+    \label{tab:app-acados-config}
+    \begin{tabular}{llc}
         \toprule
         \textbf{Parameter} & \textbf{Configuration Key} & \textbf{Value} \\
         \midrule
-        \multicolumn{3}{l}{\textbf{General Strategy}} \\
+        \multicolumn{3}{l}{\textbf{NLP Solver}} \\
         \midrule
-        Verifier mode & \texttt{general.complete\_verifier} & \texttt{input\_bab} \\
-        Incomplete verification pre-pass & \texttt{general.enable\_incomplete\_verification} & \texttt{False} \\
+        NLP solver type & \texttt{nlp\_solver\_type} & \texttt{SQP} \\
+        Hessian approximation & \texttt{hessian\_approx} & \texttt{GAUSS\_NEWTON} \\
+        Max. NLP iterations & \texttt{nlp\_solver\_max\_iter} & $200$ \\
         \midrule
-        \multicolumn{3}{l}{\textbf{Bounding \& Solver}} \\
+        \multicolumn{3}{l}{\textbf{QP Solver}} \\
         \midrule
-        Bound propagation method & \texttt{solver.bound\_prop\_method} & \texttt{crown} \\
-        Batch size (subdomains per GPU step) & \texttt{solver.batch\_size} & $32$ \\
+        QP solver & \texttt{qp\_solver} & \texttt{FULL\_CONDENSING\_HPIPM} \\
+        Max. QP iterations & \texttt{qp\_solver\_iter\_max} & $200$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Integrator \& Simulation}} \\
+        \midrule
+        Integrator type & \texttt{integrator\_type} & \texttt{ERK} \\
+        Number of stages & \texttt{sim\_method\_num\_stages} & $1$ \\
+        Number of steps & \texttt{sim\_method\_num\_steps} & $1$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{\texorpdfstring{$\alpha,\beta$}{α,β}-CROWN Verification Backend Configuration}
+\label{app:abcrown-config}
+To ensure reproducibility of the formal certification pipeline, the default configuration for the $\alpha,\beta$-CROWN verification 
+used in this thesis is summarized in \cref{tab:app-abcrown-config}. 
+The backend utilizes input-space Branch-and-Bound (\texttt{input\_bab}) combined with CROWN linear bound propagation and 
+Split-by-Score (\texttt{sb}) branching.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \caption{Configuration parameters for the $\alpha,\beta$-CROWN verification backend.}
+    \label{tab:app-abcrown-config}
+    \begin{tabular}{llc}
+        \toprule
+        \textbf{Parameter} & \textbf{Configuration Key} & \textbf{Value} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{General}} \\
+        \midrule
+        Verifier mode & \texttt{complete\_verifier} & \texttt{input\_bab} \\
+        Incomplete verification & \texttt{enable\_incomplete\_verification} & \texttt{False} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Solver}} \\
+        \midrule
+        Bound propagation & \texttt{bound\_prop\_method} & \texttt{crown} \\
+        Batch size & \texttt{batch\_size} & $32$ \\
         \midrule
         \multicolumn{3}{l}{\textbf{Branch-and-Bound (BaB)}} \\
         \midrule
-        Branching heuristic & \texttt{bab.branching.method} & \texttt{sb} (Split-by-Score) \\
-        Input space splitting & \texttt{bab.branching.input\_split.enable} & \texttt{True} \\
-        Split partitions per dimension & \texttt{bab.branching.input\_split.split\_partitions} & $2$ \\
-        IBP intermediate enhancement & \texttt{bab.branching.input\_split.ibp\_enhancement} & \texttt{True} \\
-        Monotonic bound comparison & \texttt{bab.branching.input\_split.compare\_with\_old\_bounds} & \texttt{True} \\
-        Adversarial check in tree & \texttt{bab.branching.input\_split.adv\_check} & $-1$ \\
+        Decision threshold & \texttt{decision\_thresh} & $-\varepsilon_{\mathrm{cond}} = -10^{-6}$ \\
+        Domain timeout limit & \texttt{timeout} & $60.0\,\mathrm{s}$ \\
+        Maximal active domains & \texttt{max\_domains} & $\infty$ (\texttt{None}) \\
         \midrule
-        \multicolumn{3}{l}{\textbf{Adversarial Falsification}} \\
+        \multicolumn{3}{l}{\textbf{Branching (Input Space)}} \\
+        Branching heuristic & \texttt{method} & \texttt{sb} \\
+        Input space splitting & \texttt{input\_split.enable} & \texttt{True} \\
+        Split partitions & \texttt{input\_split.split\_partitions} & $2$ \\
+        IBP enhancement & \texttt{input\_split.ibp\_enhancement} & \texttt{True} \\
+        Bound comparison & \texttt{input\_split.compare\_with\_old\_bounds} & \texttt{True} \\
+        Adversarial check & \texttt{input\_split.adv\_check} & $-1$ \\
         \midrule
-        PGD attack scheduling & \texttt{attack.pgd\_order} & \texttt{before} \\
+        \multicolumn{3}{l}{\textbf{Attack}} \\
         \midrule
-        \multicolumn{3}{l}{\textbf{Termination \& Tolerances}} \\
-        \midrule
-        Decision threshold & \texttt{bab.decision\_thresh} & $-\varepsilon_{\mathrm{cond}} = -10^{-6}$ \\
-        Domain timeout limit & \texttt{bab.timeout} & $60.0\,\mathrm{s}$ \\
-        Maximal active domains & \texttt{bab.max\_domains} & $\infty$ (\texttt{None}) \\
+        PGD attack scheduling & \texttt{pgd\_order} & \texttt{before} \\
         \bottomrule
     \end{tabular}
 \end{table}

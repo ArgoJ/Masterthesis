@@ -145,51 +145,6 @@
 
 \pgfplotstableread{
     x y
-    0 2.05935e-09
-    0.1 -4.62081e-09
-    0.2 -2.37111e-08
-    0.3 -5.57134e-08
-    0.4 -2.09852e-07
-    0.5 -3.32696e-05
-    0.6 -0.000253451
-    0.7 -0.000454374
-    0.8 -0.0005859
-    0.9 -0.000907489
-    1 -0.000448505
-    1.1 -0.000558187
-    1.2 -0.000583719
-    1.3 -0.000148218
-    1.4 -3.57537e-05
-    1.5 -6.15306e-06
-    1.6 -1.83848e-05
-    1.7 2.23794e-05
-    1.8 -0.000155681
-    1.9 -0.000156779
-    2 -0.000151463
-    2.1 -0.000151838
-    2.2 -0.000112437
-    2.3 -0.000133396
-    2.4 -9.95865e-05
-    2.5 -8.71559e-05
-    2.6 -8.63893e-05
-    2.7 -6.82557e-05
-    2.8 -5.27729e-05
-    2.9 -4.63342e-05
-    3 -3.15262e-05
-    3.1 -2.3986e-05
-    3.2 -2.23549e-05
-    3.3 -2.41721e-05
-    3.4 -1.75783e-05
-    3.5 -1.58567e-05
-    3.6 -1.13615e-05
-    3.7 -9.71464e-06
-    3.8 -6.31469e-06
-    3.9 -4.84297e-06
-    4 -1.76585e-06
-}\dataMedian
-
-\pgfplotstableread{
-    x y
     0 4.7618e-07
     0.1 0.401546
     0.2 0.328367
@@ -325,51 +280,6 @@
 
 \pgfplotstableread{
     x y
-    0 -3.3025e-09
-    0.1 -2.19247e-08
-    0.2 -5.18862e-08
-    0.3 -5.51422e-08
-    0.4 -1.0492e-07
-    0.5 -8.99841e-08
-    0.6 7.5348e-08
-    0.7 0.00118967
-    0.8 0.000463736
-    0.9 -0.00233429
-    1 -0.00176813
-    1.1 -0.00171673
-    1.2 -0.00247671
-    1.3 5.35036e-05
-    1.4 -0.000696443
-    1.5 -0.00164268
-    1.6 -0.00126142
-    1.7 -0.000937881
-    1.8 -0.000576849
-    1.9 -0.000158915
-    2 3.71984e-05
-    2.1 7.14491e-05
-    2.2 0.000225545
-    2.3 0.000265735
-    2.4 0.000206287
-    2.5 0.000176541
-    2.6 0.000197311
-    2.7 0.000155342
-    2.8 0.00012957
-    2.9 0.000135756
-    3 0.000114737
-    3.1 9.76797e-05
-    3.2 0.000125958
-    3.3 0.000105385
-    3.4 0.000110185
-    3.5 0.000104928
-    3.6 9.43943e-05
-    3.7 8.89557e-05
-    3.8 7.39713e-05
-    3.9 5.53444e-05
-    4 5.08992e-05
-}\dataMedianOne
-
-\pgfplotstableread{
-    x y
     0 4.01547
     0.1 3.49245
     0.2 4.81751
@@ -500,81 +410,32 @@
     3.9 -0.000310785
 }\dataMeanTwo
 
-\pgfplotstableread{
-    x y
-    0 0
-    0.1 0
-    0.2 0
-    0.3 0
-    0.4 0
-    0.5 0
-    0.6 -1.77636e-15
-    0.7 -3.55271e-15
-    0.8 -7.72715e-14
-    0.9 0
-    1 -8.88178e-16
-    1.1 -1.06581e-14
-    1.2 -1.77636e-15
-    1.3 -0.000435117
-    1.4 -0.00109386
-    1.5 -0.00231194
-    1.6 -0.000184107
-    1.7 0.000585199
-    1.8 -0.0012308
-    1.9 0.00047741
-    2 0.000710841
-    2.1 0.000569366
-    2.2 5.77877e-05
-    2.3 -0.000131396
-    2.4 -0.000185469
-    2.5 -0.00030688
-    2.6 -0.000344357
-    2.7 -0.000268701
-    2.8 -0.000309102
-    2.9 -0.000277422
-    3 -0.000261834
-    3.1 -0.000311915
-    3.2 -0.000317573
-    3.3 -0.00035711
-    3.4 -0.000396388
-    3.5 -0.000361704
-    3.6 -0.0003483
-    3.7 -0.00034755
-    3.8 -0.000337904
-    3.9 -0.000317786
-}\dataMedianTwo
-
 \begin{tikzpicture}
 \begin{groupplot}[
     group style={
         group size=1 by 3,
-        vertical sep=0.35cm,
+        vertical sep=0.25cm,
         xlabels at=edge bottom,
         xticklabels at=edge bottom
     },
-    width=0.8\textwidth,
-    height=3.2cm,
+    width=0.66\textwidth,
+    height=2.5cm,
     scale only axis,
     xmin=0,
     xmax=4,
     xtick={0,1,2,3,4}
 ]
 \nextgroupplot[
-    ylabel={$\Delta x$},
+    ylabel={$\Delta p\,[\text{m}]$},
     ymin=-0.168199,
     ymax=0.123656
 ]
-    \addplot+[name path=dataMax, line width=1.5pt, color=red, mark=none] table {\dataMax};
-    \addlegendentry{max}
-    \addplot+[name path=dataMin, line width=1.5pt, color=red, mark=none] table {\dataMin};
-    \addlegendentry{min}
+    \addplot+[name path=dataMax, line width=1.5pt, color=red, mark=none, forget plot] table {\dataMax};
+    \addplot+[name path=dataMin, line width=1.5pt, color=red, mark=none, forget plot] table {\dataMin};
     \addplot[fill=shapeColor2, fill opacity=0.25, draw=none, forget plot] fill between[of=dataMax and dataMin];
-    \addplot+[name path=dataMean, dashed, line width=2pt, color=black, mark=none] table {\dataMean};
-    \addlegendentry{mean}
-    \addplot+[name path=dataMedian, line width=2pt, color=blue, mark=none] table {\dataMedian};
-    \addlegendentry{median}
+    \addplot+[name path=dataMean, dashed, line width=2pt, color=black, mark=none, forget plot] table {\dataMean};
 \nextgroupplot[
-    ylabel={$\Delta v$},
+    ylabel={$\Delta v\,[\text{m/s}]$},
     ymin=-0.601987,
     ymax=0.528259
 ]
@@ -582,17 +443,28 @@
     \addplot+[name path=dataMinOne, line width=1.5pt, color=red, mark=none, forget plot] table {\dataMinOne};
     \addplot[fill=shapeColor2, fill opacity=0.25, draw=none, forget plot] fill between[of=dataMaxOne and dataMinOne];
     \addplot+[name path=dataMeanOne, dashed, line width=2pt, color=black, mark=none, forget plot] table {\dataMeanOne};
-    \addplot+[name path=dataMedianOne, line width=2pt, color=blue, mark=none, forget plot] table {\dataMedianOne};
 \nextgroupplot[
-    xlabel={$t$},
-    ylabel={$\Delta u$},
+    xlabel={$t\,[\text{s}]$},
+    ylabel={$\Delta u\,[\text{N}]$},
     ymin=-5.44329,
-    ymax=7.02479
+    ymax=7.02479,
+    legend style={
+        at={(0.5,-0.38)},
+        anchor=north,
+        legend columns=-1,
+        /tikz/every even column/.append style={column sep=0.5cm},
+        draw=none,
+        fill=none,
+        font=\small
+    }
 ]
-    \addplot+[name path=dataMaxTwo, line width=1.5pt, const plot, color=red, mark=none, forget plot] table {\dataMaxTwo};
-    \addplot+[name path=dataMinTwo, line width=1.5pt, const plot, color=red, mark=none, forget plot] table {\dataMinTwo};
+    \addplot+[name path=dataMaxTwo, line width=1.5pt, const plot, color=red, mark=none] table {\dataMaxTwo};
+    \addlegendentry{max}
+    \addplot+[name path=dataMinTwo, line width=1.5pt, const plot, color=red, mark=none] table {\dataMinTwo};
+    \addlegendentry{min}
     \addplot[fill=shapeColor2, fill opacity=0.25, draw=none, forget plot] fill between[of=dataMaxTwo and dataMinTwo];
-    \addplot+[name path=dataMeanTwo, dashed, line width=2pt, const plot, color=black, mark=none, forget plot] table {\dataMeanTwo};
-    \addplot+[name path=dataMedianTwo, line width=2pt, const plot, color=blue, mark=none, forget plot] table {\dataMedianTwo};
+    \addplot+[name path=dataMeanTwo, dashed, line width=2pt, const plot, color=black, mark=none] table {\dataMeanTwo};
+    \addlegendentry{mean}
+    \addlegendentry{median}
 \end{groupplot}
 \end{tikzpicture}

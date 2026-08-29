@@ -14,14 +14,14 @@ The initial loss $\loss_\pi$ for this particular policy starts with $23.787$, de
 and then converges to $0.047$ after 1000 epochs, which can be seen in \cref{fig:di-im-loss}. 
 \begin{figure}[htbp]
     \centering
-    \input{tikz/results/mpc_lyapunov.tex}
+    \input{tikz/results/mpc/mpc_lyapunov.tex}
     \caption{Double integrator Lyapunov landscape of the MPC's optimal value function with an estimated ROA: $1.45\cdot 10^3$.}
     \label{fig:di-mpc-lyapunov}
 \end{figure}
 \begin{figure}[htbp]
     \centering
-    \input{tikz/results/di_policy_error_bands.tex}
-    \caption{Double integrator error band. $x_\theta - x_{\mathrm{MPC}}$}
+    \input{tikz/results/double_integrator/di_policy_error_bands.tex}
+    \caption{Closed-loop trajectory tracking error between the learned policy and the MPC expert for the double integrator.}
     \label{fig:di-policy-error-bands}
 \end{figure}
 
@@ -31,7 +31,19 @@ Based on the boundary samples used for the sublevel set estimation $\mathcal{B}_
 $|g_\phi(x) - g_\phi(x^\star)|$ is $17.7\,\%$ and the positive-definite auxiliary term share 
 $\left\|  (\varepsilon I + R_\phi^\top R_\phi) (x - x^\star)  \right\|_1$ is about $82.3\,\%$. 
 This indicates that while the auxiliary term accounts for most of the magnitude and guarantees strict positive definiteness, 
-the neural component provides the necessary local deformations to satisfy the decrease conditions.
+the neural component provides the necessary local deformations to satisfy the decrease conditions. 
+As illustrated in \cref{fig:di-cex-roa}, the number of mined counterexamples found during training, $N_{\mathrm{mined}}$, 
+decreases from initially $141$ to $20$ in the final outer epoch, with a temporary increase to $299$ due to the aging buffer.
+At the same time, the ROA loss $\loss_{\mathrm{ROA}}$ decreases from $11.312$ to $1.314$, 
+which indicates an expanding region of attraction, with a simultaneous decrease in the number of counterexamples.
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/results/double_integrator/di_cex_roa.tex}
+    \caption{Progress of the co-training for the double integrator: 
+        At the left figure the number of mined counterexamples $N_{\mathrm{mined}}$ per outer epoch are shown. 
+        The right figure illustrates the convergence of the region of attraction loss $\loss_{\mathrm{ROA}}$ over inner optimization steps.}
+    \label{fig:di-cex-roa}
+\end{figure}
 
 After training the candidate $V_\phi(x)$, the final pipeline step is to find a formally verified sublevel set $\mathcal{V}_\rho$ 
 to ensure stability of the closed-loop dynamics. Given the setup in \cref{tab:hp-verification}, the verifier finds the largest formally 
@@ -41,8 +53,9 @@ than the MPC baseline with an area of $183.22$. The volume measurements for both
 Monte-Carlo integration over the state space $\mathcal{X}$.
 \begin{figure}[htbp]
     \centering
-    \input{tikz/results/di_roa.tex}
-    \caption{Double integrator Lyapunov landscape and ROA: $\rho^\star = 665.66$}
+    \input{tikz/results/double_integrator/di_roa.tex}
+    \caption{Learned Lyapunov function landscape $V_\phi$ for the double integrator with the maximal certified region of attraction 
+        boundary $\mathcal{V}_{\rho^\star}$ at $\rho^\star = 665.66$.}
     \label{fig:di-roa}
 \end{figure}
 

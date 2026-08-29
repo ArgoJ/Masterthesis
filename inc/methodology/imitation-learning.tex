@@ -40,7 +40,9 @@ This yields the neural policy visualized in \cref{fig:imitation-policy}:
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/policy_nn.tex}
-    \caption[Imitation Policy]{The imitation learning policy.}
+    \caption[Imitation policy architecture]{
+        Architecture of the imitation control policy $\pi_\theta(x)$, which ensures exact control action replication 
+        at the equilibrium $u_\star$ and enforces hard control input constraints through clipping.}
     \label{fig:imitation-policy}
 \end{figure}
 
@@ -54,19 +56,15 @@ the loss terms are normalized using strictly positive diagonal scaling matrices
     \quad \text{and} \quad
     S_u = \diag(u_{\mathrm{scale}}) \in \mathbb{R}^{n_u \times n_u}.
 \end{equation}
-Using $S_x$, the normalized distance of a state $x$ from the equilibrium $x^\star$ is quantified with the $\ell_1$-norm as
-\begin{equation}
-    \label{eq:state-distance}
-    d(x) = \frac{1}{n_x} \left\| S_x^{-1}(x - x^\star) \right\|_1.
-\end{equation}
-
-To assign appropriate priority during behavioral cloning, a state-dependent weight is defined as
+To prioritize approximation accuracy near the equilibrium during behavioral cloning, a state-dependent weight $w_x(x)$ is defined as
 \begin{equation}
     \label{eq:state-weight}
-    w_x(x) = w_{\min} + (1 - w_{\min}) \left( \frac{1}{1 + d(x)} \right)^{\gamma_x},
+    w_x(x) = w_{\min} + (1 - w_{\min}) \left( \frac{1}{1 + d(x)} \right)^{\gamma_x}, 
+    \quad \text{with} \quad
+    d(x) = \frac{1}{n_x} \left\| S_x^{-1}(x - x^\star) \right\|_1,
 \end{equation}
-where $w_{\min} \in (0, 1)$ is the baseline weight for states far from the
-equilibrium and $\gamma_x \geq 0$ controls the decay rate.
+where $d(x)$ denotes the normalized $\ell_1$-distance to the equilibrium $x^\star$, $w_{\min} \in (0, 1)$ is the 
+minimal weight for distant states, and $\gamma_x \geq 0$ controls the decay rate.
 
 \paragraph{State-Weighted Behavioral Cloning Loss} penalizes the squared normalized 
 Euclidean distance between the neural network policy and the expert targets. 

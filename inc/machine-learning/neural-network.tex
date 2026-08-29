@@ -42,7 +42,7 @@ Their qualitative profiles are illustrated in \cref{fig:activation-funs}.
 \begin{figure}[htbp]
     \centering
     \input{tikz/ml/acts.tex}
-    \caption[Activation functions]{Standard activation functions for neural control policies.}
+    \caption[Activation functions]{Standard activation functions $tanh$ and ReLU for neural control policies.}
     \label{fig:activation-funs}
 \end{figure}
 
@@ -175,7 +175,7 @@ a static learning rate $\eta$. In loss landscapes with noisy mini-batch gradient
 a fixed learning rate can cause parameter updates to oscillate in steep directions while 
 making slow progress or none on plateaus~\citeSec{4.5.4}{aggarwalNeuralNetworksDeep2023}.
 
-To resolve these limitations, the Adaptive Moment Estimation (Adam) optimizer~\cite{kingmaAdamMethodStochastic2017} 
+To resolve these limitations, the Adaptive Moment Estimation (Adam) optimizer~\cite{kingmaAdamMethodStochastic2015} 
 computes individual, adaptive learning rates for each parameter by tracking exponential moving averages of both past 
 gradients $\mu_t$ and past squared gradients $\nu_t$~
 \citeSec{4.5.5.2}{aggarwalNeuralNetworksDeep2023}:
@@ -201,6 +201,6 @@ The network parameters are then updated element-wise according to:
     \label{eq:adam-update}
     \theta_t = \theta_{t-1} - \eta \cdot \frac{\hat{\mu}_t}{\sqrt{\hat{\nu}_t} + \epsilon},
 \end{equation}
-where $\epsilon > 0$ is a small constant used for numerical stability. Following~\cite{kingmaAdamMethodStochastic2017}, 
+where $\epsilon > 0$ is a small constant used for numerical stability. Following~\cite{kingmaAdamMethodStochastic2015}, 
 the default hyperparameters are chosen as $\eta = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$, 
 providing robust convergence across various deep learning architectures. 

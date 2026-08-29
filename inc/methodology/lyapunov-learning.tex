@@ -33,7 +33,9 @@ The complete architectural layout of $V_\phi(x)$ is illustrated in \cref{fig:neu
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/lyapunov_nn.tex}
-    \caption[Neural Lyapunov Architecture]{The neural Lyapunov architecture.}
+    \caption[Neural Lyapunov architecture]{
+        Architecture of the neural Lyapunov candidate $V_\phi(x)$ combining an inner neural network $g_\phi(x)$ 
+        with a learnable auxiliary term to guarantee strict positive definiteness by construction.}
     \label{fig:neural-lyapunov}
 \end{figure}
 
@@ -132,7 +134,10 @@ this final gated loss, is summarized in \cref{fig:rho-gated-loss}.
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/rho_gated_loss.tex}
-    \caption{Combined gated condition loss $\loss_{\rho\mathrm{-gated}}$}
+    \caption[Data flow of the gated condition loss]{
+        Data flow for evaluating the combined $\rho$-gated condition loss $\loss_{\rho\mathrm{-gated}}$ 
+        defined in \labelcref{eq:rho-gated-condition-loss}, integrating the relative decrease loss, 
+        state invariance loss, and soft sublevel weighting.}
     \label{fig:rho-gated-loss}
 \end{figure}
 
@@ -159,7 +164,8 @@ causing the loss to decrease.
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/box_shell_sampling.tex}
-    \caption[Box Shell Sampling]{Illustration of uniformly drawn samples in the shell batch $\mathcal{B}_{\mathrm{ROA}}$ with $\xi = 0.6$.}
+    \caption[Box Shell Sampling]{
+        Illustration of uniformly drawn samples in the shell batch $\mathcal{B}_{\mathrm{ROA}}$ with $\xi = 0.6$.}
     \label{fig:box-shell}
 \end{figure}
 
@@ -202,11 +208,12 @@ Finally, the LIRPA-condition loss over $N_{\mathrm{L}}$ regions is computed as
         \sum_{i=1}^{N_{\mathrm{L}}} w_{\mathrm{L}}^{(i)}
     }.
 \end{equation}
-
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/lirpa_region_selection.tex}
-    \caption[Lirpa region selection]{Lirpa regions selection with $\mathcal{V}_\rho$.}
+    \caption[LIRPA region selection]{
+        Region selection for the LIRPA condition loss over the partitioned domain $\mathcal{X}_V$, 
+        where a cell is selected as active as soon as at least one of its green evaluation points lies within $\mathcal{V}_\rho$}
     \label{fig:lirpa-regions}
 \end{figure}
 
@@ -229,11 +236,12 @@ The reference value $\ell_{V,0}$ is determined once using the initial
 Lyapunov candidate prior to training. To prevent the Lyapunov candidate from 
 overfitting to a static point cloud, a new batch $\mathcal{B}_V$ is resampled from $\mathcal{X}_V$ 
 with a specified probability at each optimization step.
-
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/box_sobol_sampling.tex}
-    \caption[Sobol sequence illustration]{Comparison of Sobol and uniform sampling in two dimensions.}
+    \caption[Sobol sequence illustration]{
+        Comparison of two-dimensional state sampling, showing uniform random sampling on the left and 
+        a quasi-random Sobol sequence on the right.}
     \label{fig:sobol-sampling}
 \end{figure}
 
@@ -453,11 +461,10 @@ attraction.
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/train_flow.tex}
-    \caption[Falsification-guided training flow]{
-        Overview of the falsification-guided training framework. 
-        The architecture is divided into an outer epoch-level loop responsible for state space exploration, 
-        boundary estimation, and adversarial mining, and an inner step-level loop that optimizes 
-        the network parameters based on the generated sample pools.}
+    \caption[Falsification-guided co-training data flow]{
+        Overview of the falsification-guided co-training data flow, showing the outer epoch loop for boundary estimation, 
+        region selection, and adversarial mining into the replay buffer, alongside the inner optimization loop for 
+        neural network parameter updates.}
     \label{fig:train-flow}
 \end{figure}
 

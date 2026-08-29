@@ -131,7 +131,7 @@ The verification problem is then formulated as a maximization of this lower boun
     \underline{\psi}^\star_\alpha = \max_{\alpha \in [0, 1]^K} \mathcal{G}(\alpha) \;\le\; \psi^\star.
 \end{equation}
 The objective $\mathcal{G}(\alpha)$ can be optimized efficiently on GPUs using projected gradient-based methods, 
-such as projected Adam~\cite{kingmaAdamMethodStochastic2017}. 
+such as projected Adam~\cite{kingmaAdamMethodStochastic2015}. 
 Crucially, every intermediate configuration $\alpha \in [0, 1]^K$ defines a valid relaxation. 
 Therefore, early stopping inherently ensures soundness while also providing potentially tighter bounds 
 than static heuristics. 

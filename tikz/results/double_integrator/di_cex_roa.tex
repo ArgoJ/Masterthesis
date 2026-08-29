@@ -1,0 +1,35 @@
+\definecolor{shapeColor1}{RGB}{31,119,180}
+
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={
+        group size=2 by 1,
+        horizontal sep=1.6cm,
+    },
+    scale only axis,
+    width=0.38\textwidth,
+    height=4.2cm,
+    xmajorgrids=true,
+    ymajorgrids=true,
+]
+\nextgroupplot[
+    xlabel={Outer Epoch},
+    ylabel={$N_{\mathrm{mined}}$},
+    xmin=0,
+    xmax=2000,
+    ymin=0,
+    ymax=310,
+]
+    \addplot+[line width=1.5pt, color=shapeColor1, mark=none] table [x=x, y=y, col sep=tab] {tikz/results/double_integrator/di_cex_trace_0.tsv};
+
+\nextgroupplot[
+    xlabel={Inner Step},
+    ylabel={$\loss_{\mathrm{ROA}}$},
+    xmin=0,
+    xmax=20000,
+    ymin=0,
+    ymax=17,
+]
+    \addplot+[line width=1.5pt, color=shapeColor1, mark=none] table [x=x, y=y, col sep=tab] {tikz/results/double_integrator/di_roa_loss_trace_0.tsv};
+\end{groupplot}
+\end{tikzpicture}

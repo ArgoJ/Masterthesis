@@ -1,0 +1,127 @@
+% Required Preamble:
+% \usepackage{amsmath}
+% \usepackage{tikz}
+% \usepackage{pgfplots}
+% \pgfplotsset{compat=1.18}
+\definecolor{shapeColor1}{RGB}{31,119,180}
+
+\pgfplotstableread{
+    x y
+    1 46
+    2 46
+    3 143
+    4 143
+    5 185
+    6 185
+    7 178
+    8 178
+    9 134
+    10 134
+    11 76
+    12 76
+    13 73
+    14 73
+    15 64
+    16 64
+    17 50
+    18 50
+    19 35
+    20 35
+    21 34
+    22 34
+    23 33
+    24 33
+    25 28
+    26 28
+    27 31
+    28 31
+    29 23
+    30 23
+    31 24
+    32 24
+    33 18
+    34 18
+    35 19
+    36 19
+    37 17
+    38 17
+    39 15
+    40 15
+    41 12
+    42 12
+    43 13
+    44 13
+    45 10
+    46 10
+    47 7
+    48 7
+    49 3
+    50 3
+    51 3
+    52 3
+    53 5
+    54 5
+    55 4
+    56 4
+    57 3
+    58 3
+    59 1
+    60 1
+    61 2
+    62 2
+    63 3
+    64 3
+    65 3
+    66 3
+    67 2
+    68 2
+    69 4
+    70 4
+    71 3
+    72 3
+    73 4
+    74 4
+    75 4
+    76 4
+    77 6
+    78 6
+    79 6
+    80 6
+    81 6
+    82 6
+    83 4
+    84 4
+    85 4
+    86 4
+    87 1
+    88 1
+    89 1
+    90 1
+    91 1
+    92 1
+    93 2
+    94 2
+    95 4
+    96 4
+    97 4
+    98 4
+    99 4
+    100 4
+}\dataRunZeroZeroOne
+
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Outer Iteration},
+    xmajorgrids=true,
+    ylabel={num\_mined\_counterexamples},
+    ymajorgrids=true,
+    xmin=1,
+    xmax=100,
+    ymin=1,
+    ymax=185,
+    legend style={at={(0.5,-0.20)}, anchor=north, legend columns=-1}
+]
+    \addplot+[line width=2.2pt, color=shapeColor1, mark=none] table {\dataRunZeroZeroOne};
+    \addlegendentry{run\_001}
+\end{axis}
+\end{tikzpicture}

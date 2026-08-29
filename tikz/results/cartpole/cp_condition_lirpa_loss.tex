@@ -1,0 +1,23 @@
+% Required Preamble:
+% \usepackage{amsmath}
+% \usepackage{tikz}
+% \usepackage{pgfplots}
+% \pgfplotsset{compat=1.18}
+\definecolor{shapeColor1}{RGB}{31,119,180}
+
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Inner Step},
+    xmajorgrids=true,
+    ylabel={$\loss_{\mathrm{L}}$},
+    ymajorgrids=true,
+    xmin=1,
+    xmax=5000,
+    ymin=0.000247353,
+    ymax=0.000275036,
+    legend style={at={(0.5,-0.20)}, anchor=north, legend columns=-1}
+]
+    \addplot+[line width=2.2pt, color=shapeColor1, mark=none] table [x=x, y=y, col sep=tab] {tikz/results/cartpole/cp_condition_lirpa_trace_0.tsv};
+    \addlegendentry{run\_001}
+\end{axis}
+\end{tikzpicture}
