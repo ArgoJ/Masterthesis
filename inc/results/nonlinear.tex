@@ -13,12 +13,16 @@ error trajectories over validation rollouts are illustrated in \cref{fig:cp-poli
         Closed-loop trajectory tracking error between the learned imitation policy and the MPC expert for the cartpole system, showing the error envelopes and the mean over time.}
     \label{fig:cp-policy-error-bands}
 \end{figure}
-As shown in \cref{fig:cp-policy-error-bands}, the maximum tracking errors exceed for some states and inputs the bounds themselfes. 
-Despite these high maximum deviations, the tracking errors decrease significantly near the origin. 
-Furthermore, the mean and median deviations remain close to zero, which indicates that the learned policy generally reproduces the 
-expert's behavior and thus provides a good approximation of the MPC expert.
+As shown in \cref{fig:cp-policy-error-bands}, the unstable dynamics in the closed-loop system initially lead to temporary peak deviations 
+due to minor cumulative differences. Nevertheless, the mean and median errors remain remarkably small throughout the rollout. 
+Specifically, the mean angle error $|\Delta \varphi|$ stays below $0.13\,\text{rad}$ and the mean position error $|\Delta p|$ stays 
+below $0.24\,\text{m}$, which corresponds to $6\,\%$ of the track width. 
+Near the equilibrium after $3.5\,\text{s}$, all deviations contract toward zero, 
+demonstrating reliable closed-loop stabilization to $\varphi^\star = 0$. 
+Exemplary individual trajectories comparing both controllers are shown in \cref{app:cartpole-trajectories}.
 
 
+\todo{descibe co training evoultion}
 \begin{figure}[htbp]
     \centering
     \input{tikz/results/cartpole/cp_cotraining_traces.tex}

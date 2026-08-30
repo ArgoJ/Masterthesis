@@ -1,0 +1,16 @@
+\section{Qualitative Discussion of Results}
+\label{sec:discussion-results}
+
+The linear experimental result demonstrates that combining imitation learning with formal neural Lyapunov synthesis 
+resolves the safety limitations of uncertified neural policies while retaining near-optimal control performance. 
+In contrast to the paper of Yang et al. \cite{yangLyapunovstableNeuralControl2024}, this work shows that it is possible 
+to learn a Lyapunov candidate that can be formally verified, while also maintaining near optimum behavior. 
+Supervised imitation learning on nominal MPC trajectories provides a strong inductive a priori information,
+enabling the policy network to accurately reproduce the expert's behavior, which is reflected in the low median and
+mean values of the tracking errors in both benchmarks. 
+However, since pure supervised learning lacks guarantees of stability in a closed-loop system,
+the subsequent co-training phase specifically refines the policy parameters to form a vector field that decreases 
+toward equilibrium without compromising the underlying MPC properties.
+
+Given the inductive bias of the DARE solution with what the $R_\phi$ is initialized, 
+

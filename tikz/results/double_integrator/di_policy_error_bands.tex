@@ -560,7 +560,7 @@
     xtick={0,1,2,3,4}
 ]
 \nextgroupplot[
-    ylabel={$\Delta p\,[\text{m}]$},
+    ylabel={$|\Delta p|\,[\text{m}]$},
     ymin=0,
     ymax=0.815167
 ]
@@ -570,7 +570,7 @@
     \addplot+[name path=dataMean, dashed, line width=2pt, color=black, mark=none, forget plot] table {\dataMean};
     \addplot+[name path=dataMedian, line width=2pt, color=blue, mark=none, forget plot] table {\dataMedian};
 \nextgroupplot[
-    ylabel={$\Delta v\,[\text{m/s}]$},
+    ylabel={$|\Delta v|\,[\text{m/s}]$},
     ymin=0,
     ymax=1.16154
 ]   
@@ -581,7 +581,7 @@
     \addplot+[name path=dataMedianOne, line width=2pt, color=blue, mark=none, forget plot] table {\dataMedianOne};
 \nextgroupplot[
     xlabel={$t\,[\text{s}]$},
-    ylabel={$\Delta u\,[\text{N}]$},
+    ylabel={$|\Delta u|\,[\text{N}]$},
     ymin=0,
     ymax=7.3638,
     legend style={

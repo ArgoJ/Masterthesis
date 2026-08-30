@@ -9,7 +9,7 @@ practical foundation to learn a policy that is able to approximate the optimal c
 To evaluate the approximation accuracy of the learned imitation policy, \cref{fig:di-policy-error-bands} shows the closed-loop absolute 
 tracking errors over validation rollouts. 
 Given the system bounds of $[-10, 10]$ for all states and control inputs, the policy achieves high tracking precision. 
-The mean and median positition deviations remain below $0.4\,\text{m}$ ($4\,\%$), while the corresponding velocity deviations 
+The mean and median position deviations remain below $0.4\,\text{m}$ ($4\,\%$), while the corresponding velocity deviations 
 remain below $0.5\,\text{m/s}$ ($5\,\%$). Both state deviations approach zero. 
 Even the peak worst-case position error remains below $0.81\,\text{m}$ ($8.1\,\%$), 
 while the mean control force deviation peaks at only $1.17\,\text{N}$ ($11.7\,\%$) before decreasing to near zero. 
@@ -45,6 +45,25 @@ which indicates an expanding region of attraction, with a simultaneous decrease 
         At the left figure the number of mined counterexamples $N_{\mathrm{mined}}$ per outer epoch are shown. 
         The right figure illustrates the convergence of the region of attraction loss $\loss_{\mathrm{ROA}}$ over inner optimization steps.}
     \label{fig:di-cex-roa}
+\end{figure}
+
+To demonstrate how the policy capabilities affect behavior in a closed-loop system after co-training, \cref{fig:di-colearn-policy-error-bands} 
+illustrates the tracking errors of the co-trained policy relative to the MPC expert. 
+Since the co-training algorithm described in \cref{subsec:training-procedure} modifies the policy parameters to satisfy 
+the Lyapunov decrease conditions for the mined counterexamples and simultaneously enlarge the region of attraction, 
+the max peak deviations increase moderately compared to the purely imitation learned policy. 
+For the position and velocity the max peak deviation increase to $|\Delta p| \approx 1.655\,\text{m}$ and 
+$|\Delta v| \approx 2.76\,\text{m/s}$, respectively. 
+Nevertheless, the median deviations for position and velocity grow proportionally up to $|\Delta p| \approx 0.88\,\text{m}$ and 
+$|\Delta v| \approx 0.856\,\text{m/s}$, while again converging to zero as $t \to 4.0\,\text{s}$. 
+However, the peak control input deviation $|\Delta u|$ reaches $14.257\,\text{N}$, whereas its median stays below $3.4\,\text{N}$.
+This demonstrates that the co-training pipeline trades a small amount of nominal imitation precision to 
+achieve certified stability and expand the region of attraction without compromising task completion.
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/results/double_integrator/di_colearn_policy_error_bands.tex}
+    \caption{Closed-loop trajectory tracking error between the co-trained policy and the MPC expert for the double integrator.}
+    \label{fig:di-colearn-policy-error-bands}
 \end{figure}
 
 After training the candidate $V_\phi(x)$, the final pipeline step is to find a formally verified sublevel set $\mathcal{V}_\rho$ 
