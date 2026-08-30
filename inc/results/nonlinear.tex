@@ -13,6 +13,11 @@ error trajectories over validation rollouts are illustrated in \cref{fig:cp-poli
         Closed-loop trajectory tracking error between the learned imitation policy and the MPC expert for the cartpole system, showing the error envelopes and the mean over time.}
     \label{fig:cp-policy-error-bands}
 \end{figure}
+As shown in \cref{fig:cp-policy-error-bands}, the maximum tracking errors exceed for some states and inputs the bounds themselfes. 
+Despite these high maximum deviations, the tracking errors decrease significantly near the origin. 
+Furthermore, the mean and median deviations remain close to zero, which indicates that the learned policy generally reproduces the 
+expert's behavior and thus provides a good approximation of the MPC expert.
+
 
 \begin{figure}[htbp]
     \centering

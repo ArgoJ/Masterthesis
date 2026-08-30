@@ -6,12 +6,14 @@ the proposed co-training and falsification pipeline. Looking at the defined opti
 \cref{fig:di-mpc-lyapunov}, one can see that there exists a stable region around the origin. However, this region is 
 only estimated based on the datasets' feasibility and lyapunov decrease using the $V = x^\top P x$ as a Lyapunov function. The dataset provides a 
 practical foundation to learn a policy that is able to approximate the optimal control performance, while preserving the system's stability. 
-To show that the learned and converged controller is able to approximate the expert's performance, the error band between the closed-loop learned- 
-and expert controller is shown in \cref{fig:di-policy-error-bands}. The error band is computed using the same initial states $x_0$ 
-drawn from the validation dataset for both controllers. Then, the element-wise difference of the closed-loop trajectories is calculated. 
-Note that the states of the learned policys deviate by less than $5\%$ from the experts policy, while the inputs deviate by up to $70\%$. 
-The initial loss $\loss_\pi$ for this particular policy starts with $23.787$, decreases to $0.404$ in the first $50$ epochs 
-and then converges to $0.047$ after 1000 epochs, which can be seen in \cref{fig:di-im-loss}. 
+To evaluate the approximation accuracy of the learned imitation policy, \cref{fig:di-policy-error-bands} shows the closed-loop absolute 
+tracking errors over validation rollouts. 
+Given the system bounds of $[-10, 10]$ for all states and control inputs, the policy achieves high tracking precision. 
+The mean and median positition deviations remain below $0.4\,\text{m}$ ($4\,\%$), while the corresponding velocity deviations 
+remain below $0.5\,\text{m/s}$ ($5\,\%$). Both state deviations approach zero. 
+Even the peak worst-case position error remains below $0.81\,\text{m}$ ($8.1\,\%$), 
+while the mean control force deviation peaks at only $1.17\,\text{N}$ ($11.7\,\%$) before decreasing to near zero. 
+The imitation policy training loss converges from $23.787$ to $0.047$, as shown in \cref{fig:di-im-loss}. 
 \begin{figure}[htbp]
     \centering
     \input{tikz/results/mpc/mpc_lyapunov.tex}

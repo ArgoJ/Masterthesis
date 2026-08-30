@@ -102,3 +102,20 @@ Split-by-Score (\texttt{sb}) branching.
     \caption{Double integrator imitation learning policy training and validation loss over epochs.}
     \label{fig:di-im-loss}
 \end{figure}
+
+
+
+\subsection{Cartpole Expert and Policy Trajectories}
+\label{app:cartpole-trajectories}
+
+To provide insight into the closed-loop performance of the learned imitation policy compared to the MPC expert, 
+\cref{fig:app-cartpole-trajectories} illustrates the state and control input trajectories for five initial conditions on the cartpole system.
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/appendix/cp_policy_vs_expert_trajectories.tex}
+    \caption[Cartpole closed-loop trajectory comparison]{
+        Closed-loop state and control input trajectories comparing the learned imitation policy and the MPC expert for 
+        five initial states on the cartpole system.}
+    \label{fig:app-cartpole-trajectories}
+\end{figure}
