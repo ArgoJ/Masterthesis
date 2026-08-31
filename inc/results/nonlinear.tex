@@ -45,7 +45,7 @@ to $4$ demonstrates the effective learning process towards enlarging the region 
 To analyze the remaining violations, \cref{fig:cp-final-counterexamples} illustrates the normalized states and violation 
 magnitudes of the $4$ counterexamples mined in the final outer epoch. 
 In contrast to the linear double integrator, in which the neural feature term provided significant local deformation, 
-the feature term $|g_\phi(x) - g_\phi(x^\star)|$ contributes less than $1\,\%$ across the cartpole state pool $\mathcal{S}$, 
+the feature term $|g_\phi(x) - g_\phi(x^\star)|$ contributes less than $1\,\%$ across the boundary bath $\mathcal{B}_\partial$, 
 while the auxiliary term accounts for $99\,\%$.
 Since the Lyapunov candidate remains predominantly quadratic in character, making it difficult to capture the unstable dynamics 
 of the system outside the region around the equilibrium. Thus, the remaining counterexamples cluster at higher 
