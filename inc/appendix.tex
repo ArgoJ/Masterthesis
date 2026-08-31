@@ -94,13 +94,27 @@ Split-by-Score (\texttt{sb}) branching.
 
 
 
-
+\subsection{Imitation Learning Training Losses}
+\label{app:imitation-loss}
+To illustrate the convergence behavior and generalization of the supervised imitation learning phase, 
+\cref{fig:di-im-loss} and \cref{fig:cp-im-loss} show the training and validation loss trajectories over epochs 
+for the double integrator and the cartpole system, respectively. 
+For both benchmarks, optimization is performed using an $80/20$ train-validation split combined with the 
+\texttt{ReduceLROnPlateau} learning rate scheduler. In both violations, the validation loss 
+follows the training loss without overfitting. 
 
 \begin{figure}[htbp]
     \centering
     \input{tikz/appendix/di_loss.tex}
     \caption{Double integrator imitation learning policy training and validation loss over epochs.}
     \label{fig:di-im-loss}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/appendix/cp_loss.tex}
+    \caption{Cartpole imitation learning policy training and validation loss over epochs.}
+    \label{fig:cp-im-loss}
 \end{figure}
 
 

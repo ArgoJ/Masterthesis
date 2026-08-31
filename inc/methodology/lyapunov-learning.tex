@@ -247,7 +247,7 @@ with a specified probability at each optimization step.
 
 
 \paragraph{Policy Scaling Loss} encourages the learned policy $\pi_V$ to remain close 
-to the output of the original imitation controller $\pi$, which is based on the MPC teacher. 
+to the output of the original imitation controller $\pi_\theta$, which is based on the MPC teacher. 
 A quasi-Monte Carlo batch $\mathcal{B}_{\mathrm{pol}} \subset \mathcal{X}_V$ is sampled using a 
 low-discrepancy Sobol sequence~\cite{joeConstructingSobolSequences2008}. 
 To prevent overfitting to a static set of states, this batch is also resampled from $\mathcal{X}_V$ 
@@ -256,9 +256,9 @@ The normalized deviation between the learned policy and the imitation controller
 \begin{equation}
     \label{eq:policy-scaling-loss}
     \loss_{\mathrm{pol}} = \frac{
-        \sum_{x \in \mathcal{B}_{\mathrm{pol}}} \lVert \pi_V(x) - \pi(x) \rVert_2^2
+        \sum_{x \in \mathcal{B}_{\mathrm{pol}}} \lVert \pi_V(x) - \pi_\theta(x) \rVert_2^2
     }{
-        \sum_{x \in \mathcal{B}_{\mathrm{pol}}} \lVert \pi(x) \rVert_2^2
+        \sum_{x \in \mathcal{B}_{\mathrm{pol}}} \lVert \pi_\theta(x) \rVert_2^2
     }
 \end{equation}
 

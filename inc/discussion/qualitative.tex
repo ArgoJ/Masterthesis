@@ -1,16 +1,41 @@
 \section{Qualitative Discussion of Results}
 \label{sec:discussion-results}
 
-The linear experimental result demonstrates that combining imitation learning with formal neural Lyapunov synthesis 
-resolves the safety limitations of uncertified neural policies while retaining near-optimal control performance. 
-In contrast to the paper of Yang et al. \cite{yangLyapunovstableNeuralControl2024}, this work shows that it is possible 
-to learn a Lyapunov candidate that can be formally verified, while also maintaining near optimum behavior. 
-Supervised imitation learning on nominal MPC trajectories provides a strong inductive a priori information,
-enabling the policy network to accurately reproduce the expert's behavior, which is reflected in the low median and
-mean values of the tracking errors in both benchmarks. 
-However, since pure supervised learning lacks guarantees of stability in a closed-loop system,
-the subsequent co-training phase specifically refines the policy parameters to form a vector field that decreases 
-toward equilibrium without compromising the underlying MPC properties.
+Supervised imitation learning based on nominal MPC trajectories serves as a strong inductive prior and 
+enables small neural policies to accurately reproduce the expert's behavior with low tracking errors in both benchmarks. 
+However, since pure imitation learning lacks closed-loop stability guarantees, the co-training phase is designed to 
+jointly refine the policy and learn a verified Lyapunov certificate. 
+In contrast to approaches such as \cite{yangLyapunovstableNeuralControl2024}, the core idea of 
+this work is to achieve formal verification while maintaining near-optimal closed-loop performance.
 
-Given the inductive bias of the DARE solution with what the $R_\phi$ is initialized, 
+The results for the double integrator demonstrate that this pipeline can be successful for
+imitation learning and formal verification for linear systems. 
+Throughout co-training, the falsification loop systematically reduces the number of mined counterexamples, 
+resulting in a formally certified region of attraction that is $42.1\,\%$ larger than the approximated MPC baseline. 
+Both the policy and the Lyapunov network are parameterized as compact ReLU Multi-Layer Perceptrons. 
+Since ReLU networks yield piecewise linear input-output mappings, they are well-suited for linear 
+relaxation and branch-and-bound verification in $\alpha,\beta$-CROWN. 
+Furthermore, the neural feature term $|g_\phi(x) - g_\phi(x^\star)|$ accounts for an active $17.7\,\%$ share of the 
+Lyapunov candidate when computed over the boundary states $\mathcal{B}_\partial$. 
+This confirms that the learned candidate does not rely exclusively on the quadratic DARE auxiliary term, but rather that the 
+neural network actively shapes the Lyapunov geometry to satisfy the decrease condition across an expanded domain.
 
+In comparison, the cartpole benchmark shows a deceptive convergence behavior that highlights critical challenges 
+in the co-training of nonlinear systems. 
+Although the condition loss $\loss_{\rho\mathrm{-gated}}$ and the number of mined counterexamples decrease 
+during co-training, the closed-loop tracking performance of the resulting policy degrades, 
+leading to substantial violations of the state constraints. However, these violating trajectories may have an initial state 
+that lies outside the positive invariant, contracting sublevel set $\mathcal{V}_\rho$. 
+Since the policy primarily adapts to the enforced decrease on the Lyapunov landscape, this can lead to a suboptimal control mapping.
+This issue could potentially be mitigated by introducing a one-step state violation term as described in \labelcref{eq:dynamics-aware-loss} 
+on a quasi-Monte Carlo shell batch sampled from $\mathcal{X}$. Nonetheless, incorporating an additional loss term makes the 
+landscape more complicated and therefore harder to optimize. Furthermore, state generation consumes computational 
+power, leading to slower training. 
+
+Throughout the cartpole state pool, the neural feature term contributes less than $1\,\%$ to the Lyapunov candidate $V_\phi(x)$, 
+leaving the function dominated by the auxiliary term. 
+Consequently, the Lyapunov candidate remains mostly quadratic and cannot adapt its form to the nonlinear dynamics, 
+which forces the optimization to compensate for this through aggressive control inputs in the policy.
+This distorts the trajectories in the closed-loop system and eventually prevents successful formal certification. 
+Notably, 
+wodurch

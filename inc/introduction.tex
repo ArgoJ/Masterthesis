@@ -1,13 +1,13 @@
 \chapter{Introduction}
 \label{ch:intro}
 
-The use of autonomous cyber-physical systems in safety-critical areas requires control architectures that combine high flexibility,
-real-time capability, and strict safety guarantees. Model Predictive Control (MPC) is well-established for constrained multivariable optimal control, 
-offering systematic and provable constraint satisfaction under nominal model assumptions. 
+The use of autonomous cyber-physical systems in safety-critical areas requires control architectures that combine
+real-time capability and strict safety guarantees. Model Predictive Control (MPC) is a widely used control appraoch 
+for a varity of systems, enabling optimal control of these systems while explicitly taking safety constraints into account.
 Furthermore, MPC provides well-understood stability guarantees for the closed-loop system, based on Lyapunov 
 theory~\cite{gruneNonlinearModelPredictive2017,rawlingsModelPredictiveControl2020}. 
-Even though numerical solvers become increasingly efficient, real-time execution of nonlinear MPC requires a significant amount of 
-computational power, which is especially limiting for embedded systems.
+Even though numerical solvers become increasingly efficient, real-time execution of nonlinear 
+MPC requires a significant amount of computational power.
 To address this computational limitation, neural control policies synthesized using Imitation or Reinforcement Learning offer highly efficient inference 
 during a forward pass~\cite{kargEfficientRepresentationApproximation2020,hertneckLearningApproximateModel2018,hewingLearningBasedModelPredictive2020}, 
 motivating recent interest in synergistic MPC-learning frameworks~\cite{reiterSynthesisOfMPC2026}.
@@ -22,24 +22,22 @@ perturbations~\cite{aggarwalNeuralNetworksDeep2023,zhangEfficientNeuralNetwork20
 
 Consequently, formal guarantees are no longer just a theoretical problem, as lawmakers and regulatory agencies
 around the world are shifting towards binding technical requirements. 
-Under the European Union's Artificial Intelligence Act (Regulation (EU) 2024/1689), autonomous and safety-critical control systems 
-fall into the category of \textit{High-Risk AI}, which imposes strict regulatory requirements on risk management, system robustness and 
-verifiable reliability~\cite{VerordnungEU20242024}. 
-Since the regulatory frameworks requires compliance without prescribing specific algorithmic solutions, this work addresses this gap by 
-proposing an integrated, GPU-accelerated framework for training and formally verifying neural imitation policies using learned Lyapunov candidates.
+Driven by emerging regulations such as the EU Artificial Intelligence Act~\cite{VerordnungEU20242024}, 
+safety-critical systems face increasing demands for verifiable reliability.
+Since formal verification provides a method toward meeting such requirements, this thesis proposes a 
+GPU-accelerated framework for training and formally certifying neural imitation policies using learned Lyapunov candidates.
 
 \section*{State of the Art}
 \label{sec:intro-sota}
 
-In control theory, the stability of a closed-loop system is typically proven using Lyapunov stability theory, which requires finding a scalar, 
+In control theory, the stability of a closed-loop system can be proven using Lyapunov stability theory, which requires finding a scalar, 
 energy-like function $V(x)$ that is positive definite and strictly decreasing along non-equilibrium closed-loop 
-trajectories over a Lyapunov sublevel set $\mathcal{V}_\rho$, which provides a certified inner approximation of the 
-ROA~\cite{gruneNonlinearModelPredictive2017,rawlingsModelPredictiveControl2020}. 
+trajectories within an invariant state domain~\cite{gruneNonlinearModelPredictive2017,rawlingsModelPredictiveControl2020}. 
 However, for nonlinear systems controlled by neural policies, it is difficult to construct these Lyapunov certificates and formally verify the 
 Lyapunov conditions across a continuous state space. Recent research has therefore focused on the joint synthesis of neural Lyapunov
 functions and neural controllers, coupled with formal verification
 methods~\cite{yangLyapunovstableNeuralControl2024}.
-To verify these stability properties, established verification frameworks rely on general-purpose Satisfiability Modulo Theories 
+To provide these stability properties, established verification frameworks rely on general-purpose Satisfiability Modulo Theories 
 (SMT)~\cite{katzReluplexEfficientSMT2017} or Mixed-Integer Linear Programming (MILP)~\cite{tjengEvaluatingRobustnessNeural2019} solvers. 
 While mathematically sound, they scale poorly with increasing state-space dimensionality and network depth, which 
 makes the formal verification of nonlinear closed-loop systems on larger domains challenging~\cite{bunelUnifiedViewPiecewise2018,xuFastCompleteEnabling2021}.
@@ -52,22 +50,16 @@ benchmarks~\cite{yangLyapunovstableNeuralControl2024}.
 \section*{Contributions of this Work}
 \label{subsec:intro-contributions}
 
-In contrast to prior work focusing on learning certified neural controllers from scratch, this thesis establishes an integrated framework 
-for learning imitation policies from nominal MPC experts, followed by learning a corresponding Lyapunov candidate to formally verify the converged policy. 
-A dataset generated with an MPC expert is used to optimize a constrained policy architecture that enforces control input bounds 
-$\underline{u} \le \pi_\theta(x) \le \overline{u}$ and satisfies the equilibrium constraint $\pi_\theta(x^\star) = u^\star$ by construction. 
-The optimization penalizes deviations with state-dependent weights prioritizing accuracy near the origin, while promoting forward invariance 
-using a one-step dynamics-aware loss. Building upon the converged imitation policy, 
-the policy is refined while simultaneously learning a structurally positive definite neural Lyapunov candidate $V_\phi(x)$.
-The optimization objective incorporates a soft $\rho$-gated Lyapunov condition and state invariance loss, augmented by LiRPA bound propagation 
-penalties to shape a verifier-friendly loss landscape.
-To compute the gated loss, the sublevel bound $\rho$ is dynamically estimated along the domain boundary using $\ell_\infty$-Projected Gradient Descent (PGD). 
-Simultaneously, adversarial mining using PGD actively searches for stability counterexamples, which are maintained in a 
-replay buffer and fed back into training to actively address localized condition violations.
-For rigorous guarantees, a formal certification pipeline based on the complete $\alpha,\beta$-CROWN verifier utilizes a scaling and 
-bisection search algorithm to soundly compute the maximal certified sublevel value $\rho^*$~\cite{yangLyapunovstableNeuralControl2024}. 
-Formulating the stability criteria as a disjunctive logical specification over a punctured state space enables the solver to formally certify 
-positive definiteness, regional forward invariance, and exponential Lyapunov decrease.
+In contrast to prior work focusing on learning certified neural controllers from scratch, this thesis establishes 
+an integrated framework for learning imitation policies from nominal MPC experts, followed by learning a corresponding 
+Lyapunov candidate to formally verify the converged policy. 
+First, expert trajectories are used to optimize a constrained neural policy architecture that satisfies physical input 
+limits and equilibrium conditions by construction.
+Building upon the converged imitation policy, a falsification-guided co-training scheme jointly refines the controller and 
+a structurally positive definite neural Lyapunov candidate. This optimization actively incorporates counterexamples identified 
+using adversarial methods, along with regularization terms adapted to the verifier, to form a stability landscape.
+Finally, a formal certification pipeline based on the complete $\alpha,\beta$-CROWN verifier soundly computes the maximal 
+certifiable sublevel set, providing rigorous guarantees on regional forward invariance and stability.
 
 \section*{Overview}
 \label{subsec:intro-overview}
