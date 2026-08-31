@@ -1,0 +1,100 @@
+% Required Preamble:
+% \usepackage{amsmath}
+% \usepackage{tikz}
+% \usepackage{pgfplots}
+% \pgfplotsset{compat=1.18}
+
+% Inverted Viridis Colors (Violation 0 -> Yellow, Violation 1 -> Dark Purple)
+\definecolor{virRevYellow}{RGB}{252, 255, 164}    % Violation = 0.000
+\definecolor{virRevYellowGrn}{RGB}{249, 252, 157}  % Violation = 0.011
+\definecolor{virRevGreen}{RGB}{250, 148, 7}     % Violation = 0.237
+\definecolor{virRevBlue}{RGB}{79, 13, 108}       % Violation = 0.767
+\definecolor{virRevPurple}{RGB}{73, 11, 106}     % Violation = 0.785
+\definecolor{virRevDarkPurp}{RGB}{0, 0, 4}     % Violation = 1.000
+
+\pgfplotstableread{
+    x y
+    1 0.687831
+    2 0.388253
+    3 0.716064
+    4 0.247029
+    5 0
+}\dataCexOne
+
+\pgfplotstableread{
+    x y
+    1 0.670994
+    2 0.318384
+    3 0.617188
+    4 0.387812
+    5 0.0110292
+}\dataCexTwo
+
+\pgfplotstableread{
+    x y
+    1 0.527813
+    2 0.527636
+    3 0.0736249
+    4 0.879418
+    5 0.236732
+}\dataCexThree
+
+\pgfplotstableread{
+    x y
+    1 0.415791
+    2 0.915912
+    3 0.232273
+    4 0.612622
+    5 0.76688
+}\dataCexFour
+
+\pgfplotstableread{
+    x y
+    1 0.526726
+    2 0.464908
+    3 0.248919
+    4 0.745188
+    5 0.785429
+}\dataCexFive
+
+\pgfplotstableread{
+    x y
+    1 0.407311
+    2 0.905684
+    3 0.138699
+    4 0.715712
+    5 1
+}\dataCexSix
+
+\begin{tikzpicture}
+\begin{axis}[
+    width=0.66\textwidth,
+    height=4.5cm,
+    xmajorgrids=true,
+    grid style={solid, black!20, line width=0.6pt},
+    xticklabel style={anchor=north, font=\small},
+    tick label style={font=\small},
+    ymin=0,
+    ymax=1,
+    ytick={0, 0.5, 1},
+    xtick={1,2,3,4,5},
+    xticklabels={{$p$},{$v$},{$\varphi$},{$\omega$},{Violation}},
+    ylabel={$\text{Normalized value}$},
+    xmin=1,
+    xmax=5,
+    enlargelimits=false
+]
+    \draw[draw=gray, draw opacity=0.6, line width=8pt] (rel axis cs:0, 0.488636) -- (rel axis cs:0, 0.511364);
+    \draw[draw=gray, draw opacity=0.6, line width=8pt] (rel axis cs:0.25, 0.409091) -- (rel axis cs:0.25, 0.590909);
+    \draw[draw=gray, draw opacity=0.6, line width=8pt] (rel axis cs:0.5, 0.483924) -- (rel axis cs:0.5, 0.516076);
+    \draw[draw=gray, draw opacity=0.6, line width=8pt] (rel axis cs:0.75, 0.454545) -- (rel axis cs:0.75, 0.545455);
+
+    % Plot from lowest violation (yellow) to highest violation (dark purple)
+    \addplot[line width=1.3pt, color=virRevYellow, mark=none] table {\dataCexOne};
+    \addplot[line width=1.3pt, color=virRevYellowGrn, mark=none] table {\dataCexTwo};
+    \addplot[line width=1.3pt, color=virRevGreen, mark=none] table {\dataCexThree};
+    \addplot[line width=1.3pt, color=virRevBlue, mark=none] table {\dataCexFour};
+    \addplot[line width=1.3pt, color=virRevPurple, mark=none] table {\dataCexFive};
+    \addplot[line width=1.3pt, color=virRevDarkPurp, mark=none] table {\dataCexSix};
+\end{axis}
+\end{tikzpicture}

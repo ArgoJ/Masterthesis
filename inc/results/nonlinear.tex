@@ -10,7 +10,8 @@ error trajectories over validation rollouts are illustrated in \cref{fig:cp-poli
     \centering
     \input{tikz/results/cartpole/cp_policy_error_bands.tex}
     \caption[Closed-loop cartpole error bands]{
-        Closed-loop trajectory tracking error between the learned imitation policy and the MPC expert for the cartpole system, showing the error envelopes and the mean over time.}
+        Closed-loop trajectory tracking error between the learned imitation policy and the MPC expert for the cartpole system, 
+        showing the error envelopes and the mean over time.}
     \label{fig:cp-policy-error-bands}
 \end{figure}
 As shown in \cref{fig:cp-policy-error-bands}, the unstable dynamics in the closed-loop system initially lead to temporary peak deviations 
@@ -19,10 +20,17 @@ Specifically, the mean angle error $|\Delta \varphi|$ stays below $0.13\,\text{r
 below $0.24\,\text{m}$, which corresponds to $6\,\%$ of the track width. 
 Near the equilibrium after $3.5\,\text{s}$, all deviations contract toward zero, 
 demonstrating reliable closed-loop stabilization to $\varphi^\star = 0$. 
-Exemplary individual trajectories comparing both controllers are shown in \cref{app:cartpole-trajectories}.
+Similar to the linear system, the imitation policy training loss shows steady convergence from initially $27.07$ to $3.183$, 
+reflecting effective behavioral cloning of the MPC expert.
+Exemplary individual trajectories comparing both expert and learned controllers are shown in \cref{app:cartpole-trajectories}.
 
-
-\todo{descibe co training evoultion}
+The co-learning framework is initialized with the pretrained imitation policy and the DARE solution for the cartpole system. 
+As visualized in \cref{fig:cp-cotraining-traces}, the training progresses over inner and outer epochs shows a converging behavior. 
+The weighted condition loss $\loss_{\rho\mathrm{-gated}}$ starts at around $1$ and rapidly decreases to below $0.05$ 
+after the $300$ inner epochs, while the number of mined counterexamples $N_{\mathrm{mined}}$ decreases from initially $46$ to $4$ in the final 
+outer epoch. Furthermore, the estimated $\rho$-sublevel boundary $\tilde{\rho}$ increases from $177.831$ to a final value of $196.708$. 
+Combined with the weighted $\loss_{\mathrm{ROA}}$ that decreases to $0.177$ and the number of mined counterexamples that decreases 
+to $4$ demonstrates the effective learning process towards enlarging the region of attraction. 
 \begin{figure}[htbp]
     \centering
     \input{tikz/results/cartpole/cp_cotraining_traces.tex}
@@ -33,3 +41,43 @@ Exemplary individual trajectories comparing both controllers are shown in \cref{
         over outer epochs.}
     \label{fig:cp-cotraining-traces}
 \end{figure}
+
+To analyze the remaining violations, \cref{fig:cp-final-counterexamples} illustrates the normalized states and violation 
+magnitudes of the $4$ counterexamples mined in the final outer epoch. 
+In contrast to the linear double integrator, in which the neural feature term provided significant local deformation, 
+the feature term $|g_\phi(x) - g_\phi(x^\star)|$ contributes less than $1\,\%$ across the cartpole state pool $\mathcal{S}$, 
+while the auxiliary term accounts for $99\,\%$.
+Since the Lyapunov candidate remains predominantly quadratic in character, making it difficult to capture the unstable dynamics 
+of the system outside the region around the equilibrium. Thus, the remaining counterexamples cluster at higher 
+angles $\varphi$ and angular velocities $\omega$.
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/results/cartpole/cp_final_counterexamples.tex}
+    \caption{Normalized state coordinates and violation magnitudes of the counterexamples mined in the final outer epoch for the cartpole system.}
+    \label{fig:cp-final-counterexamples}
+\end{figure}
+
+Although the loss metrics indicate a successful learning process and a growing region of attraction, 
+the closed-loop performance of the co-trained policy degrades significantly outside the co-training state space 
+compared to the initial imitation baseline. 
+As illustrated in \cref{fig:cp-colearn-policy-error-bands}, the mean trajectory tracking error of the 
+cart position increases to $|\Delta p| \le 0.62\,\text{m}$ compared to $|\Delta p| \le 0.24\,\text{m}$ for pure imitation. 
+More critically, the peak position deviation reaches up to $7.5\,\text{m}$, which severely violates the 
+allowable state bounds of $p \in [-2, 2]\,\text{m}$ considering the possible range of $4\,\text{m}$.
+To illustrate how the co-trained policy exceeds the state bounds, \cref{fig:app-cartpole-trajectories} shows a 
+comparison of the state and inputs for the expert, imitation and co-trained policy.
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/results/cartpole/cp_colearn_policy_error_bands.tex}
+    \caption{Closed-loop trajectory tracking error between the co-trained policy and the MPC expert for the cartpole system.}
+    \label{fig:cp-colearn-policy-error-bands}
+\end{figure}
+
+Following the co-training approach, the final pipeline step attempts to formally certify the region of 
+attraction and compute the maximal certifiable sublevel set $\mathcal{V}_{\rho^\star}$ using $\alpha,\beta$-CROWN 
+and the scaling and bisection search in \cref{alg:search-and-bisect}. 
+However, for the nonlinear cartpole system, formal verification cannot prove the existence of any non-trivial 
+sublevel set $\rho^\star > 0$ with the configuration specified in \cref{tab:hp-verification}. 
+Even varying the verifier settings, such as the verification domain $\mathcal{X}_C$, the decrease rate $\kappa$, 
+or the number of input partitions $p_{\mathrm{split}}$, does not result in a successful region certification.
+A detailed discussion and analysis of these verification challenges is provided in \cref{ch:discussion}.
