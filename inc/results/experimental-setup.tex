@@ -1,10 +1,12 @@
 \section{System Modeling and Problem Formulation}
 \label{sec:system-modeling}
-For our experimental evaluation, two benchmark systems are selected: the double integrator and the cartpole. 
-While the double integrator serves as a low-dimensional linear reference baseline, 
-the cartpole represents a nonlinear benchmark to stress-test the co-training and falsification loop.
-In the following, both system models and their optimization problems are formulated, followed by the shared implementation pipeline and 
-the corresponding hyperparameter configurations.
+In the following, both discrete-time system along with their state and input constraints are formulated, 
+as well as their associated optimization problems. 
+Subsequently, the shared implementation pipeline, including data generation, imitation learning, 
+Lyapunov learning and the formal verification, as well as their corresponding hyperparameter configurations, are presented. 
+All experiments are conducted on linux hardware with an Intel i5 processor, a NVIDIA RTX 3060 graphics card 
+and 32Gb of ram. The entire pipeline is written in Python with the main frameworks \texttt{PyTorch}~\cite{paszkePyTorchImperativeStyle2019}, 
+$\alpha,\beta$-CROWN~\cite{wang2021beta,xuFastCompleteEnabling2021} and \texttt{acados}~\cite{verschuerenAcadosModularOpensource2022}.
 
 
 % ================================================================================
@@ -105,7 +107,6 @@ $k = 200$ steps for the cartpole to capture full stabilization and swing-up beha
 The detailed solver configurations are shown in \cref{tab:app-acados-config}.
 
 
-\todo{Put in actual cartpole values}
 \paragraph{Imitation Policy Training.}
 The imitation policy $\pi_\theta$ is based on the architecture defined in \labelcref{eq:policy-arch}, 
 where an inner network $h_\theta$ is combined with state-wise clamping to ensure constraint satisfaction. 

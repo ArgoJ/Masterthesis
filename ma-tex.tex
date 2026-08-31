@@ -34,7 +34,16 @@
 
 \input{common/includes.tex}
 
-\usepackage[backend=biber,style=ieee,bibencoding=utf8,url=false,doi=false,eprint=false]{biblatex}
+\usepackage[
+  backend=biber,
+  style=ieee,
+  bibencoding=utf8,
+  url=false,
+  doi=false,
+  eprint=false,
+  maxnames=3,
+  minnames=3
+]{biblatex}
 \AtEveryBibitem{
   \clearfield{url}
   \clearfield{urldate}
