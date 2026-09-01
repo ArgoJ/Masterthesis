@@ -1,2 +1,32 @@
 \section{Scalability and Limitations}
 \label{sec:discussion-limitations}
+
+A primary limitation of neural Lyapunov certification lies in the trade-off between the network's expressive power,
+the size of the architecture, and the dimensionality of the physical state-space.
+While linear bound propagation (LiRPA) in $\alpha,\beta$-CROWN runs efficiently on GPUs, 
+increasing the depth and width of neural networks significantly degrades verifiability. 
+Layer-wise bound propagation accumulates relaxation errors across successive layers, 
+while larger models introduce more unstable activation states that exponentially expand 
+the branch-and-bound search tree. 
+Consequently, existing neural Lyapunov approaches rely on compact network architectures 
+in order to maintain tight bounds~\citeTab{3}{yangLyapunovstableNeuralControl2024}.
+Simultaneously, the computational complexity is constrained by the continuous state dimension $n_x$. 
+Since formal certification over the region of interest $\mathcal{X}_C$ requires recursive input domain partitioning, 
+the number of required subproblems scales with $2^{n_x}$. 
+The combination of the accumulation of neural relaxation errors and the curse of dimensionality 
+limits rigorous formal verification to systems with low to medium state dimensionality
+and compact neural representations. 
+
+Furthermore, the pipeline fundamentally relies on the coverage of the expert imitation dataset $\mathcal{D}_\pi$. 
+For the cartpole, approximately 30\,\% of the sampled trajectories are feasible. 
+Consequently, the solver cannot find valid control solutions in certain regions of the state space, 
+leaving the policy effectively without expert supervision in these infeasible subdomains.
+
+Finally, the verification guarantees rely on a nominal discrete-time model $x_{k+1} = f(x_k, u_k)$ discretized with 
+explicit Euler. While higher-order methods such as 4th-order Runge-Kutta (RK4) provide higher simulation accuracy, 
+incorporating four intermediate forward passes into the computational graph would amplify relaxation errors in LiRPA.
+Furthermore, in real-world applications, unmodeled dynamics such as sensor noise, latency, friction, 
+and higher-order integration errors can deviate from the nominal model. 
+Since nominal certificates do not inherently provide formal robustness margins against external disturbances, 
+the sim-to-real gap must be addressed by including bounded parameter uncertainties and disturbance sets directly 
+into the verification graph. Note that this significantly expands the verification dimensions.

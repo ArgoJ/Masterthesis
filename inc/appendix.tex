@@ -124,13 +124,24 @@ follows the training loss without overfitting.
 
 To provide insight into the closed-loop performance of the learned imitation policy compared to the MPC expert, 
 \cref{fig:app-cartpole-trajectories} illustrates the state and control input trajectories for 
-five initial conditions on the cartpole system.
+five initial conditions on the cartpole system. 
+In contrast, \cref{fig:app-cp-cotrain-trajectories} shows the rollouts of the co-trained policy, 
+illustrating the resulting actuator chattering and trajectory divergence.
 
 \begin{figure}[htbp]
     \centering
     \input{tikz/appendix/cp_policy_vs_expert_trajectories.tex}
-    \caption[Cartpole closed-loop trajectory comparison]{
+    \caption[Cartpole imitation learning trajectory comparison]{
         Closed-loop state and control input trajectories comparing the learned imitation policy and the MPC expert for 
         five initial states on the cartpole system.}
     \label{fig:app-cartpole-trajectories}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/appendix/cp_cotrain_trajectories.tex}
+    \caption[Cartpole co-trained policy closed-loop trajectories]{
+        Closed-loop state and control input trajectories of the co-trained policy for 
+        five initial states on the cartpole system, showing actuator chattering and state divergence.}
+    \label{fig:app-cp-cotrain-trajectories}
 \end{figure}

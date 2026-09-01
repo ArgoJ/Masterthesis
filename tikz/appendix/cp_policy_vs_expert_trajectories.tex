@@ -12221,8 +12221,9 @@
 ]
 \nextgroupplot[
     ylabel={$p\,[\text{m}]$},
-    ymin=-5.91781,
-    ymax=1.97421
+    ymin=-6,
+    ymax=6,
+    ytick={-5,0,5}
 ]
     \addplot+[trajMain, color=shapeColor1, forget plot] table {\dataTextPolicy};
     \addplot+[trajFaint, color=shapeColor1] table {\dataTextPolicyOne};
@@ -12241,8 +12242,9 @@
     \addplot+[trajFaint, color=shapeColor3] table {\dataTextCoTrainedPolicyFour};
 \nextgroupplot[
     ylabel={$v\,[\text{m/s}]$},
-    ymin=-10.3869,
-    ymax=7.70378
+    ymin=-10.5,
+    ymax=10.5,
+    ytick={-10,0,10}
 ]
     \addplot+[trajMain, color=shapeColor1, forget plot] table {\dataTextPolicyFive};
     \addplot+[trajFaint, color=shapeColor1] table {\dataTextPolicySix};
@@ -12261,8 +12263,9 @@
     \addplot+[trajFaint, color=shapeColor3] table {\dataTextCoTrainedPolicyNine};
 \nextgroupplot[
     ylabel={$\varphi\,[\text{rad}]$},
-    ymin=-2.9817,
-    ymax=3.07773
+    ymin=-3.1,
+    ymax=3.1,
+    ytick={-3,0,3}
 ]
     \addplot+[trajMain, color=shapeColor1, forget plot] table {\dataTextPolicyTen};
     \addplot+[trajFaint, color=shapeColor1] table {\dataTextPolicyEleven};
@@ -12281,8 +12284,9 @@
     \addplot+[trajFaint, color=shapeColor3] table {\dataTextCoTrainedPolicyFourteen};
 \nextgroupplot[
     ylabel={$\omega\,[\text{rad/s}]$},
-    ymin=-7.7641,
-    ymax=8.4449
+    ymin=-8.5,
+    ymax=8.5,
+    ytick={-8,0,8}
 ]
     \addplot+[trajMain, color=shapeColor1, forget plot] table {\dataTextPolicyFifteen};
     \addplot+[trajFaint, color=shapeColor1] table {\dataTextPolicySixteen};
@@ -12302,8 +12306,9 @@
 \nextgroupplot[
     xlabel={$t\,[\text{s}]$},
     ylabel={$u\,[\text{N}]$},
-    ymin=-61.1654,
-    ymax=46.2663,
+    ymin=-62,
+    ymax=62,
+    ytick={-60,0,60},
     legend style={
         at={(0.5,-0.38)},
         anchor=north,

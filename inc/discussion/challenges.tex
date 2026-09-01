@@ -1,2 +1,28 @@
 \section{Challenges with Nonlinear Dynamics}
 \label{sec:discussion-challenges}
+
+Extending formal Lyapunov verification from linear to nonlinear systems introduces theoretical and numerical challenges. 
+Unlike the double integrator, the cartpole dynamics involve complex state couplings and trigonometric functions, 
+which makes verification harder due to larger relaxation errors. 
+
+Since the DARE solution is inherently a local Lyapunov function for nonlinear systems and not globally valid, 
+its suitability as an initial inductive prior strongly depends on the operating region of the imitation policy. 
+When the Lyapunov candidate remains dominated by this quadratic DARE term, the optimization algorithm 
+chooses the path of least resistance. Consequently, it forces the policy to generate large control inputs to satisfy 
+the Lyapunov decrease condition on mined counterexamples, which are only evaluated pointwise. 
+Nevertheless, although the closed-loop state trajectories may exceed the admissible domain in rollouts, 
+it is open to question whether the policy remains reasonably close to the expert within the actual training domain $\mathcal{X}_V$.
+
+During formal verification, the linear system benefits from exact bound propagation through its affine dynamics, 
+while the nonlinear system suffers from larger relaxation errors. 
+Especially the next Lyapunov value $V(f(x,\pi_\theta(x)))$ in \labelcref{eq:lyapunov-decrease} is sensitive to relaxations 
+in the policy, because these propagate through the dynamics and the neural Lyapunov candidate. 
+
+Beyond verification, the co-training reveals a fundamental limitation of single-step adversarial training. 
+As illustrated in \cref{fig:app-cp-cotrain-trajectories}, the co-trained controller exhibits actuator oscillations 
+ompared to the smooth imitation baseline. 
+Since the adversarial falsifier is restricted to single-step transitions $x_k \mapsto x_{k+1}$, 
+PGD cannot account for multi-step dynamic accumulation.
+By generating localized extreme control inputs, the policy satisfies the decrease condition on isolated points,
+which reduces the mined counterexamples during training, 
+but affects the smoothness in the closed-loop system and tracking performance over extended rollouts.

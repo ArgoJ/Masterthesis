@@ -38,10 +38,15 @@ power, leading to slower training.
 
 Throughout the boundary batch $\mathcal{B}_\partial$, the neural feature term contributes less than $1\,\%$ to the 
 Lyapunov candidate $V_\phi(x)$, leaving the function dominated by the auxiliary term. 
-Consequently, the Lyapunov candidate remains mostly quadratic and cannot adapt its form to the nonlinear dynamics.  
+Consequently, the Lyapunov candidate remains mostly quadratic and cannot adapt its form to the nonlinear dynamics. 
+Notably, this collapse cannot be attributed to the weight initialization of the final layer $W^{(L)}$ in the Lyapunov network $g_\phi$, 
+since experiments with different standard deviations for its initial weights as well as with ReLU activations in $g_\phi$ 
+consistently demonstrate the same behavior at convergence.
+To address this collapse, it might be beneficial to specifically regularize the feature term share on the boundary set $\mathcal{B}_\partial$, 
+forcing the candidate not to rely solely on the quadratic DARE term.
 As the counterexamples in \cref{fig:cp-cotraining-traces} show, condition violations 
-occure at large pendulum angles $\varphi$ and angular velocities $\omega$, 
-where the linearized DARE approximation starts to fail. 
+occur at large pendulum angles $\varphi$ and angular velocities $\omega$, 
+where the linearized DARE approximation starts to fail.
 To compensate for this structural mismatch, the optimization forces the policy to generate large control inputs. 
 Furthermore, while the use of $\tanh$ activations for $V_\phi$ provides smooth representations, 
 it leads to looser relaxations in CROWN compared to piecewise linear ReLU networks. 
