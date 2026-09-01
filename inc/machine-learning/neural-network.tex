@@ -42,7 +42,8 @@ Their qualitative profiles are illustrated in \cref{fig:activation-funs}.
 \begin{figure}[htbp]
     \centering
     \input{tikz/ml/acts.tex}
-    \caption[Activation functions]{Standard activation functions $tanh$ and ReLU for neural control policies.}
+    \caption[Activation functions]{Standard activation functions $tanh$ and ReLU for neural control policies, 
+        where $z$ denotes the pre-activation and $a = \sigma(z)$ denotes the activation value.}
     \label{fig:activation-funs}
 \end{figure}
 
@@ -55,9 +56,10 @@ illustrates a representative architecture.
 \begin{figure}[htbp]
     \centering
     \input{tikz/ml/ann.tex}
-    \caption[MLP]{
-        Architecture of an exemplary Multi-Layer Perceptron with three inputs, two outputs and two hidden layers with four neurons each. 
-        Illustration adapted from~\citeFig{3.1}{kollmannsbergerDeepLearningComputational2021}
+    \caption[MLP Architecture]{
+        Architecture of an exemplary Multi-Layer Perceptron with three inputs $x_1, \dots, x_3$, two outputs $\hat{y}_1, \hat{y}_2$ and 
+        two hidden layers $L-1 = 2$ with four neurons each $n_h = 4$. 
+        The illustration is adapted from~\citeFig{3.1}{kollmannsbergerDeepLearningComputational2021}
     }
     \label{fig:mlp-architecture}
 \end{figure}

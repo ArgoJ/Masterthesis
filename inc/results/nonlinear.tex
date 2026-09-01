@@ -11,9 +11,10 @@ error trajectories over validation rollouts are illustrated in \cref{fig:cp-poli
     \input{tikz/results/cartpole/cp_policy_error_bands.tex}
     \caption[Closed-loop cartpole error bands]{
         Closed-loop trajectory tracking error between the learned imitation policy and the MPC expert for the cartpole system, 
-        showing the error envelopes and the mean over time.}
+        showing the error deviations, mean and median over time.}
     \label{fig:cp-policy-error-bands}
 \end{figure}
+
 As shown in \cref{fig:cp-policy-error-bands}, the unstable dynamics in the closed-loop system initially lead to temporary peak deviations 
 due to minor cumulative differences. Nevertheless, the mean and median errors remain remarkably small throughout the rollout. 
 Specifically, the mean angle error $|\Delta \varphi|$ stays below $0.13\,\text{rad}$ and the mean position error $|\Delta p|$ stays 
@@ -25,7 +26,7 @@ reflecting effective behavioral cloning of the MPC expert.
 Exemplary individual trajectories comparing both expert and learned controllers are shown in \cref{app:cartpole-trajectories}.
 
 The co-learning framework is initialized with the pretrained imitation policy and the DARE solution for the cartpole system. 
-As visualized in \cref{fig:cp-cotraining-traces}, the training progresses over inner and outer epochs shows a converging behavior. 
+As visualized in \cref{fig:cp-cotraining-traces}, the training progress over inner and outer epochs shows a converging behavior. 
 The weighted condition loss $\loss_{\rho\mathrm{-gated}}$ starts at around $1$ and rapidly decreases to below $0.05$ 
 after the $300$ inner epochs, while the number of mined counterexamples $N_{\mathrm{mined}}$ decreases from initially $46$ to $4$ in the final 
 outer epoch. Furthermore, the estimated $\rho$-sublevel boundary $\tilde{\rho}$ increases from $177.831$ to a final value of $196.708$. 
@@ -36,9 +37,9 @@ to $4$ demonstrates the effective learning process towards enlarging the region 
     \input{tikz/results/cartpole/cp_cotraining_traces.tex}
     \caption[Cartpole co-training convergence traces]{
         Co-training progression for the cartpole system, showing the gated condition loss $\loss_{\rho\mathrm{-gated}}$ on the top left 
-        and the ROA loss $\loss_{\mathrm{ROA}}$ on the bottom left over inner optimization steps, alongside 
+        and the ROA loss $\loss_{\mathrm{ROA}}$ on the bottom left over the inner optimization steps, alongside 
         the mined counterexamples $N_{\mathrm{mined}}$ on the top right and the estimated sublevel set bound $\tilde{\rho}$ on the bottom right 
-        over outer epochs.}
+        over the outer epochs.}
     \label{fig:cp-cotraining-traces}
 \end{figure}
 
@@ -47,8 +48,8 @@ magnitudes of the $4$ counterexamples mined in the final outer epoch.
 In contrast to the linear double integrator, in which the neural feature term provided significant local deformation, 
 the feature term $|g_\phi(x) - g_\phi(x^\star)|$ contributes less than $1\,\%$ across the boundary bath $\mathcal{B}_\partial$, 
 while the auxiliary term accounts for $99\,\%$.
-Since the Lyapunov candidate remains predominantly quadratic in character, making it difficult to capture the unstable dynamics 
-of the system outside the region around the equilibrium. Thus, the remaining counterexamples cluster at higher 
+Since the Lyapunov candidate remains predominantly quadratic in character, it is difficult to capture the unstable dynamics 
+of the system outside the region around the equilibrium. Thus, the remaining counterexamples cluster at larger 
 angles $\varphi$ and angular velocities $\omega$.
 \begin{figure}[htbp]
     \centering

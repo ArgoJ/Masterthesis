@@ -1,9 +1,8 @@
 \section{Model Predictive Control and Stability}
 \label{sec:mpc-stability}
-
-This section summarizes the model predictive control (MPC) framework as well as
-the conditions that are required to ensure the stability of the control loop in 
-optimal control configurations with a finite time horizon.
+This section introduces the model predictive control (MPC) framework as well as
+the conditions that are required to ensure closed-loop stability for 
+finite-horizon optimal control problems.
 
 
 \subsection{Problem Formulation}
@@ -125,7 +124,10 @@ linearization errors of the underlying nonlinear dynamics.
 \begin{figure}[htbp]
     \centering
     \input{tikz/basics/sets.tex}
-    \caption{Comparison of the terminal set $\mathcal{X}_f$ (red) with the entire state space $\mathcal{X}$ (blue).}
+    \caption[Terminal set and predicted trajectory]{
+        Predicted state trajectory $x_0, \dots, x_N$ evolving within the state constraint set $\mathcal{X}$ (blue) and 
+        terminating inside the terminal constraint set $\mathcal{X}_f \subseteq \mathcal{X}$ (red).
+    }
     \label{fig:terminal-set-comparison}
 \end{figure}
 

@@ -5,21 +5,21 @@ Extending formal Lyapunov verification from linear to nonlinear systems introduc
 Unlike the double integrator, the cartpole dynamics involve complex state couplings and trigonometric functions, 
 which makes verification harder due to larger relaxation errors. 
 
-Since the DARE solution provides a local Lyapunov approximation around the equilibrium for nonlinear systems and not globally valid, 
+Since the DARE solution provides a local Lyapunov approximation around the equilibrium for nonlinear systems and is not globally valid, 
 its suitability as an initial inductive prior strongly depends on the operating region of the imitation policy. 
 When the Lyapunov candidate remains dominated by this quadratic DARE term, the optimization may favor changes to 
 the policy that provide a low-cost way to reduce the penalized condition violations. 
 Consequently, the optimization may promote large control inputs to reduce 
 the Lyapunov decrease condition on mined counterexamples, which are only evaluated pointwise. 
 Nevertheless, although the closed-loop state trajectories may exceed the admissible domain in rollouts, 
-it is open to question whether the policy remains reasonably close to the expert within the actual training domain $\mathcal{X}_V$.
+it is questionable whether the policy remains reasonably close to the expert within the actual training domain $\mathcal{X}_V$.
 
 During formal verification, the linear system benefits from exact bound propagation through its affine dynamics, 
 while the nonlinear system suffers from larger relaxation errors. 
 Especially the next Lyapunov value $V(f(x,\pi_\theta(x)))$ in \labelcref{eq:lyapunov-decrease} is sensitive to relaxations 
 in the policy, because these propagate through the dynamics and the neural Lyapunov candidate. 
 
-Beyond verification, the co-training reveals a limitation of single-step adversarial training sheme. 
+Beyond verification, the co-training reveals a limitation of the single-step adversarial training sheme. 
 As illustrated in \cref{fig:app-cp-cotrain-trajectories}, the co-trained controller exhibits actuator oscillations 
 ompared to the smooth imitation baseline. 
 Since the adversarial falsifier is restricted to single-step transitions $x_k \mapsto x_{k+1}$, 

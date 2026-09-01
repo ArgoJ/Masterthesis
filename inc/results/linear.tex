@@ -2,8 +2,8 @@
 \label{sec:results-linear}
 
 Since the double integrator is a linear system, it serves as a good baseline to determine the performance of 
-the proposed co-training and falsification pipeline. Looking at the defined optimal value function of the double integrator MPC in 
-\cref{fig:di-mpc-lyapunov}, one can see that there exists a stable region around the origin. However, this region is 
+the proposed co-training and falsification pipeline. Considering the defined optimal value function of the double-integrator MPC in
+\cref{fig:di-mpc-lyapunov}, there is a stable region around the origin. However, this region is 
 only estimated based on the datasets' feasibility and lyapunov decrease using the $V = x^\top P x$ as a Lyapunov function. The dataset provides a 
 practical foundation to learn a policy that is able to approximate the optimal control performance, while preserving the system's stability. 
 To evaluate the approximation accuracy of the learned imitation policy, \cref{fig:di-policy-error-bands} shows the closed-loop absolute 

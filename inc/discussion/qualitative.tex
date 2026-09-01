@@ -39,9 +39,8 @@ power, leading to slower training.
 Throughout the boundary batch $\mathcal{B}_\partial$, the neural feature term contributes less than $1\,\%$ to the 
 Lyapunov candidate $V_\phi(x)$, leaving the function dominated by the auxiliary term. 
 Consequently, the Lyapunov candidate remains largely quadratic and adapts only weakly to the nonlinear dynamics. 
-Notably, within the tested initialization schemes and activations, varying the standard deviation of the final-layer weights $W^{(L)}$ 
-of the Lyapunov network $g_\phi$ did not prevent this behavior.
-consistently demonstrate the same behavior at convergence.
+Notably, within the tested initialization schemes, neither varying the standard deviation of the final-layer weights $W^{(L)}$ 
+of the Lyapunov network $g_\phi$ did not prevent this behavior, nor using ReLU as activations.
 To address this collapse, it might be beneficial to specifically regularize the feature term share on the boundary set $\mathcal{B}_\partial$, 
 thereby encouraging a stronger contribution from the neural component.
 As the counterexamples in \cref{fig:cp-cotraining-traces} show, condition violations 
