@@ -9,7 +9,7 @@
 \bottomrule
 \endfoot
 
-% --- Chapter 3: System Dynamics & Control ---
+% --- Chapter 2: System Dynamics & Control ---
 \multicolumn{2}{@{}l}{\textit{System Dynamics \& Control}} \\
 \midrule
 $n_x$ & State space dimension \\
@@ -38,7 +38,7 @@ $f_c(x, u)$ & Continuous-time system dynamics \\
 $f(x_k, u_k)$ & Discrete-time system dynamics \\
 \midrule
 
-% --- Chapter 3: Optimal Control & MPC ---
+% --- Chapter 2: Optimal Control & MPC ---
 \multicolumn{2}{@{}l}{\textit{Optimal Control \& Model Predictive Control (MPC)}} \\
 \midrule
 $N$ & Prediction horizon \\
@@ -48,11 +48,14 @@ $V_f(x)$ & Terminal cost function \\
 $\mathcal{X}_f$ & Terminal constraint set \\
 $Q$ & State weighting matrix \\
 $R$ & Input weighting matrix \\
+$\lambda_{\min}(Q), \lambda_{\max}(Q)$ & Minimum and maximum eigenvalues of state weight matrix $Q$ \\
 $\pi_0(x)$ & Closed-loop MPC feedback policy \\
 $\pi_f(x)$ & Auxiliary local terminal control law \\
 $u_{0|k}^\star$ & Optimal control input at time step $k$ \\
+$x_{i|k}^\star, u_{i|k}^\star$ & Optimal predicted state and control input sequence \\
 $V_N(x)$ & Optimal value function \\
 $x_{i|k}, u_{i|k}$ & Predicted state and input at horizon step $i$ initialized at step $k$ \\
+$x_{N|k}$ & Predicted terminal state at horizon step $N$ initialized at step $k$ \\
 $(\tilde{u}_{i|k+1})$ & Shifted candidate input sequence \\
 $(\tilde{x}_{i|k+1})$ & Shifted candidate state sequence \\
 $A$ & Linearized system state matrix \\
@@ -62,7 +65,7 @@ $P$ & DARE solution matrix \\
 $\mathcal{X}_N$ & Feasible initial state set \\
 \midrule
 
-% --- Chapter 4: Machine Learning ---
+% --- Chapter 3: Machine Learning ---
 \multicolumn{2}{@{}l}{\textit{Machine Learning}} \\
 \midrule
 $L$ & Total layer count \\
@@ -85,12 +88,14 @@ $\theta$ & Trainable network parameters \\
 $\theta^\star$ & Optimal network parameters \\
 $\mathcal{D}$ & Training dataset \\
 $\mathcal{B}$ & Mini-batch \\
+$\mathcal{B}_t$ & Mini-batch at optimization step $t$ \\
 $\loss$ & Total training loss function \\
 $\loss_{\mathrm{MSE}}$ & Mean squared error loss \\
 $\loss_{\mathrm{reg}}$ & Regularization loss \\
 $\loss_{\mathrm{aux}}$ & Auxiliary loss \\
 $\lambda_{\mathrm{reg}}$ & Regularization weight \\ 
 $\lambda_{\mathrm{aux}}$ & Auxiliary weight \\
+$\lambda_{\ell_2}$ & $L_2$ weight decay regularization weight \\
 $\delta^{(l)}$ & Loss sensitivity per layer \\
 $\delta^{(L)}$ & Loss sensitivity at last layer \\
 $\odot$ & Element-wise (Hadamard) product \\
@@ -118,7 +123,7 @@ $\Pi_{x + \mathcal{P}}(\cdot)$ & Projection operator onto perturbation set \\
 $\operatorname{sign}(\cdot)$ & Signum function \\
 \midrule
 
-% --- Chapter 5: Neural Network Verification Foundations ---
+% --- Chapter 4: Neural Network Verification Foundations ---
 \multicolumn{2}{@{}l}{\textit{Neural Network Verification (Foundations)}} \\
 \midrule
 $\mathcal{F}$ & Verification input domain \\
@@ -127,6 +132,7 @@ $\psi(a^{(L)})$ & Scalar specification function \\
 $\psi^\star$ & Global minimum of specification function \\
 $\underline{\psi}$ & Guaranteed sound specification lower bound \\
 $[l_j^{(l)}, u_j^{(l)}]$ & Pre-activation lower and upper bounds of neuron $j$ in layer $l$ \\
+$\operatorname{sigmoid}(\cdot)$ & Logistic sigmoid activation function \\
 $\alpha_{L,j}^{(l)}, \alpha_{U,j}^{(l)}$ & CROWN linear lower and upper bounding slopes \\
 $d_{L,j}^{(l)}, d_{U,j}^{(l)}$ & CROWN linear lower and upper bounding intercepts \\
 $\zeta_l^+, \zeta_l^-, \zeta_l^\pm$ & Strictly concave, convex, and mixed curvature neuron sets \\
@@ -148,7 +154,7 @@ $\mathcal{G}(\alpha, \beta)$ & Joint lower bound objective function in $\alpha,\
 $\underline{\psi}^\star_{\alpha,\beta}$ & Jointly optimized lower bound via $\alpha,\beta$-CROWN \\
 \midrule
 
-% --- Chapter 6.1: Methodology - Imitation Learning ---
+% --- Chapter 5.1: Methodology - Imitation Learning ---
 \multicolumn{2}{@{}l}{\textit{Imitation Learning (Methodology)}} \\
 \midrule
 $\mathcal{X}_{\mathrm{MPC}}$ & MPC trajectory sampling domain \\
@@ -161,8 +167,8 @@ $\mathcal{D}_\pi$ & Imitation learning dataset \\
 $N_{\mathcal{D}}$ & Imitation learning dataset sample count \\
 $(x^{(i)}, u^{(i)})$ & State-action sample pair in dataset \\
 $\mathcal{B}_\pi$ & Imitation learning training batch \\
-$\pi_0(x)$ & Expert MPC policy \\
 $\pi_\theta(x)$ & Learned imitation policy \\
+$\tilde{\pi}_\theta(x)$ & Unconstrained equilibrium-centered imitation policy \\
 $h_\theta(x)$ & Unconstrained neural network output \\
 $\clamp(\cdot)$ & Control input clamping function \\
 $S_x$ & State scaling matrix \\
@@ -180,7 +186,7 @@ $\lambda_f$ & Dynamics-aware constraint loss weight \\
 $\loss_\pi$ & Total imitation policy loss \\
 \midrule
 
-% --- Chapter 6.2: Methodology - Neural Lyapunov Learning & Falsification ---
+% --- Chapter 5.2: Methodology - Neural Lyapunov Learning & Falsification ---
 \multicolumn{2}{@{}l}{\textit{Neural Lyapunov Learning \& Falsification}} \\
 \midrule
 $\pi_V(x)$ & Co-trained imitation policy \\
@@ -192,6 +198,7 @@ $R_\phi$ & Learnable transformation matrix \\
 $\rho$ & Target Lyapunov sublevel value \\
 $\rho_{\mathrm{max}}$ & Theoretical maximum sublevel bound \\
 $\mathcal{V}_\rho$ & Certified sublevel set \\
+$\mathcal{V}_{\rho^\star}$ & Certified maximal sublevel set \\
 $\mathcal{X}_V$ & Lyapunov training domain \\
 $\underline{x}_V$ & Lower bound of Lyapunov training domain \\
 $\overline{x}_V$ & Upper bound of Lyapunov training domain \\
@@ -257,10 +264,11 @@ $\chi$ & Overestimation factor \\
 $\tilde{\rho}$ & Estimated ROA boundary minimum \\
 $\upsilon_\rho$ & $\rho$ EMA decay rate \\
 $N_{\mathrm{outer}}$ & Outer epoch count \\
+$N_{\mathrm{co-train}}$ & Total co-training epoch count \\
 $K_{\mathrm{steps}}$ & Inner mini-batch optimization steps per epoch \\
 \midrule
 
-% --- Chapter 6.3: Methodology - Formal Stability Verification ---
+% --- Chapter 5.3: Methodology - Formal Stability Verification ---
 \multicolumn{2}{@{}l}{\textit{Formal Stability Verification (Methodology)}} \\
 \midrule
 $\mathcal{X}_C$ & Formal verification domain \\
@@ -275,22 +283,30 @@ $\Phi_{\mathrm{dec}}$ & Strict Lyapunov decrease predicate \\
 $\Psi(\rho)$ & Global domain verification condition \\
 $\rho_0$ & Initial sublevel search bound \\
 $\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}$ & Search interval lower and upper bounds \\
+$\rho_{\mathrm{mid}}$ & Bisection search interval midpoint \\
+$\varepsilon_{\mathrm{bisect}}$ & Bisection search convergence tolerance \\
+$\varepsilon_{\mathrm{cond}}$ & Condition verification satisfaction tolerance \\
+$\mathcal{B}_{\mathrm{ver}}$ & Verification candidate state evaluation batch \\
 $q$ & Exponential search scaling factor \\
 $N_{\mathrm{scale}}, N_{\mathrm{bisect}}$ & Scaling and bisection iteration limits \\
 $\rho^\star$ & Maximal verified sublevel value \\
 \midrule
 
-% --- Chapter 7: Benchmark Systems & Experimental Evaluation ---
+% --- Chapter 6: Benchmark Systems & Experimental Evaluation ---
 \multicolumn{2}{@{}l}{\textit{Benchmark Systems \& Experimental Evaluation}} \\
 \midrule
 $\Delta t$ & Discrete simulation sampling time \\
 $f_{\mathrm{DI}}$ & Discrete-time double integrator dynamics \\
 $f_{\mathrm{CP}}$ & Discrete-time cartpole dynamics \\
 $p, v$ & Cart position and velocity states \\
+$p_k, v_k$ & Discrete-time cart position and velocity states \\
 $\varphi, \omega$ & Cartpole pendulum angle and angular velocity states \\
+$\varphi_k, \omega_k$ & Discrete-time pendulum angle and angular velocity states \\
 $F$ & Control force applied to the cart \\
+$F_k$ & Discrete-time control force input \\
 $M$ & Cart mass \\
 $m$ & Pendulum mass \\
 $l_p$ & Pendulum length \\
 $g$ & Acceleration due to gravity \\
+$\underline{x}_f, \overline{x}_f$ & Terminal set constraints \\
 \end{longtable}

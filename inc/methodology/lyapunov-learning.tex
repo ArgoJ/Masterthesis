@@ -430,7 +430,7 @@ Finally, to reduce fluctuations caused by changes in the estimated boundary mini
 the gating bound $\rho$ is updated using an exponential moving average (EMA):
 \begin{equation}
     \label{eq:rho-ema}
-    \rho \leftarrow \upsilon_\rho \rho + (1 - \upsilon) \tilde{\rho},
+    \rho \leftarrow \upsilon_\rho \rho + (1 - \upsilon_\rho) \tilde{\rho},
 \end{equation}
 where $\upsilon_\rho \in [0, 1)$ denotes the EMA decay rate.
 
