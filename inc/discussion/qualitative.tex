@@ -20,8 +20,8 @@ Since ReLU networks yield piecewise linear input-output mappings, they are well-
 relaxation and branch-and-bound verification in $\alpha,\beta$-CROWN. 
 Furthermore, the neural feature term $|g_\phi(x) - g_\phi(x^\star)|$ accounts for an active $17.7\,\%$ share of the 
 Lyapunov candidate when evaluated over the boundary states $\mathcal{B}_\partial$. 
-This confirms that the learned candidate does not rely exclusively on the quadratic DARE auxiliary term, but rather that the 
-neural network actively shapes the Lyapunov geometry to satisfy the decrease condition across an expanded domain.
+This indicates that the learned candidate does not rely exclusively on the quadratic DARE auxiliary 
+term and that the neural component contributes non-negligibly to the resulting Lyapunov landscape over the expanded domain.
 
 In comparison, the cartpole benchmark demonstrates a deceptive convergence behavior 
 that highlights critical challenges in the co-training of nonlinear systems. 
@@ -38,17 +38,17 @@ power, leading to slower training.
 
 Throughout the boundary batch $\mathcal{B}_\partial$, the neural feature term contributes less than $1\,\%$ to the 
 Lyapunov candidate $V_\phi(x)$, leaving the function dominated by the auxiliary term. 
-Consequently, the Lyapunov candidate remains mostly quadratic and cannot adapt its form to the nonlinear dynamics. 
-Notably, this collapse cannot be attributed to the weight initialization of the final layer $W^{(L)}$ in the Lyapunov network $g_\phi$, 
-since experiments with different standard deviations for its initial weights as well as with ReLU activations in $g_\phi$ 
+Consequently, the Lyapunov candidate remains largely quadratic and adapts only weakly to the nonlinear dynamics. 
+Notably, within the tested initialization schemes and activations, varying the standard deviation of the final-layer weights $W^{(L)}$ 
+of the Lyapunov network $g_\phi$ did not prevent this behavior.
 consistently demonstrate the same behavior at convergence.
 To address this collapse, it might be beneficial to specifically regularize the feature term share on the boundary set $\mathcal{B}_\partial$, 
-forcing the candidate not to rely solely on the quadratic DARE term.
+thereby encouraging a stronger contribution from the neural component.
 As the counterexamples in \cref{fig:cp-cotraining-traces} show, condition violations 
 occur at large pendulum angles $\varphi$ and angular velocities $\omega$, 
 where the linearized DARE approximation starts to fail.
 To compensate for this structural mismatch, the optimization forces the policy to generate large control inputs. 
 Furthermore, while the use of $\tanh$ activations for $V_\phi$ provides smooth representations, 
 it leads to looser relaxations in CROWN compared to piecewise linear ReLU networks. 
-Together, the degraded trajectory tracking and the loose bounds relaxations prevent the 
-verifier from certifying a sublevel set $\rho^\star > 0$
+Together, the degraded trajectory tracking and the loose bounds relaxations appear to limit the 
+verifier's ability to certify a sublevel set $\rho^\star > 0$
