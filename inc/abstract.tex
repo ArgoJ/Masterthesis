@@ -1,2 +1,15 @@
 \chapter*{Abstract}
 \label{ch:abstract}
+
+Neural control policies have emerged as an effective approach for controlling 
+complex dynamical systems, enabling the imitation of Model Predictive Controllers. 
+Nevertheless, their practical use in safety-critical applications remains constrained by the 
+lack of rigorous closed-loop stability guarantees.
+This thesis presents a framework for learning and formally certifying neural imitation controllers 
+using learned Lyapunov functions. 
+The proposed methodology combines supervised imitation learning from an expert MPC with falsification-guided 
+co-training of the policy and a neural Lyapunov candidate, using mined adversarial counterexamples 
+to refine the policy and Lyapunov candidate toward a verifier-friendly landscape. 
+Local stability and forward invariance is then searched using 
+the GPU-accelerated verifier $\alpha,\beta$-CROWN to formally verify the region of attraction. 
+The framework is evaluated on both a double integrator and a nonlinear cartpole system.

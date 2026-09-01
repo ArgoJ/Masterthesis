@@ -12,9 +12,9 @@ the core idea of this work is to achieve formal verification while maintaining n
 The results for the double integrator demonstrate that this pipeline can be successful for
 imitation learning and formal verification for linear systems. 
 Throughout co-training, the falsification loop systematically reduces the number of mined counterexamples, 
-resulting in a formally certified region of attraction that is $42.1\,\%$ larger than the approximated MPC baseline. 
-Key is that this expansion reflects an active trade-off, where the co-trained policy adapts its 
-control actions away from near optimality.
+resulting in a formally certified sublevel set covering $65.07\,\%$ of the considered state domain $\mathcal{X}$.
+This certification reflects a trade-off, as the co-trained policy adapts its control actions away 
+from the nominal MPC behavior to satisfy the Lyapunov decrease condition.
 Both the policy and the Lyapunov network are parameterized as compact ReLU Multi-Layer Perceptrons. 
 Since ReLU networks yield piecewise linear input-output mappings, they are well-suited for linear 
 relaxation and branch-and-bound verification in $\alpha,\beta$-CROWN. 

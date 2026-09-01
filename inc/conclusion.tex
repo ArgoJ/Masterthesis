@@ -6,15 +6,15 @@ learned Lyapunov functions. The proposed approach combines imitation learning ba
 falsification-guided co-training of a neural control policy and the corresponding Lyapunov candidate, 
 followed by formal verification using the $\alpha,\beta$-CROWN framework.
 
-The empirical results demonstrate that imitation learning provides an effective inductive prior, 
-enabling compact networks to closely replicate optimal behavior. 
-Formal verification identified a certified region of attraction with an area of $260.27$, compared to $183.22$
-for the approximated MPC baseline, corresponding to an increase of $42.1\,\%$. 
-This expansion came at the cost of deviation from nominal MPC behavior, 
-highlighting the trade-off between imitation accuracy and the size of the formally certified region.
-The results therefore demonstrate the potential of combining imitation learning, learned Lyapunov functions, 
-and falsification-guided training for obtaining compact neural controllers with formal stability guarantees.
-
+For the linear double integrator, the empirical results demonstrate that imitation learning provides an 
+effective inductive prior, enabling compact networks to accurately replicate optimal behavior. 
+Building upon this initialization, falsification-guided co-training successfully refines both the controller and 
+the neural Lyapunov candidate by systematically reducing mined counterexamples. 
+Subsequent formal verification using $\alpha,\beta$-CROWN certifies a region of attraction 
+covering $65.07\,\%$ of the considered state domain $\mathcal{X}$ for the closed-loop neural controller. 
+While enforcing the Lyapunov decrease condition in this domain causes the policy to deviate slightly
+from the expert's behavior, this demonstrates that it is possible to trade imitation accuracy
+for formal guarantees of closed-loop stability.
 In contrast, the nonlinear cartpole benchmark revealed key limitations of the proposed method. 
 Although the co-training procedure converged toward lower condition losses and fewer counterexamples, 
 the overall performance of the co-trained controller degraded compared to the imitation baseline. 

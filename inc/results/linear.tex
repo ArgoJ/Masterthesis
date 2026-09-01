@@ -67,13 +67,15 @@ achieve certified stability and expand the region of attraction without compromi
 \end{figure}
 
 After training the candidate $V_\phi(x)$, the final pipeline step is to find a formally verified sublevel set $\mathcal{V}_\rho$ 
-to ensure stability of the closed-loop dynamics. Given the configuration in \cref{tab:hp-verification}, the verifier identifies the 
-largest formally verified $\rho^\star = 665.66$, as shown in \cref{fig:di-roa}. To provide geometric context, this certified 
-region covers an area of $260.27$, which is computed via Monte-Carlo integration over $\mathcal{X}$.
-For the nominal MPC value function, the quadratic sublevel set estimation yields an area of $183.22$, as visualized in 
-\cref{fig:di-mpc-lyapunov}. This confirms that the co-training procedure successfully expands the verifiable region of attraction. 
-However, this expansion comes at the cost of nominal optimality, as the policy adapts its control inputs away from the MPC expert 
-to satisfy the Lyapunov decrease condition across a wider state domain.
+within which closed-loop stability can be certified. Given the configuration in \cref{tab:hp-verification}, the verifier identifies the 
+formally verified $\rho^\star = 665.66$, as shown in \cref{fig:di-roa}. To provide geometric context, consider the state domain 
+$\mathcal{X} = [-10,10]^2$, with a total area of $|\mathcal{X}| = 20 \times 20 = 400$. The certified region covers an area of $260.27$, 
+corresponding to $65.07\,\%$ of $\mathcal{X}$, as estimated using Monte Carlo integration over $\mathcal{X}$.
+For the nominal MPC value function, the quadratic sublevel set estimation yields an area of $183.22$, 
+which corresponds to $45.81\,\%$ of $\mathcal{X}$, as visualized in \cref{fig:di-mpc-lyapunov}. 
+These values provide a geometric reference for the certified sublevel set obtained after co-training.
+The larger certified sublevel set is accompanied by a deviation from the nominal MPC behavior, as the policy adapts 
+its control inputs to satisfy the Lyapunov decrease condition over a wider state domain.
 \begin{figure}[htbp]
     \centering
     \input{tikz/results/double_integrator/di_roa.tex}

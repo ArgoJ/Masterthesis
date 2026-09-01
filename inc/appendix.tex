@@ -1,7 +1,7 @@
 \chapter{Appendix}
 \label{ch:appendix}
 
-\subsection{Imitation Learning}
+\section{Imitation Learning}
 Note:
 If the MPC problem
 becomes infeasible at any time during one trajectory, all training pairs
@@ -12,7 +12,7 @@ state-action pairs are removed during preprocessing. The concatenated
 state-action vectors are normalized and mapped onto an adaptive voxel grid.
 For each occupied voxel, at most one representative pair is retained.
 
-\subsection{\texorpdfstring{\texttt{acados}}{acados} OCP Solver Configuration}
+\section{\texorpdfstring{\texttt{acados}}{acados} OCP Solver Configuration}
 \label{app:acados-config}
 For generating the expert MPC trajectories, the optimal control problems are solved using \texttt{acados}~\cite{verschuerenAcadosModularOpensource2022}. 
 \Cref{tab:app-acados-config} summarizes the underlying NLP and QP solver options as well as the integrator configuration.
@@ -45,7 +45,7 @@ For generating the expert MPC trajectories, the optimal control problems are sol
     \end{tabular}
 \end{table}
 
-\subsection{\texorpdfstring{$\alpha,\beta$}{α,β}-CROWN Verification Backend Configuration}
+\section{\texorpdfstring{$\alpha,\beta$}{α,β}-CROWN Verification Backend Configuration}
 \label{app:abcrown-config}
 To ensure reproducibility of the formal certification pipeline, the default configuration for the $\alpha,\beta$-CROWN verification 
 used in this thesis is summarized in \cref{tab:app-abcrown-config}. 
@@ -94,7 +94,7 @@ Split-by-Score (\texttt{sb}) branching.
 
 
 
-\subsection{Imitation Learning Training Losses}
+\section{Imitation Learning Training Losses}
 \label{app:imitation-loss}
 To illustrate the convergence behavior and generalization of the supervised imitation learning phase, 
 \cref{fig:di-im-loss} and \cref{fig:cp-im-loss} show the training and validation loss trajectories over epochs 
@@ -119,7 +119,7 @@ follows the training loss without overfitting.
 
 
 
-\subsection{Cartpole Expert and Policy Trajectories}
+\section{Cartpole Expert and Policy Trajectories}
 \label{app:cartpole-trajectories}
 
 To provide insight into the closed-loop performance of the learned imitation policy compared to the MPC expert, 
