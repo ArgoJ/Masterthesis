@@ -1,0 +1,20 @@
+\begin{tikzpicture}[>=Latex, font=\scriptsize]
+    % Achsen
+    \draw[->, thick, black] (0,0) -- (3.6,0) node[right, text=black] {$t$};
+    \draw[->, thick, black] (0,-0.2) -- (0,2.0) node[above, text=black] {$x$};
+
+    % Diskrete Experten-Datenpunkte (acados MPC)
+    \foreach \t/\x in {0.3/1.6, 0.7/1.3, 1.2/0.8, 1.8/0.45, 2.4/0.2, 3.0/0.05} {
+        \fill[navy] (\t,\x) circle (1.8pt);
+    }
+    
+    % Experten-Trajektorie (gestrichelt)
+    \draw[thick, navy, dashed] (0.2, 1.7) to[out=-25, in=165] (1.5, 0.6) to[out=-15, in=180] (3.2, 0.05);
+
+    % Gelernte Policy Trajektorie (durchgezogen teal)
+    \draw[very thick, teal] (0.2, 1.65) to[out=-20, in=170] (1.5, 0.63) to[out=-10, in=180] (3.2, 0.05);
+
+    % Labels
+    \node[anchor=west, font=\tiny\bfseries, text=navy] at (1.8, 1.6) {Expert $\mathcal{D}_\pi$};
+    \node[anchor=west, font=\tiny\bfseries, text=teal] at (1.8, 1.25) {Policy $\pi_\theta(x)$};
+\end{tikzpicture}

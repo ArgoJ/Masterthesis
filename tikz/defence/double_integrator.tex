@@ -1,0 +1,48 @@
+\begin{tikzpicture}[>=Latex, font=\small, text=black]
+
+    % --- 1. Schiene / Boden ---
+    \draw[thick, black] (-1.5,0) -- (5.0,0);
+    \foreach \x in {-1.2,-0.7,...,4.8} {
+        \draw[thin, black] (\x,0) -- (\x-0.2,-0.25);
+    }
+    
+    % Positionsachse p (Schwarz)
+    \draw[->, thick, black] (-1.5,-0.6) -- (5.0,-0.6) node[right, font=\footnotesize, text=black] {$p$};
+    \draw[thick, black] (0,-0.5) -- (0,-0.7) node[below, font=\scriptsize, text=black] {$0$};
+
+    % --- 2. Wagen / Masse m ---
+    \def\xcart{2.0}
+    \def\wcart{2.2}
+    \def\hcart{1.2}
+    \def\rwheel{0.22}
+
+    % Räder
+    \filldraw[fill=white, draw=navy, thick] (\xcart - 0.65, \rwheel) circle (\rwheel);
+    \filldraw[fill=white, draw=navy, thick] (\xcart + 0.65, \rwheel) circle (\rwheel);
+    \fill[black] (\xcart - 0.65, \rwheel) circle (1.5pt);
+    \fill[black] (\xcart + 0.65, \rwheel) circle (1.5pt);
+
+    % Wagenkörper
+    \draw[very thick, navy, fill=navy!10, rounded corners=2pt] 
+        (\xcart - \wcart/2, 2*\rwheel) rectangle (\xcart + \wcart/2, 2*\rwheel + \hcart);
+    \node[font=\bfseries, text=black] at (\xcart, 2*\rwheel + \hcart/2) {$m$};
+
+    % --- 3. Zustände & Stellgröße ---
+    % Position p Projektion (Schwarz gestrichelt)
+    \draw[dashed, black, thick] (\xcart, 2*\rwheel) -- (\xcart, -0.6);
+    \draw[thick, black] (\xcart,-0.5) -- (\xcart,-0.7) node[below, font=\scriptsize, text=black] {$p$};
+
+    % Geschwindigkeit v
+    \draw[->, very thick, teal] (\xcart + 0.3, 2*\rwheel + \hcart + 0.3) --++ (1.3, 0) 
+        node[right, font=\footnotesize\bfseries, text=black] {$v$};
+
+    % Stellkraft u
+    \draw[->, very thick, purple] (\xcart - \wcart/2 - 1.2, 2*\rwheel + \hcart/2) --++ (1.1, 0) 
+        node[midway, above, font=\footnotesize\bfseries, text=black] {$u$};
+
+    % Zustandsvektor-Badge
+    \node[draw=black, fill=white, rounded corners=3pt, font=\scriptsize, text=black, anchor=west] at (-1.5, 2.2) {
+        $x = \begin{bmatrix} p \\ v \end{bmatrix} \in \mathbb{R}^2$
+    };
+
+\end{tikzpicture}
