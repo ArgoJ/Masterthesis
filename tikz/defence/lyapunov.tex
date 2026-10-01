@@ -1,0 +1,22 @@
+\begin{tikzpicture}[>=Latex, font=\scriptsize]
+    % Koordinatenkreuz
+    \draw[->, thick, black] (-1.8,0) -- (1.8,0) node[right, text=black] {$x_1$};
+    \draw[->, thick, black] (0,-1.4) -- (0,1.4) node[above, text=black] {$x_2$};
+
+    % Ursprung
+    \fill[navy] (0,0) circle (1.8pt) node[below left=1pt, font=\tiny\bfseries, text=navy] {$x^\star$};
+
+    % Inneres Level-Set (aktuelles \rho)
+    \draw[thick, teal, fill=teal!10] (0,0) ellipse (1.1cm and 0.75cm);
+    \node[font=\tiny\bfseries, text=teal!80!black] at (0, 0.4) {$\mathcal{V}_\rho$};
+
+    % Expandiertes Ziel-Level-Set (gestrichelt)
+    \draw[thick, teal!70!black, dashed] (0,0) ellipse (1.55cm and 1.05cm);
+
+    % Expansionspfeil
+    \draw[->, semithick, teal!80!black] (0.8, 0.55) -- (1.25, 0.85);
+
+    % Mined Counterexample x_adv
+    \fill[amber!90!black] (1.35, 0.4) circle (2.2pt);
+    \node[anchor=west, font=\tiny\bfseries, text=amber!90!black] at (1.4, 0.4) {$x_{\mathrm{adv}}$};
+\end{tikzpicture}

@@ -1,0 +1,40 @@
+\begin{tikzpicture}[>=Latex, font=\scriptsize]
+
+    % --- 1. Subplot: Stellgröße u_k in Stufen (Links) ---
+    \begin{scope}[xshift=0cm]
+        \draw[->, thick, black] (0,0) -- (3.2,0) node[right, text=black] {$t$};
+        \draw[->, thick, black] (0,-1.3) -- (0,1.4) node[above, text=black] {$u$};
+        
+        % Input Bounds \pm u_max
+        \draw[dashed, red!80!black, thick] (0,1.0) -- (3.0,1.0) node[right, font=\tiny\bfseries, text=red!80!black] {$u_{\max}$};
+        \draw[dashed, red!80!black, thick] (0,-1.0) -- (3.0,-1.0) node[right, font=\tiny\bfseries, text=red!80!black] {$-u_{\max}$};
+        
+        % Stufenförmiger Steuerungsverlauf (ZOH-Steps)
+        \draw[very thick, teal!90!black] 
+            (0.2, 0.75) -- (0.7, 0.75) --
+            (0.7, 0.35) -- (1.2, 0.35) --
+            (1.2, -0.60) -- (1.7, -0.60) --
+            (1.7, -0.20) -- (2.2, -0.20) --
+            (2.2, 0.0) -- (2.8, 0.0);
+            
+    \end{scope}
+
+    % --- 2. Subplot: Zustandstrajektorie x(t) (Rechts) ---
+    \begin{scope}[xshift=4.2cm]
+        \draw[->, thick, black] (0,0) -- (3.2,0) node[right, text=black] {$t$};
+        \draw[->, thick, black] (0,-1.3) -- (0,1.4) node[above, text=black] {$x$};
+        
+        % State Bounds \pm x_max
+        \draw[dashed, red!80!black, thick] (0,1.0) -- (3.0,1.0) node[right, font=\tiny\bfseries, text=red!80!black] {$x_{\max}$};
+        \draw[dashed, red!80!black, thick] (0,-1.0) -- (3.0,-1.0) node[right, font=\tiny\bfseries, text=red!80!black] {$-x_{\max}$};
+        
+        % Startzustand
+        \fill[navy] (0.2, 0.70) circle (2pt) node[above left, font=\tiny, text=navy] {$x_0$};
+        
+        % Glatte, geregelte Trajektorie
+        \draw[very thick, navy] (0.2, 0.70) 
+            to[out=-25, in=170] (1.4, 0.15) 
+            to[out=-10, in=180] (2.4, 0.0) -- (2.8, 0.0);
+    \end{scope}
+
+\end{tikzpicture}

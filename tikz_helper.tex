@@ -1,0 +1,26 @@
+%!TEX root = tikz_helper.tex
+%!TEX recipe = LuaLaTeX (Single Pass)
+\documentclass[tikz,border=2pt]{standalone}
+\usepackage{amsmath,amssymb}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\usepackage[english]{babel}
+\usepackage{iflang}
+
+\providecommand{\IfLanguageName}[3]{#3}
+\input{common/include_and_setup_pgf.tex}
+
+\begin{document}
+\ifdefined\customwidth
+    \setlength{\linewidth}{\customwidth}
+\else
+    \setlength{\linewidth}{20cm}
+\fi
+
+\ifdefined\tikzfile
+    \input{\tikzfile}
+\else
+    \PackageError{helper}{Keine TikZ-Datei angegeben! \string\def\string\tikzfile{...} nutzen.}{}
+\fi
+\end{document}

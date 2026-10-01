@@ -1,6 +1,12 @@
 {
   "latex-workshop.latex.recipes": [
     {
+      "name": "LuaLaTeX (Single Pass)",
+      "tools": [
+        "lualatex"
+      ]
+    },
+    {
       "name": "LuaLaTeX ➔ Biber ➔ LuaLaTeX x2",
       "tools": [
         "lualatex",

@@ -1,15 +1,147 @@
 \chapter{Appendix}
-\label{cha:appendix}
+\label{ch:appendix}
 
-\subsection{Imitation Learning}
+\section{Imitation Learning}
 Note:
 If the MPC problem
 becomes infeasible at any time during one trajectory, all training pairs
 associated with that trajectory are discarded.
 
-To reduce the overrepresentations of regions with high sampling rates, near-duplicate
+To reduce the overrepresentation of regions with high sampling rates, near-duplicate
 state-action pairs are removed during preprocessing. The concatenated
 state-action vectors are normalized and mapped onto an adaptive voxel grid.
 For each occupied voxel, at most one representative pair is retained.
 
-\todo{settings for abcrown}
+\section{\texorpdfstring{\texttt{acados}}{acados} OCP Solver Configuration}
+\label{app:acados-config}
+For generating the expert MPC trajectories, the optimal control problems are solved using \texttt{acados}~\cite{verschuerenAcadosModularOpensource2022}. 
+\Cref{tab:app-acados-config} summarizes the underlying NLP and QP solver options as well as the integrator configuration.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Configuration options for the \texttt{acados} OCP solver.}
+    \label{tab:app-acados-config}
+    \begin{tabular}{llc}
+        \toprule
+        \textbf{Parameter} & \textbf{Configuration Key} & \textbf{Value} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{NLP Solver}} \\
+        \midrule
+        NLP solver type & \texttt{nlp\_solver\_type} & \texttt{SQP} \\
+        Hessian approximation & \texttt{hessian\_approx} & \texttt{GAUSS\_NEWTON} \\
+        Max. NLP iterations & \texttt{nlp\_solver\_max\_iter} & $200$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{QP Solver}} \\
+        \midrule
+        QP solver & \texttt{qp\_solver} & \texttt{FULL\_CONDENSING\_HPIPM} \\
+        Max. QP iterations & \texttt{qp\_solver\_iter\_max} & $200$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Integrator \& Simulation}} \\
+        \midrule
+        Integrator type & \texttt{integrator\_type} & \texttt{ERK} \\
+        Number of stages & \texttt{sim\_method\_num\_stages} & $1$ \\
+        Number of steps & \texttt{sim\_method\_num\_steps} & $1$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{\texorpdfstring{$\alpha,\beta$}{α,β}-CROWN Verification Backend Configuration}
+\label{app:abcrown-config}
+To ensure reproducibility of the formal certification pipeline, the default configuration for the $\alpha,\beta$-CROWN verification 
+used in this thesis is summarized in \cref{tab:app-abcrown-config}. 
+The backend utilizes input-space Branch-and-Bound (\texttt{input\_bab}) combined with CROWN linear bound propagation and 
+Split-by-Score (\texttt{sb}) branching.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \caption{Configuration parameters for the $\alpha,\beta$-CROWN verification backend.}
+    \label{tab:app-abcrown-config}
+    \begin{tabular}{llc}
+        \toprule
+        \textbf{Parameter} & \textbf{Configuration Key} & \textbf{Value} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{General}} \\
+        \midrule
+        Verifier mode & \texttt{complete\_verifier} & \texttt{input\_bab} \\
+        Incomplete verification & \texttt{enable\_incomplete\_verification} & \texttt{False} \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Solver}} \\
+        \midrule
+        Bound propagation & \texttt{bound\_prop\_method} & \texttt{crown} \\
+        Batch size & \texttt{batch\_size} & $32$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Branch-and-Bound (BaB)}} \\
+        \midrule
+        Decision threshold & \texttt{decision\_thresh} & $-\varepsilon_{\mathrm{cond}} = -10^{-6}$ \\
+        Domain timeout limit & \texttt{timeout} & $60.0\,\mathrm{s}$ \\
+        Maximal active domains & \texttt{max\_domains} & $\infty$ (\texttt{None}) \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Branching (Input Space)}} \\
+        Branching heuristic & \texttt{method} & \texttt{sb} \\
+        Input space splitting & \texttt{input\_split.enable} & \texttt{True} \\
+        Split partitions & \texttt{input\_split.split\_partitions} & $2$ \\
+        IBP enhancement & \texttt{input\_split.ibp\_enhancement} & \texttt{True} \\
+        Bound comparison & \texttt{input\_split.compare\_with\_old\_bounds} & \texttt{True} \\
+        Adversarial check & \texttt{input\_split.adv\_check} & $-1$ \\
+        \midrule
+        \multicolumn{3}{l}{\textbf{Attack}} \\
+        \midrule
+        PGD attack scheduling & \texttt{pgd\_order} & \texttt{before} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+
+\section{Imitation Learning Training Losses}
+\label{app:imitation-loss}
+To illustrate the convergence behavior and generalization of the supervised imitation learning phase, 
+\cref{fig:di-im-loss} and \cref{fig:cp-im-loss} show the training and validation loss trajectories over epochs 
+for the double integrator and the cartpole system, respectively. 
+For both benchmarks, optimization is performed using an $80/20$ train-validation split combined with the 
+\texttt{ReduceLROnPlateau} learning rate scheduler. In both violations, the validation loss 
+follows the training loss without overfitting. 
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/appendix/di_loss.tex}
+    \caption{Double integrator imitation learning policy training and validation loss over epochs.}
+    \label{fig:di-im-loss}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/appendix/cp_loss.tex}
+    \caption{Cartpole imitation learning policy training and validation loss over epochs.}
+    \label{fig:cp-im-loss}
+\end{figure}
+
+
+
+\section{Cartpole Expert and Policy Trajectories}
+\label{app:cartpole-trajectories}
+
+To provide insight into the closed-loop performance of the learned imitation policy compared to the MPC expert, 
+\cref{fig:app-cartpole-trajectories} illustrates the state and control input trajectories for 
+five initial conditions on the cartpole system. 
+In contrast, \cref{fig:app-cp-cotrain-trajectories} shows the rollouts of the co-trained policy, 
+illustrating the resulting actuator chattering and trajectory divergence.
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/appendix/cp_policy_vs_expert_trajectories.tex}
+    \caption[Cartpole imitation learning trajectory comparison]{
+        Closed-loop state and control input trajectories comparing the learned imitation policy and the MPC expert for 
+        five initial states on the cartpole system.}
+    \label{fig:app-cartpole-trajectories}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \input{tikz/appendix/cp_cotrain_trajectories.tex}
+    \caption[Cartpole co-trained policy closed-loop trajectories]{
+        Closed-loop state and control input trajectories of the co-trained policy for 
+        five initial states on the cartpole system, showing actuator chattering and state divergence.}
+    \label{fig:app-cp-cotrain-trajectories}
+\end{figure}

@@ -21,7 +21,7 @@ Before evaluating the stability conditions, the equilibrium $x^\star$ must be ex
 certification domain 
 $\mathcal{X}_C := \{ x \in \mathbb{R}^n \mid \underline{x}_C \le x \le \overline{x}_C \} \subseteq \mathcal{X}_V$. 
 By construction, $V_\phi(x^\star) = 0$ and $x^+ = x^\star$ hold at the equilibrium, 
-causing the strict positivity and strict decrease conditions to evaluate to false at this exact point. 
+causing the strict positivity and strict decrease conditions to evaluate as false at this exact point. 
 Since these conditions are only required to hold for $x \neq x^\star$, and positive definiteness is structurally 
 enforced by the network architecture, formal verification is instead performed over the punctured evaluation domain 
 $\mathcal{X}_{\mathrm{eval}} := \mathcal{X}_C \setminus \mathcal{X}_{\mathrm{hole}}$, where 
@@ -32,7 +32,10 @@ as shown in \cref{fig:hole-exclusion}.
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/hole_exclusion.tex}
-    \caption{2D Hole exclusion example with $\mathcal{X}_{\mathrm{hole}} := \left\{ x \in \mathbb{R}^2 \;\mid\; \lVert x \rVert_\infty < 0.25 \right\}$.}
+    \caption{
+        Two-dimensional hole exclusion, dividing the certification domain $\mathcal{X}_C$ into four subregions 
+        $\mathcal{X}_{\mathrm{eval}}$ to isolate the equilibrium region
+        $\mathcal{X}_{\mathrm{hole}} := \left\{ x \in \mathbb{R}^2 \mid \lVert x \rVert_\infty < 0.25 \right\}$.}
     \label{fig:hole-exclusion}
 \end{figure}
 
@@ -83,7 +86,7 @@ First, a scaling phase exponentially expands or contracts $\rho$ by a factor $q 
 boundary within an interval $[\rho_{\mathrm{lo}}, \rho_{\mathrm{up}}]$.
 Second, a bisection phase narrows this interval until the gap falls below a tolerance $\varepsilon$. 
 Upon termination, the lower bound yields the maximum certified value $\rho^\star \approx \rho_{\mathrm{lo}}$.
-Compared to the proposed formulation by Yang in~\cite{yangLyapunovstableNeuralControl2024}, 
+Compared to the proposed formulation by Yang et al. ~\cite{yangLyapunovstableNeuralControl2024}, 
 explicit iteration limits $N_{\mathrm{scale}}$ and $N_{\mathrm{bisect}}$ are integrated into both phases. 
 This caps the maximum number of verifier calls, effectively preventing excessive computational 
 overhead on difficult verification problems.

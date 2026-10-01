@@ -1,0 +1,55 @@
+\begin{tikzpicture}[>=Latex, font=\scriptsize]
+
+    \def\layersep{1.3cm}
+    
+    % Input Layer (3 Neuronen: Zustand x_k)
+    \foreach \i in {1,2,3} {
+        \node[circle, draw=navy, fill=white, thick, minimum size=6.5mm, inner sep=0pt] (in_\i) at (0, 1.4 - \i*0.7) {};
+    }
+    \node[font=\tiny\bfseries, text=navy] at (in_1) {$p$};
+    \node[font=\tiny\bfseries, text=navy] at (in_2) {$v$};
+    \node[font=\tiny\bfseries, text=navy] at (in_3) {$\dots$};
+
+    % Hidden Layer 1 (4 Neuronen)
+    \foreach \j in {1,2,3,4} {
+        \node[circle, draw=teal!80!black, fill=teal!15, thick, minimum size=6mm, inner sep=0pt] (h1_\j) at (\layersep, 1.75 - \j*0.7) {};
+    }
+
+    % Hidden Layer 2 (4 Neuronen)
+    \foreach \k in {1,2,3,4} {
+        \node[circle, draw=teal!80!black, fill=teal!15, thick, minimum size=6mm, inner sep=0pt] (h2_\k) at (2*\layersep, 1.75 - \k*0.7) {};
+    }
+
+    % Output Layer (1 Neuron: Stellgröße u_k)
+    \node[circle, draw=purple, fill=purple!20, thick, minimum size=6.5mm, inner sep=0pt] (out_1) at (3*\layersep, 0) {};
+    \node[font=\tiny\bfseries, text=purple] at (out_1) {$u$};
+
+    % Verbindungen: Input -> Hidden 1
+    \foreach \i in {1,2,3} {
+        \foreach \j in {1,2,3,4} {
+            \draw[->, thin, black] (in_\i.east) -- (h1_\j.west);
+        }
+    }
+
+    % Verbindungen: Hidden 1 -> Hidden 2
+    \foreach \j in {1,2,3,4} {
+        \foreach \k in {1,2,3,4} {
+            \draw[->, thin, black] (h1_\j.east) -- (h2_\k.west);
+        }
+    }
+
+    % Verbindungen: Hidden 2 -> Output
+    \foreach \k in {1,2,3,4} {
+        \draw[->, thin, black] (h2_\k.east) -- (out_1.west);
+    }
+
+    % Externe Pfeile
+    \draw[<-, thick, navy] (in_2.west) --++ (-0.7, 0) node[left, font=\scriptsize\bfseries] {$x_k$};
+    \draw[->, thick, purple] (out_1.east) --++ (0.7, 0) node[right, font=\scriptsize\bfseries] {$\pi_\theta(x_k)$};
+
+    % Layer Beschriftungen oben
+    \node[font=\tiny\bfseries, text=black] at (0, 1.2) {Input};
+    \node[font=\tiny\bfseries, text=black] at (1.5*\layersep, 1.5) {Hidden Layers};
+    \node[font=\tiny\bfseries, text=black] at (3*\layersep, 1.2) {Output};
+
+\end{tikzpicture}

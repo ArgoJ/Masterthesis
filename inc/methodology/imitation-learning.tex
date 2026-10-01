@@ -22,24 +22,27 @@ where $x^{(i)} \in \mathcal{X}_\pi$ and $u^{(i)} = \pi_0(x^{(i)})$.
 \paragraph{Imitation Policy} follows the structure proposed in~\cite{yangLyapunovstableNeuralControl2024}, 
 as it enforces true control inputs at the equilibrium $\pi_\theta(x^\star) = u^\star$ and 
 satisfies the control input constraints $\underline{u} \leq \pi_\theta(x) \leq \overline{u}$ 
-by construction. The neural policy $\pi_\theta$ is visualized in \cref{fig:imitation-policy} and 
-formulated as 
+by construction. The unconstrained neural policy $\tilde{\pi}_\theta$ is formulated as 
+\begin{equation}
+    \label{eq:unc-policy-arch}
+    \tilde{\pi}_\theta(x) = h_\theta(x) - h_\theta(x^\star) + u^\star.
+\end{equation}
+where $h_\theta : \mathbb{R}^{n_x} \to \mathbb{R}^{n_u}$ is a neural network and 
+$u^\star \in \mathcal{U} $ represents the desired control action at the equilibrium $x^\star$.
+However, to ensure the satisfaction of the control input constraints, the unconstrained output $\tilde{\pi}_\theta(x)$ 
+is clipped element-wise using $\clamp(\cdot, \underline{\cdot}, \overline{\cdot})$. 
+This yields the neural policy visualized in \cref{fig:imitation-policy}:
 \begin{equation}
     \label{eq:policy-arch}
-    \pi_\theta(x) = \clamp(
-            h_\theta(x) - h_\theta(x^\star) + u^\star, 
-            \underline{u},
-            \overline{u}
-    ).
+    \pi_\theta(x) = \clamp(\tilde{\pi}_\theta(x), \underline{u}, \overline{u}).
 \end{equation}
-where $h_\theta : \mathbb{R}^{n_x} \to \mathbb{R}^{n_u}$ is an unconstrained neural network, 
-$u^\star \in \mathcal{U} $ represents the desired control action at the equilibrium $x^\star$, 
-and $\clamp(\cdot, \underline{\cdot}, \overline{\cdot})$ acts element-wise to enforce the input constraints.
 
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/policy_nn.tex}
-    \caption[Imitation Policy]{The imitation learning policy.}
+    \caption[Imitation policy architecture]{
+        Architecture of the imitation control policy $\pi_\theta(x)$, which ensures exact control action replication 
+        at the equilibrium $u_\star$ and enforces hard control input constraints through clipping.}
     \label{fig:imitation-policy}
 \end{figure}
 
@@ -53,19 +56,15 @@ the loss terms are normalized using strictly positive diagonal scaling matrices
     \quad \text{and} \quad
     S_u = \diag(u_{\mathrm{scale}}) \in \mathbb{R}^{n_u \times n_u}.
 \end{equation}
-Using $S_x$, the normalized distance of a state $x$ from the equilibrium $x^\star$ is quantified with the $\ell_1$-norm as
-\begin{equation}
-    \label{eq:state-distance}
-    d(x) = \frac{1}{n_x} \left\| S_x^{-1}(x - x^\star) \right\|_1.
-\end{equation}
-
-To assign appropriate priority during behavioral cloning, a state-dependent weight is defined as
+To prioritize approximation accuracy near the equilibrium during behavioral cloning, a state-dependent weight $w_x(x)$ is defined as
 \begin{equation}
     \label{eq:state-weight}
-    w_x(x) = w_{\min} + (1 - w_{\min}) \left( \frac{1}{1 + d(x)} \right)^{\gamma_x},
+    w_x(x) = w_{\min} + (1 - w_{\min}) \left( \frac{1}{1 + d(x)} \right)^{\gamma_x}, 
+    \quad \text{with} \quad
+    d(x) = \frac{1}{n_x} \left\| S_x^{-1}(x - x^\star) \right\|_1,
 \end{equation}
-where $w_{\min} \in (0, 1)$ is the baseline weight for states far from the
-equilibrium and $\gamma_x \geq 0$ controls the decay rate.
+where $d(x)$ denotes the normalized $\ell_1$-distance to the equilibrium $x^\star$, $w_{\min} \in (0, 1)$ is the 
+minimal weight for distant states, and $\gamma_x \geq 0$ controls the decay rate.
 
 \paragraph{State-Weighted Behavioral Cloning Loss} penalizes the squared normalized 
 Euclidean distance between the neural network policy and the expert targets. 
@@ -81,11 +80,11 @@ $|\mathcal{B}_\pi|$, the behavioral cloning loss is defined as
 Here, the state-dependent weight $w_x(x)$ prioritizes approximation accuracy near the equilibrium.
 
 
-\paragraph{Dynamics-Aware Constraint Loss} applies a one-step penalty for successor states 
-that leave the admissible state set $\mathcal{X}_\pi$.
-For each state $x \in \mathcal{B}_\pi$, the next state is evaluated under 
-the neural policy as $x^+ = f(x,\pi_\theta(x))$. 
-Using the element-wise ReLU function defined in \labelcref{eq:relu}, the loss is defined as
+\paragraph{Dynamics-Aware Constraint Loss} applies a one-step penalty for successor states that leave 
+the admissible state set $\mathcal{X}_\pi$. To maintain non-zero gradient flow even in regions of the 
+state space where the control input saturates, the one-step forward dynamics are evaluated for all 
+$x \in \mathcal{B}_\pi$ using the unconstrained neural policy as $x^+ = f(x,\tilde{\pi}_\theta(x))$. 
+Using the element-wise ReLU function defined in \labelcref{eq:relu}, the loss is formulated as
 \begin{equation}
     \label{eq:dynamics-aware-loss}
     \loss_f = \frac{1}{|\mathcal{B}_\pi| n_x} \sum_{x \in \mathcal{B}_\pi} \left( 
@@ -97,7 +96,7 @@ Using the element-wise ReLU function defined in \labelcref{eq:relu}, the loss is
     \right).
 \end{equation}
 Here, a one-step evaluation outside the admissible set results in a penalty for the current state, 
-forcing the learned policy to stay inside the admissible set.
+forcing the learned policy to stay inside the admissible set. 
 
 
 \paragraph{Total Imitation Loss} is the combination of the state-weighted behavioral cloning 
@@ -117,6 +116,6 @@ In combination with the policy architecture in \labelcref{eq:policy-arch}, $\pi_
 $\underline{u} \leq \pi_\theta(x) \leq \overline{u}$ for all states $x \in \mathbb{R}^{n_x}$ and guarantees exact 
 equilibrium control $\pi_\theta(x^\star) = u^\star$. 
 Additionally, the state-dependent weighting in \labelcref{eq:state-weight} prioritizes approximation accuracy 
-near the equilibrium, which may be beneficial establishing Lyapunov stability.
+near the equilibrium, which may be beneficial for establishing Lyapunov stability.
 Now, this imitation learning pipeline establishes an accurate expert imitation, 
 serving as an initial policy for the subsequent Lyapunov co-training.

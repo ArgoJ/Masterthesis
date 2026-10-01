@@ -19,15 +19,15 @@ is obtained by approximating the continuous dynamics using a numerical integrati
 Here, $k \in \mathbb{N}_0$ denotes the discrete time step index, such that $x_k := x(k T_s) \in \mathbb{R}^{n_x}$ and 
 $u_k := u(k T_s) \in \mathbb{R}^{n_u}$ represent the state and control input at time step $k$. 
 The discrete-time function $f: \mathbb{R}^{n_x} \times \mathbb{R}^{n_u} \to \mathbb{R}^{n_x}$ is evaluated using a 
-numerical integration scheme, such as the forward Euler or a fourth-order Runge-Kutta (RK4) method~
-\cite{butcherNumericalMethodsOrdinary2016}.
+numerical integration scheme, such as the forward Euler or a fourth-order Runge-Kutta (RK4) 
+method~\cite{butcherNumericalMethodsOrdinary2016}.
 
 To account for physical and operational limitations, the system states and control inputs are restricted to 
 constraint sets $\mathcal{X} := [\underline{x}, \overline{x}] \subseteq \mathbb{R}^{n_x}$ and 
 $\mathcal{U} := [\underline{u}, \overline{u}] \subseteq \mathbb{R}^{n_u}$. 
 Furthermore, without loss of generality, any equilibrium $(x^\star, u^\star)$ can be shifted to the origin 
 via deviation variables $\tilde{x} := x - x^\star$ and $\tilde{u} := u - u^\star$. For readability, 
-the tilde notation is subsequently dropped, so that $x$ and $u$ represent the shifted variables, 
+the tilde notation is subsequently dropped, with $x$ and $u$ denoting the shifted variables, 
 assuming $(x^\star, u^\star) = (\mathbf{0}, \mathbf{0})$ throughout this work.
 
 
@@ -49,3 +49,6 @@ $V: \mathcal{X} \to \mathbb{R}_{\ge 0}$ satisfying~\citeThm{2.13}{rawlingsModelP
 \end{equation}
 Here, the decrease condition ensures that any trajectory starting in $\mathcal{X}$
 remains bounded within $\mathcal{X}$ and asymptotically converges towards the equilibrium $x^\star = 0$.
+The Lyapunov conditions guarantee stability within the admissible state set, 
+while practical control problems typically also involve state and input constraints. 
+Optimal control provides a framework for addressing these constraints.

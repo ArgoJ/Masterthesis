@@ -1,2 +1,36 @@
 \chapter{Conclusion}
-\label{cha:conclusion}
+\label{ch:conclusion}
+
+This thesis presented an integrated framework for learning and formally verifying neural imitation controllers using 
+learned Lyapunov functions. The proposed approach combines imitation learning based on an expert MPC with 
+falsification-guided co-training of a neural control policy and the corresponding Lyapunov candidate, 
+followed by formal verification using the $\alpha,\beta$-CROWN framework.
+
+For the linear double integrator, the empirical results demonstrate that imitation learning provides an 
+effective inductive prior, enabling compact networks to accurately replicate optimal behavior. 
+Building upon this initialization, falsification-guided co-training successfully refines both the controller and 
+the neural Lyapunov candidate by systematically reducing mined counterexamples. 
+Subsequent formal verification using $\alpha,\beta$-CROWN certifies a region of attraction 
+covering $65.07\,\%$ of the considered state domain $\mathcal{X}$ for the closed-loop neural controller. 
+While enforcing the Lyapunov decrease condition in this domain causes the policy to deviate slightly
+from the expert's behavior, this demonstrates that it is possible to trade imitation accuracy
+for formal guarantees of closed-loop stability.
+In contrast, the nonlinear cartpole benchmark revealed key limitations of the proposed method. 
+Although the co-training procedure converged toward lower condition losses and fewer counterexamples, 
+the overall performance of the co-trained controller degraded compared to the imitation baseline. 
+Furthermore, formal verification of the co-trained controller failed to yield stability guarantees. 
+This highlights that the convergence of the objective alone is insufficient to ensure a verifiable region of attraction.
+
+To address these challenges, future work could focus on targeted regularization terms, for example, to ensure a substantial 
+contribution of the feature term to the overall Lyapunov function, effectively preventing feature term collapse. 
+Furthermore, the falsification loop could be extended from single-step transitions to multi-step rollout horizons 
+to suppress actuator oscillations and penalize cumulative dynamic error growth. 
+Additionally, the issue of the curse of dimensionality in the verification pipeline could be addressed by 
+changing the verification strategy from input-space partitioning to intermediate layer splitting using $\beta$-CROWN. 
+Finally, incorporating bounded disturbance sets and parametric uncertainties directly into the computational 
+graph would extend the nominal certificates toward robust sim-to-real transfer.
+
+In summary, this thesis establishes a foundational framework for integrating imitation learning with formal 
+neural Lyapunov certification. While providing a promising methodological basis for safety-critical neural control, 
+scaling verifiable stability guarantees to complex nonlinear dynamics remains an open challenge that requires 
+the co-design of expressive architectures, trajectory-oriented falsification, and verifier-aligned optimization.

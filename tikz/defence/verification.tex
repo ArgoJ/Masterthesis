@@ -1,0 +1,20 @@
+\begin{tikzpicture}[>=Latex, font=\scriptsize]
+    % Domain XC Box mit Branch-and-Bound Partitionierung
+    \draw[thick, navy] (-1.5,-1.3) rectangle (1.5,1.3);
+    \draw[thin, black, dashed] (-1.5,0) -- (1.5,0);
+    \draw[thin, black, dashed] (0,-1.3) -- (0,1.3);
+    \draw[thin, black, dashed] (-0.75,-1.3) -- (-0.75,1.3);
+    \draw[thin, black, dashed] (0.75,-1.3) -- (0.75,1.3);
+
+    % Origin Exclusion Hole X_hole
+    \draw[thick, draw=purple, fill=white] (-0.35,-0.25) rectangle (0.35,0.25);
+    \node[font=\tiny\bfseries, text=purple] at (0,0) {$\mathcal{X}_{\mathrm{hole}}$};
+
+    % Verifizierte Niveaulinie \rho*
+    \draw[very thick, teal] (0,0) ellipse (1.2cm and 0.85cm);
+    \node[font=\tiny\bfseries, text=teal!90!black, fill=white, inner sep=1pt] at (0.9, -0.65) {$\rho^\star$};
+
+    % Status-Label oben rechts
+    \node[draw=teal, fill=teal!10, rounded corners=2pt, font=\tiny\bfseries, text=teal!90!black, inner sep=1.5pt] 
+        at (0.85, 1.05) {Certified};
+\end{tikzpicture}

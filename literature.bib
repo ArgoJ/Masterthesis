@@ -1,5 +1,22 @@
+@article{abateFormalSynthesisLyapunov2021,
+  title = {Formal {{Synthesis}} of {{Lyapunov Neural Networks}}},
+  author = {Abate, Alessandro and Ahmed, Daniele and Giacobbe, Mirco and Peruffo, Andrea},
+  date = {2021},
+  journaltitle = {IEEE Control Systems Letters},
+  shortjournal = {IEEE Control Syst. Lett.},
+  volume = {5},
+  pages = {773--778},
+  issn = {2475-1456},
+  doi = {10.1109/LCSYS.2020.3005328},
+  url = {https://ieeexplore.ieee.org/document/9126840},
+  urldate = {2026-08-28},
+  abstract = {We propose an automatic and formally sound method for synthesising Lyapunov functions for the asymptotic stability of autonomous non-linear systems. Traditional methods are either analytical and require manual effort or are numerical but lack of formal soundness. Symbolic computational methods for Lyapunov functions, which are in between, give formal guarantees but are typically semi-automatic because they rely on the user to provide appropriate function templates. We propose a method that finds Lyapunov functions fully automatically-using machine learning-while also providing formal guarantees-using satisfiability modulo theories (SMT). We employ a counterexample-guided approach where a numerical learner and a symbolic verifier interact to construct provably correct Lyapunov neural networks (LNNs). The learner trains a neural network that satisfies the Lyapunov criteria for asymptotic stability over a samples set; the verifier proves via SMT solving that the criteria are satisfied over the whole domain or augments the samples set with counterexamples. Our method supports neural networks with polynomial activation functions and multiple depth and width, which display wide learning capabilities. We demonstrate our method over several non-trivial benchmarks and compare it favourably against a numerical optimisation-based approach, a symbolic template-based approach, and a cognate LNN-based approach. Our method synthesises Lyapunov functions faster and over wider spatial domains than the alternatives, yet providing stronger or equal guarantees.},
+  keywords = {Asymptotic stability,Biological neural networks,Computer-aided control design,Lyapunov methods,neural networks,Neurons,Numerical stability,Stability analysis},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\46LPSGP5\\Abate et al. - 2021 - Formal Synthesis of Lyapunov Neural Networks.pdf;C\:\\Users\\josua\\Zotero\\storage\\25GER2HS\\9126840.html}
+}
+
 @book{aggarwalNeuralNetworksDeep2023,
-  title = {Neural Networks and Deep Learning: A Textbook},
+  title = {{{Neural Networks}} and {{Deep Learning}}: A Textbook},
   shorttitle = {Neural Networks and Deep Learning},
   author = {Aggarwal, Charu C.},
   date = {2023},
@@ -13,24 +30,8 @@
   file = {C:\Users\josua\Zotero\storage\U56PVFAH\Aggarwal - 2023 - Neural networks and deep learning a textbook.pdf}
 }
 
-@online{bechihiRegionAttractionEstimate2025,
-  title = {Region of {{Attraction Estimate Learning}} and {{Verification}} for {{Nonlinear Systems}} Using {{Neural-Network-based Lyapunov Functions}}},
-  author = {Bechihi, Adel and Kapnopoulos, Aristotelis},
-  date = {2025-11-14},
-  eprint = {2511.11026},
-  eprinttype = {arXiv},
-  eprintclass = {eess.SY},
-  doi = {10.48550/arXiv.2511.11026},
-  url = {http://arxiv.org/abs/2511.11026},
-  urldate = {2026-06-24},
-  abstract = {Estimating the Region of Attraction (RoA) for nonlinear dynamical systems is a fundamental problem in control theory, with direct implications for stability analysis and safe controller design. Traditional approaches rely on analytically derived Lyapunov functions, which are often conservative and challenging to construct for high-dimensional or highly nonlinear systems. In this work, we propose a data-driven framework for learning and verifying RoA estimates for nonlinear systems using neural-network-based Lyapunov functions. Our method employs a composite Lyapunov function that combines a quadratic term with a neural-network-based component, providing both structure and flexibility. We introduce a novel homogeneous loss function for training, which removes the imbalance typically caused by the two non-homogeneous Lyapunov conditions. Together, these two aspects enable efficient training of the Lyapunov candidate. To guarantee the correctness of the learned Lyapunov function, we employ a Satisfiability Modulo Theories (SMT) solver to formally verify the stability results. Lastly, we perform a deeper analysis near the origin to overcome numerical artifacts, ensuring strict asymptotic stability. We demonstrate the effectiveness of our approach on benchmark nonlinear systems, showing that it significantly reduces conservatism compared to traditional Lyapunov methods while maintaining verifiability. This framework bridges the gap between function approximation and stability certification, paving the way for scalable safety analysis in learning-based control and safety-critical applications.},
-  pubstate = {prepublished},
-  keywords = {Electrical Engineering and Systems Science - Systems and Control,Mathematics - Dynamical Systems},
-  file = {C\:\\Users\\josua\\Zotero\\storage\\978CDV8Z\\Bechihi und Kapnopoulos - 2025 - Region of Attraction Estimate Learning and Verification for Nonlinear Systems using Neural-Network-b.pdf;C\:\\Users\\josua\\Zotero\\storage\\GHUNLHVW\\2511.html}
-}
-
 @article{bunelBranchBoundPiecewise2020,
-  title = {Branch and Bound for Piecewise Linear Neural Network Verification},
+  title = {{{Branch and Bound}} for {{Piecewise Linear Neural Network Verification}}},
   author = {Bunel, Rudy and Lu, Jingyue and Turkaslan, Ilker and Torr, Philip H.S. and Kohli, Pushmeet and Kumar, M. Pawan},
   date = {2020},
   journaltitle = {Journal of Machine Learning Research},
@@ -76,7 +77,7 @@
 }
 
 @book{butcherNumericalMethodsOrdinary2016,
-  title = {Numerical Methods for Ordinary Differential Equations},
+  title = {{{Numerical Methods}} for {{Ordinary Differential Equations}}},
   author = {Butcher, John C.},
   date = {2016},
   edition = {3},
@@ -84,6 +85,36 @@
   location = {Chichester, UK},
   doi = {10.1002/9781119121534},
   isbn = {978-1-119-12153-4},
+  langid = {english}
+}
+
+@inproceedings{changNeuralLyap2019,
+  title = {Neural Lyapunov Control},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
+  author = {Chang, Ya-Chien and Roohi, Nima and Gao, Sicun},
+  editor = {Wallach, H. and Larochelle, H. and Beygelzimer, A. and F., d'Alch{\'e}-Buc and Fox, E. and Garnett, R.},
+  date = {2019},
+  volume = {32},
+  pages = {3245--3254},
+  publisher = {Curran Associates, Inc.},
+  url = {https://proceedings.neurips.cc/paper_files/paper/2019/file/2647c1dba23bc0e0f9cdf75339e120d2-Paper.pdf},
+  eventtitle = {33th {{Conference}} on {{Neural Information Processing Systems}}}
+}
+
+@article{diehlRealTimeIterationScheme2005,
+  title = {A {{Real-Time Iteration Scheme}} for {{Nonlinear Optimization}} in {{Optimal Feedback Control}}},
+  author = {Diehl, Moritz and Bock, Hans Georg and Schlöder, Johannes P.},
+  date = {2005-01},
+  journaltitle = {SIAM Journal on Control and Optimization},
+  shortjournal = {SIAM J. Control Optim.},
+  volume = {43},
+  number = {5},
+  pages = {1714--1736},
+  issn = {0363-0129, 1095-7138},
+  doi = {10.1137/S0363012902400713},
+  url = {https://epubs.siam.org/doi/10.1137/S0363012902400713},
+  urldate = {2026-08-28},
+  abstract = {An efficient Newton-type scheme for the approximate on-line solution of optimization problems as they occur in optimal feedback control is presented. The scheme allows a fast reaction to disturbances by delivering approximations of the exact optimal feedback control which are iteratively refined during the runtime of the controlled process. The contractivity of this real-time iteration scheme is proven, and a bound on the loss of optimality---compared with the theoretical optimal solution---is given. The robustness and excellent real-time performance of the method is demonstrated in a numerical experiment, the control of an unstable system, namely, an airborne kite that shall fly loops.},
   langid = {english}
 }
 
@@ -117,21 +148,42 @@
   file = {C:\Users\josua\Zotero\storage\MR5CNCTZ\Grüne und Pannek - 2017 - Nonlinear Model Predictive Control Theory and Algorithms.pdf}
 }
 
-@online{huangBranchBoundMixed2021,
-  title = {Branch and {{Bound}} in {{Mixed Integer Linear Programming Problems}}: {{A Survey}} of {{Techniques}} and {{Trends}}},
-  shorttitle = {Branch and {{Bound}} in {{Mixed Integer Linear Programming Problems}}},
-  author = {Huang, Lingying and Chen, Xiaomeng and Huo, Wei and Wang, Jiazheng and Zhang, Fan and Bai, Bo and Shi, Ling},
-  date = {2021-11-05},
-  eprint = {2111.06257},
+@article{hertneckLearningApproximateModel2018,
+  title = {Learning an {{Approximate Model Predictive Controller}} with {{Guarantees}}},
+  author = {Hertneck, Michael and Köhler, Johannes and Trimpe, Sebastian and Allgöwer, Frank},
+  date = {2018},
+  journaltitle = {IEEE Control Systems Letters},
+  shortjournal = {IEEE Control Syst. Lett.},
+  volume = {2},
+  eprint = {1806.04167},
   eprinttype = {arXiv},
-  eprintclass = {cs.LG},
-  doi = {10.48550/arXiv.2111.06257},
-  url = {http://arxiv.org/abs/2111.06257},
-  urldate = {2026-08-17},
-  abstract = {In this paper, we surveyed the existing literature studying different approaches and algorithms for the four critical components in the general branch and bound (B\&B) algorithm, namely, branching variable selection, node selection, node pruning, and cutting-plane selection. However, the complexity of the B\&B algorithm always grows exponentially with respect to the increase of the decision variable dimensions. In order to improve the speed of B\&B algorithms, learning techniques have been introduced in this algorithm recently. We further surveyed how machine learning can be used to improve the four critical components in B\&B algorithms. In general, a supervised learning method helps to generate a policy that mimics an expert but significantly improves the speed. An unsupervised learning method helps choose different methods based on the features. In addition, models trained with reinforcement learning can beat the expert policy, given enough training and a supervised initialization. Detailed comparisons between different algorithms have been summarized in our survey. Finally, we discussed some future research directions to accelerate and improve the algorithms further in the literature.},
-  pubstate = {prepublished},
-  keywords = {Computer Science - Machine Learning,Electrical Engineering and Systems Science - Systems and Control,Mathematics - Optimization and Control},
-  file = {C\:\\Users\\josua\\Zotero\\storage\\D7NKWDBU\\Huang et al. - 2021 - Branch and Bound in Mixed Integer Linear Programming Problems A Survey of Techniques and Trends.pdf;C\:\\Users\\josua\\Zotero\\storage\\IDSERNB9\\2111.html}
+  eprintclass = {eess.SY},
+  pages = {543--548},
+  issn = {2475-1456},
+  doi = {10.1109/LCSYS.2018.2843682},
+  url = {http://arxiv.org/abs/1806.04167},
+  urldate = {2026-08-28},
+  abstract = {A supervised learning framework is proposed to approximate a model predictive controller (MPC) with reduced computational complexity and guarantees on stability and constraint satisfaction. The framework can be used for a wide class of nonlinear systems. Any standard supervised learning technique (e.g. neural networks) can be employed to approximate the MPC from samples. In order to obtain closed-loop guarantees for the learned MPC, a robust MPC design is combined with statistical learning bounds. The MPC design ensures robustness to inaccurate inputs within given bounds, and Hoeffding's Inequality is used to validate that the learned MPC satisfies these bounds with high confidence. The result is a closed-loop statistical guarantee on stability and constraint satisfaction for the learned MPC. The proposed learning-based MPC framework is illustrated on a nonlinear benchmark problem, for which we learn a neural network controller with guarantees.},
+  keywords = {Computer Science - Machine Learning,Electrical Engineering and Systems Science - Systems and Control},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\6Q8NEMTF\\Hertneck et al. - 2018 - Learning an Approximate Model Predictive Controller with Guarantees.pdf;C\:\\Users\\josua\\Zotero\\storage\\F9X8AEZC\\1806.html}
+}
+
+@article{hewingLearningBasedModelPredictive2020,
+  title = {Learning-{{Based Model Predictive Control}}: {{Toward Safe Learning}} in {{Control}}},
+  shorttitle = {Learning-{{Based Model Predictive Control}}},
+  author = {Hewing, Lukas and Wabersich, Kim P. and Menner, Marcel and Zeilinger, Melanie N.},
+  date = {2020},
+  journaltitle = {Annual Review of Control, Robotics, and Autonomous Systems},
+  shortjournal = {Annu. Rev. Control Robot. Auton. Syst.},
+  volume = {3},
+  pages = {269--296},
+  publisher = {Annual Review},
+  issn = {2573-5144},
+  doi = {10.1146/annurev-control-090419-075625},
+  url = {https://www.annualreviews.org/content/journals/10.1146/annurev-control-090419-075625},
+  urldate = {2026-08-28},
+  abstract = {Recent successes in the field of machine learning, as well as the availability of increased sensing and computational capabilities in modern control systems, have led to a growing interest in learning and data-driven control techniques. Model predictive control (MPC), as the prime methodology for constrained control, offers a significant opportunity to exploit the abundance of data in a reliable manner, particularly while taking safety constraints into account. This review aims at summarizing and categorizing previous research on learning-based MPC, i.e., the integration or combination of MPC with learning methods, for which we consider three main categories. Most of the research addresses learning for automatic improvement of the prediction model from recorded data. There is, however, also an increasing interest in techniques to infer the parameterization of the MPC controller, i.e., the cost and constraints, that lead to the best closed-loop performance. Finally, we discuss concepts that leverage MPC to augment learning-based controllers with constraint satisfaction properties.},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\5JKTJHPU\\Hewing et al. - 2020 - Learning-Based Model Predictive Control Toward Safe Learning in Control.pdf;C\:\\Users\\josua\\Zotero\\storage\\I6LXFDUN\\annurev-control-090419-075625.html}
 }
 
 @article{joeConstructingSobolSequences2008,
@@ -143,15 +195,32 @@
   volume = {30},
   number = {5},
   pages = {2635--2654},
-  issn = {1064-8275, 1095-7197},
+  issn = {1064-8275},
   doi = {10.1137/070709359},
   url = {http://epubs.siam.org/doi/10.1137/070709359},
   urldate = {2026-08-03},
   langid = {english}
 }
 
+@article{kargEfficientRepresentationApproximation2020,
+  title = {Efficient {{Representation}} and {{Approximation}} of {{Model Predictive Control Laws}} via {{Deep Learning}}},
+  author = {Karg, Benjamin and Lucia, Sergio},
+  date = {2020},
+  journaltitle = {IEEE Transactions on Cybernetics},
+  shortjournal = {IEEE Trans. Cybern.},
+  volume = {50},
+  pages = {3866--3878},
+  issn = {2168-2275},
+  doi = {10.1109/TCYB.2020.2999556},
+  url = {https://ieeexplore.ieee.org/document/9123670},
+  urldate = {2026-08-28},
+  abstract = {We show that artificial neural networks with rectifier units as activation functions can exactly represent the piecewise affine function that results from the formulation of model predictive control (MPC) of linear time-invariant systems. The choice of deep neural networks is particularly interesting as they can represent exponentially many more affine regions compared to networks with only one hidden layer. We provide theoretical bounds on the minimum number of hidden layers and neurons per layer that a neural network should have to exactly represent a given MPC law. The proposed approach has a strong potential as an approximation method of predictive control laws, leading to a better approximation quality and significantly smaller memory requirements than previous approaches, as we illustrate via simulation examples. We also suggest different alternatives to correct or quantify the approximation error. Since the online evaluation of neural networks is extremely simple, the approximated controllers can be deployed on low-power embedded devices with small storage capacity, enabling the implementation of advanced decision-making strategies for complex cyber-physical systems with limited computing capabilities.},
+  keywords = {Biological neural networks,Embedded systems,Machine learning,Memory management,neural networks,Neurons,Optimization,predictive control,Predictive control},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\CMWNQC7K\\Karg und Lucia - 2020 - Efficient Representation and Approximation of Model Predictive Control Laws via Deep Learning.pdf;C\:\\Users\\josua\\Zotero\\storage\\2GQR2AZP\\9123670.html}
+}
+
 @inproceedings{katzReluplexEfficientSMT2017,
-  title = {Reluplex: {{An}} Efficient {{SMT}} Solver for Verifying Deep Neural Networks},
+  title = {{{Reluplex}}: {{An Efficient SMT Solver}} for {{Verifying Deep Neural Networks}}},
   booktitle = {Computer Aided Verification},
   author = {Katz, Guy and Barrett, Clark and Dill, David L. and Julian, Kyle and Kochenderfer, Mykel J.},
   editor = {Majumdar, Rupak and Kunčak, Viktor},
@@ -163,8 +232,8 @@
   isbn = {978-3-319-63387-9}
 }
 
-@inproceedings{kingmaAdamMethodStochastic2017,
-  title = {Adam: {{A Method}} for {{Stochastic Optimization}}},
+@inproceedings{kingmaAdamMethodStochastic2015,
+  title = {{{Adam}}: {{A Method}} for {{Stochastic Optimization}}},
   shorttitle = {Adam},
   booktitle = {International {{Conference}} on {{Learning Representations}}},
   author = {Kingma, Diederik P. and Ba, Jimmy},
@@ -182,7 +251,7 @@
 }
 
 @book{kollmannsbergerDeepLearningComputational2021,
-  title = {Deep Learning in Computational Mechanics: An Introductory Course},
+  title = {{{Deep Learning}} in {{Computational Mechanics}}: {{An Introductory Course}}},
   shorttitle = {Deep Learning in Computational Mechanics},
   author = {Kollmannsberger, Stefan and D'Angella, Davide and Jokeit, Moritz and Herrmann, Leon},
   date = {2021},
@@ -196,39 +265,11 @@
   file = {C:\Users\josua\Zotero\storage\DL796EID\DL_in_CL_kollmannsberger.pdf}
 }
 
-@inproceedings{kotha2023provably,
-  title = {Provably Bounding Neural Network Preimages},
-  booktitle = {Advances in {{Neural Information Processing Systems}}},
-  author = {Kotha, Suhas and Brix, Christopher and Kolter, J. Zico and Dvijotham, Krishnamurthy and Zhang, Huan},
-  editor = {Oh, A. and Neumann, T. and Globerson, A. and Saenko, K. and Hardt, M. and Levine, S.},
-  date = {2023},
-  volume = {36},
-  pages = {80270--80290},
-  url = {http://papers.nips.cc/paper\_files/paper/2023/hash/fe061ec0ae03c5cf5b5323a2b9121bfd-Abstract-Conference.html},
-  eventtitle = {37th {{Conference}} on {{Neural Information Processing Systems}}}
-}
-
-@article{landAutomaticMethodSolving1960,
-  title = {An {{Automatic Method}} of {{Solving Discrete Programming Problems}}},
-  author = {Land, A. H. and Doig, A. G.},
-  date = {1960-07},
-  journaltitle = {Econometrica},
-  volume = {28},
-  number = {3},
-  eprint = {1910129},
-  eprinttype = {jstor},
-  pages = {497},
-  issn = {00129682},
-  doi = {10.2307/1910129},
-  url = {https://www.jstor.org/stable/1910129?origin=crossref},
-  urldate = {2026-08-17}
-}
-
-@online{liBridgingControlNeural2026,
+@misc{liBridgingControlNeural2026,
   title = {Bridging {{Control}} with {{Neural Network Verifier}} Alpha-Beta-{{CROWN}}: {{A Tutorial}}},
   shorttitle = {Bridging {{Control}} with {{Neural Network Verifier}} Alpha-Beta-{{CROWN}}},
   author = {Li, Haoyu and Zhong, Xiangru and Cheng, Hao and Hu, Bin and Zhang, Huan},
-  date = {2026-05-26},
+  date = {2026},
   eprint = {2605.26577},
   eprinttype = {arXiv},
   eprintclass = {eess.SY},
@@ -260,7 +301,7 @@
   shorttitle = {{{PyTorch}}},
   booktitle = {Advances in {{Neural Information Processing Systems}}},
   author = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and Köpf, Andreas and Yang, Edward Z. and DeVito, Zachary and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
-  editor = {Wallach, Hanna M. and Larochelle, Hugo and Beygelzimer, Alina and family=Buc, given=Florence, prefix=d'Alché-, useprefix=true and Fox, Emily B. and Garnett, Roman},
+  editor = {Wallach, Hanna M. and Larochelle, Hugo and Beygelzimer, Alina and d'Alch{\'e}-Buc, Florence and Fox, Emily B. and Garnett, Roman},
   date = {2019},
   volume = {32},
   pages = {8024--8035},
@@ -271,7 +312,7 @@
 }
 
 @book{rawlingsModelPredictiveControl2020,
-  title = {Model Predictive Control: Theory, Computation and Design},
+  title = {{{Model Predictive Control}}: {{Theory}}, {{Computation}} and {{Design}}},
   shorttitle = {Model Predictive Control},
   author = {Rawlings, James Blake and Mayne, David Q. and Diehl, Moritz},
   date = {2020},
@@ -285,16 +326,19 @@
   file = {C:\Users\josua\Zotero\storage\73QFQQEE\Rawlings et al. - 2020 - Model predictive control theory, computation and design.pdf}
 }
 
-@inproceedings{salman2019convex,
-  title = {A Convex Relaxation Barrier to Tight Robustness Verification of Neural Networks},
-  booktitle = {Advances in {{Neural Information Processing Systems}}},
-  author = {Salman, Hadi and Yang, Greg and Zhang, Huan and Hsieh, Cho-Jui and Zhang, Pengchuan},
-  date = {2019},
-  volume = {32},
-  pages = {9832--9842},
-  location = {Vancouver, BC, Canada},
-  url = {https://proceedings.neurips.cc/paper/2019/hash/246a3c5544feb054f3ea718f61adfa16-Abstract.html},
-  eventtitle = {33rd {{Annual Conference}} on {{Neural Information Processing Systems}}}
+@article{reiterSynthesisOfMPC2026,
+  title = {Synthesis of {{Model Predictive Control}} and {{Reinforcement Learning}}: {{Survey}} and {{Classification}}},
+  author = {Reiter, Rudolf and Hoffmann, Jasper and Reinhardt, Dirk and Messerer, Florian and Baumgärtner, Katrin and Sawant, Shambhuraj and Bödecker, Joschka and Diehl, Moritz and Gros, Sebastien},
+  date = {2026},
+  journaltitle = {Annual Reviews in Control},
+  shortjournal = {Annu. Rev. Control},
+  volume = {61},
+  pages = {101045},
+  issn = {1367-5788},
+  doi = {10.1016/j.arcontrol.2026.101045},
+  url = {https://www.sciencedirect.com/science/article/pii/S1367578826000015},
+  abstract = {model predictive control (MPC) and reinforcement learning (RL) are two successful control techniques for Markov decision processes. Both approaches are derived from similar fundamental principles, and both are widely used in practical applications, including robotics, process control, energy systems, and autonomous driving. Despite their similarities, MPC and RL follow distinct paradigms that emerged from diverse communities and different requirements. Various technical discrepancies, particularly the role of an environment model as part of the algorithm, lead to methodologies with nearly complementary advantages. Due to their orthogonal benefits, research interest in combination methods has recently increased significantly, resulting in a large and growing set of complex ideas that leverage MPC and RL. This work illuminates the differences, similarities, and fundamentals that enable various combination algorithms and categorizes existing work accordingly. Particularly, we focus on the versatile actor–critic RL approach as a basis for our categorization and examine how the online optimization approach of MPC can be used to improve the overall closed-loop performance of a policy.},
+  keywords = {Approximate dynamic programming,Model predictive control,Reinforcement learning}
 }
 
 @incollection{shiNeuralNetworkVerification2025a,
@@ -318,7 +362,7 @@
 }
 
 @inproceedings{szegedyIntriguingPropertiesNeural2014,
-  title = {Intriguing Properties of Neural Networks},
+  title = {Intriguing {{Properties}} of {{Neural Networks}}},
   booktitle = {International {{Conference}} on {{Learning Representations}}},
   author = {Szegedy, Christian and Zaremba, Wojciech and Sutskever, Ilya and Bruna, Joan and Erhan, Dumitru and Goodfellow, Ian and Fergus, Rob},
   date = {2014},
@@ -347,14 +391,25 @@
   file = {C\:\\Users\\josua\\Zotero\\storage\\WPYKKTUR\\Tjeng et al. - 2019 - Evaluating Robustness of Neural Networks with Mixed Integer Programming.pdf;C\:\\Users\\josua\\Zotero\\storage\\SQ5MEQ88\\1711.html}
 }
 
+@legislation{VerordnungEU20242024,
+  title = {Regulation ({{EU}}) 2024/1689 of 13 {{June}} 2024 {{Laying}} down {{Harmonised Rules}} on {{Artificial Intelligence}} ({{Artificial Intelligence Act}})},
+  shorttitle = {{{EU AI Act}}},
+  author = {{European Parliament and Council of the European Union}},
+  date = {2024},
+  journaltitle = {OJ L 2024/1689},
+  url = {http://data.europa.eu/eli/reg/2024/1689/oj},
+  urldate = {2026-08-28},
+  langid = {english},
+  file = {C\:\\Users\\josua\\Zotero\\storage\\ZMM44C82\\European Parliament and Council of the European Union - 2024 - Regulation (EU) 20241689 of 13 June 2024 Laying down Harmonised Rules on Artificial Intelligence (A.pdf;C\:\\Users\\josua\\Zotero\\storage\\UVWNBXYA\\oj.html}
+}
+
 @article{verschuerenAcadosModularOpensource2022,
-  title = {Acados—a Modular Open-Source Framework for Fast Embedded Optimal Control},
-  author = {Verschueren, Robin and Frison, Gianluca and Kouzoupis, Dimitris and Frey, Jonathan and family=Duijkeren, given=Niels, prefix=van, useprefix=false and Zanelli, Andrea and Novoselnik, Branimir and Albin, Thivaharan and Quirynen, Rien and Diehl, Moritz},
-  date = {2022-03-01},
+  title = {{{acados}} -- {{A Modular Open-Source Framework}} for {{Fast Embedded Optimal Control}}},
+  author = {Verschueren, Robin and Frison, Gianluca and Kouzoupis, Dimitris and Frey, Jonathan and van Duijkeren, Niels and Zanelli, Andrea and Novoselnik, Branimir and Albin, Thivaharan and Quirynen, Rien and Diehl, Moritz},
+  date = {2022},
   journaltitle = {Mathematical Programming Computation},
   shortjournal = {Math. Program. Comput.},
   volume = {14},
-  number = {1},
   pages = {147--183},
   issn = {1867-2957},
   doi = {10.1007/s12532-021-00208-8},
@@ -363,7 +418,7 @@
 }
 
 @inproceedings{wang2021beta,
-  title = {Beta-{{CROWN}}: {{Efficient}} Bound Propagation with per-Neuron Split Constraints for Complete and Incomplete Neural Network Verification},
+  title = {{{{$\beta$}-CROWN}}: {{Efficient Bound Propagation}} with per-{{Neuron Split Constraints}} for {{Complete}} and {{Incomplete Neural Network Verification}}},
   booktitle = {Advances in {{Neural Information Processing Systems}}},
   author = {Wang, Shiqi and Zhang, Huan and Xu, Kaidi and Lin, Xue and Jana, Suman and Hsieh, Cho-Jui and Kolter, J Zico},
   date = {2021},
@@ -379,7 +434,7 @@
   author = {Xu, Kaidi and Shi, Zhouxing and Zhang, Huan and Wang, Yihan and Chang, Kai-Wei and Huang, Minlie and Kailkhura, Bhavya and Lin, Xue and Hsieh, Cho-Jui},
   date = {2020},
   volume = {33},
-  location = {virtual},
+  pages = {1129--1141},
   url = {https://proceedings.neurips.cc/paper/2020/hash/0cbc5671ae26f67871cb914d81ef8fc1-Abstract.html},
   eventtitle = {34th {{Annual Conference}} on {{Neural Information Processing Systems}}}
 }
@@ -390,7 +445,7 @@
   booktitle = {International {{Conference}} on {{Learning Representations}}},
   author = {Xu, Kaidi and Zhang, Huan and Wang, Shiqi and Wang, Yihan and Jana, Suman and Lin, Xue and Hsieh, Cho-Jui},
   date = {2021},
-  location = {Austria},
+  location = {Virtual Event},
   url = {https://openreview.net/forum?id=nVZtXBI6LNn},
   urldate = {2026-08-09},
   eventtitle = {9th {{International Conference}} on {{Learning Representations}}},
@@ -399,7 +454,7 @@
 }
 
 @inproceedings{yangLyapunovstableNeuralControl2024,
-  title = {Lyapunov-Stable {{Neural Control}} for {{State}} and {{Output Feedback}}: {{A Novel Formulation}}},
+  title = {Lyapunov-{{Stable Neural Control}} for {{State}} and {{Output Feedback}}: {{A Novel Formulation}}},
   shorttitle = {Lyapunov-Stable {{Neural Control}} for {{State}} and {{Output Feedback}}},
   booktitle = {International {{Conference}} on {{Machine Learning}}},
   author = {Yang, Lujie and Dai, Hongkai and Shi, Zhouxing and Hsieh, Cho-Jui and Tedrake, Russ and Zhang, Huan},
@@ -413,7 +468,7 @@
   eventtitle = {41st {{International Conference}} on {{Machine Learning}}},
   langid = {english},
   keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning,Computer Science - Robotics,Electrical Engineering and Systems Science - Systems and Control,Mathematics - Optimization and Control},
-  file = {C\:\\Users\\josua\\Zotero\\storage\\4725JAKC\\Yang et al. - 2024 - Lyapunov-stable Neural Control for State and Output Feedback A Novel Formulation.pdf;C\:\\Users\\josua\\Zotero\\storage\\9GF2N8GQ\\2404.html}
+  file = {C\:\\Users\\josua\\Zotero\\storage\\4725JAKC\\Yang et al. - 2024 - Lyapunov-Stable Neural Control for State and Output Feedback A Novel Formulation.pdf;C\:\\Users\\josua\\Zotero\\storage\\9GF2N8GQ\\2404.html}
 }
 
 @article{yuanAdversarialExamplesAttacks2019,
@@ -434,75 +489,17 @@
   file = {C\:\\Users\\josua\\Zotero\\storage\\VLFN8EVY\\Yuan et al. - 2018 - Adversarial Examples Attacks and Defenses for Deep Learning.pdf;C\:\\Users\\josua\\Zotero\\storage\\VP472KDY\\1712.html}
 }
 
-@inproceedings{zhang22babattack,
-  title = {A Branch and Bound Framework for Stronger Adversarial Attacks of {{ReLU}} Networks},
-  booktitle = {International {{Conference}} on {{Machine Learning}}},
-  author = {Zhang, Huan and Wang, Shiqi and Xu, Kaidi and Wang, Yihan and Jana, Suman and Hsieh, Cho-Jui and Kolter, Zico},
-  date = {2022},
-  series = {Proceedings of {{Machine Learning Research}}},
-  volume = {162},
-  pages = {26591--26604},
-  location = {Baltimore, Maryland, USA},
-  issn = {2640-3498},
-  url = {https://proceedings.mlr.press/v162/zhang22ae.html},
-  abstract = {Strong adversarial attacks are important for evaluating the true robustness of deep neural networks. Most existing attacks search in the input space, e.g., using gradient descent, and may miss adversarial examples due to non-convexity. In this work, we systematically search adversarial examples in the activation space of ReLU networks to tackle hard instances where none of the existing adversarial attacks succeed. Unfortunately, searching the activation space typically relies on generic mixed integer programming (MIP) solvers and is limited to small networks and easy problem instances. To improve scalability and practicability, we use branch and bound (BaB) with specialized GPU-based bound propagation methods, and propose a top-down beam-search approach to quickly identify the subspace that may contain adversarial examples. Moreover, we build an adversarial candidates pool using cheap attacks to further assist the search in activation space via diving techniques and a bottom-up large neighborhood search. Our adversarial attack framework, BaB-Attack, opens up a new opportunity for designing novel adversarial attacks not limited to searching the input space, and enables us to borrow techniques from integer programming theory and neural network verification. In experiments, we can successfully generate adversarial examples when existing attacks on input space fail. Compared to off-the-shelf MIP solver based attacks that requires significant computations, we outperform in both success rates and efficiency.},
-  eventtitle = {39th {{International Conference}} on {{Machine Learning}}}
-}
-
 @inproceedings{zhangEfficientNeuralNetwork2018,
   title = {Efficient {{Neural Network Robustness Certification}} with {{General Activation Functions}}},
   booktitle = {Advances in {{Neural Information Processing Systems}}},
   author = {Zhang, Huan and Weng, Tsui-Wei and Chen, Pin-Yu and Hsieh, Cho-Jui and Daniel, Luca},
   date = {2018},
   volume = {31},
+  pages = {4939--4948},
   url = {https://proceedings.neurips.cc/paper/2018/hash/d04863f100d59b3eb688a11f95b0ae60-Abstract.html},
   urldate = {2026-08-09},
   abstract = {Finding minimum distortion of adversarial examples and thus certifying robustness in neural networks classifiers is known to be a challenging problem. Nevertheless, recently it has been shown to be possible to give a non-trivial certified lower bound of minimum distortion, and some recent progress has been made towards this direction by exploiting the piece-wise linear nature of ReLU activations. However, a generic robustness certification for \textbackslash textit\{general\} activation functions still remains largely unexplored. To address this issue, in this paper we introduce CROWN, a general framework to certify robustness of neural networks with general activation functions. The novelty in our algorithm consists of bounding a given activation function with linear and quadratic functions, hence allowing it to tackle general activation functions including but not limited to the four popular choices: ReLU, tanh, sigmoid and arctan. In addition, we facilitate the search for a tighter certified lower bound by \textbackslash textit\{adaptively\} selecting appropriate surrogates for each neuron activation. Experimental results show that CROWN on ReLU networks can notably improve the certified lower bounds compared to the current state-of-the-art algorithm Fast-Lin, while having comparable computational efficiency. Furthermore, CROWN also demonstrates its effectiveness and flexibility on networks with general activation functions, including tanh, sigmoid and arctan.},
   eventtitle = {32nd {{Annual Conference}} on {{Neural Information Processing Systems}}},
   keywords = {Computer Science - Cryptography and Security,Computer Science - Machine Learning,Statistics - Machine Learning},
   file = {C\:\\Users\\josua\\Zotero\\storage\\NR2X6HKC\\Zhang et al. - 2018 - Efficient Neural Network Robustness Certification with General Activation Functions.pdf;C\:\\Users\\josua\\Zotero\\storage\\RK7N2PNZ\\1811.html}
-}
-
-@inproceedings{zhangGeneralCuttingPlanes2022a,
-  title = {General {{Cutting Planes}} for {{Bound-Propagation-Based Neural Network Verification}}},
-  booktitle = {Advances in {{Neural Information Processing Systems}}},
-  author = {Zhang, Huan and Wang, Shiqi and Xu, Kaidi and Li, Linyi and Li, Bo and Jana, Suman and Hsieh, Cho-Jui and Kolter, J. Zico},
-  date = {2022},
-  volume = {35},
-  pages = {1656--1670},
-  doi = {10.52202/068431-0121},
-  url = {https://proceedings.neurips.cc//paper_files/paper/2022/hash/0b06c8673ebb453e5e468f7743d8f54e-Abstract-Conference.html},
-  urldate = {2026-08-09},
-  eventtitle = {36th {{Annual Conference}} on {{Neural Information Processing Systems}}},
-  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Cryptography and Security,Computer Science - Machine Learning,Mathematics - Optimization and Control,Statistics - Machine Learning},
-  file = {C\:\\Users\\josua\\Zotero\\storage\\CTCJ6L22\\Zhang et al. - 2022 - General Cutting Planes for Bound-Propagation-Based Neural Network Verification.pdf;C\:\\Users\\josua\\Zotero\\storage\\VGCYR9U6\\2208.html}
-}
-
-@inproceedings{zhou2024scalable,
-  title = {Scalable Neural Network Verification with Branch-and-Bound Inferred Cutting Planes},
-  booktitle = {Advances in {{Neural Information Processing Systems}}},
-  author = {Zhou, Duo and Brix, Christopher and Hanasusanto, Grani A and Zhang, Huan},
-  date = {2024},
-  volume = {37},
-  pages = {29324--29353},
-  location = {Vancouver, Canada},
-  doi = {10.52202/079017-0923},
-  url = {https://proceedings.neurips.cc/paper_files/paper/2024/file/33d93e4dc57453e7667b20f62e7c0681-Paper-Conference.pdf},
-  eventtitle = {38th {{Conference}} on {{Neural Information Processing Systems}}}
-}
-
-@inproceedings{zhouClipandVerifyLinearConstraintDriven2025,
-  title = {Clip-and-{{Verify}}: {{Linear Constraint-Driven Domain Clipping}} for {{Accelerating Neural Network Verification}}},
-  shorttitle = {Clip-and-{{Verify}}},
-  booktitle = {Advances in {{Neural Information Processing Systems}}},
-  author = {Zhou, Duo and Chavez, Jorge and Chen, Hesun and Hanasusanto, Grani A. and Zhang, Huan},
-  date = {2025},
-  volume = {38},
-  pages = {174849--174895},
-  doi = {10.52202/085713-5815},
-  url = {https://proceedings.neurips.cc//paper_files/paper/2025/hash/ffa977364ab7046c803da0e04dbb2832-Abstract-Conference.html},
-  urldate = {2026-08-09},
-  eventtitle = {39th {{Annual Conference}} on {{Neural Information Processing Systems}}},
-  keywords = {Computer Science - Artificial Intelligence,Computer Science - Cryptography and Security,Computer Science - Machine Learning,Mathematics - Optimization and Control},
-  file = {C\:\\Users\\josua\\Zotero\\storage\\AJ2YI4GP\\Zhou et al. - 2025 - Clip-and-Verify Linear Constraint-Driven Domain Clipping for Accelerating Neural Network Verificati.pdf;C\:\\Users\\josua\\Zotero\\storage\\2N7UUVHT\\2512.html}
 }

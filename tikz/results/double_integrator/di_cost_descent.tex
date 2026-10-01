@@ -137,63 +137,21 @@
 
 \pgfplotstableread{
     x y
-    0 -1.76015
-    1 -1.53251
-    2 -1.35541
-    3 -1.1735
-    4 -0.95118
-    5 -0.8085
-    6 -0.744428
-    7 -0.679431
-    8 -0.634707
-    9 -0.576705
-    10 -0.538456
-    11 -0.507092
-    12 -0.417087
-    13 -0.366487
-    14 -0.342927
-    15 -0.311223
-    16 -0.291449
-    17 -0.272161
-    18 -0.246891
-    19 -0.217192
-    20 -0.192971
-    21 -0.171916
-    22 -0.153201
-    23 -0.135143
-    24 -0.113833
-    25 -0.0927504
-    26 -0.0736145
-    27 -0.0566686
-    28 -0.042928
-    29 -0.0253592
-    30 -0.0160244
-    31 -0.0120597
-    32 -0.00978619
-    33 -0.00764882
-    34 -0.00651592
-    35 -0.00627907
-    36 -0.00591638
-    37 -0.00566219
-    38 -0.00535046
-}\dataMedian
-
-\pgfplotstableread{
-    x y
     0 0
     1 0
 }\dataTraceFive
 
-\begin{tikzpicture}
+\begin{tikzpicture} %[trim axis left, trim axis right]
 \begin{axis}[
+    scale only axis,
     xlabel={$k$},
-    ylabel={$\Delta V_k$},
+    ylabel={$|\Delta V_k|$},
     xmin=0,
     xmax=38,
     ymin=-72.3753,
     ymax=0.0176249,
-    width=0.85\textwidth,
-    height=6.5cm,
+    width=0.8\textwidth,
+    height=5cm,
     legend style={
         at={(0.5,-0.22)},
         anchor=north,
@@ -214,7 +172,6 @@
     \addplot+[name path=dataMean, dashed, line width=2pt, color=black, mark=none] table {\dataMean};
     \addlegendentry{mean}
 
-    \addplot+[name path=dataMedian, line width=2pt, color=blue, mark=none] table {\dataMedian};
     \addlegendentry{median}
 
     \addplot+[name path=dataTraceFive, dashed, line width=1pt, color=black, mark=none, forget plot] table {\dataTraceFive};

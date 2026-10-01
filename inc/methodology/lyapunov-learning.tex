@@ -33,7 +33,9 @@ The complete architectural layout of $V_\phi(x)$ is illustrated in \cref{fig:neu
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/lyapunov_nn.tex}
-    \caption[Neural Lyapunov Architecture]{The neural Lyapunov architecture.}
+    \caption[Neural Lyapunov architecture]{
+        Architecture of the neural Lyapunov candidate $V_\phi(x)$ combining an inner neural network $g_\phi(x)$ 
+        with a learnable auxiliary term to guarantee strict positive definiteness by construction.}
     \label{fig:neural-lyapunov}
 \end{figure}
 
@@ -132,7 +134,10 @@ this final gated loss, is summarized in \cref{fig:rho-gated-loss}.
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/rho_gated_loss.tex}
-    \caption{Combined gated condition loss $\loss_{\rho\mathrm{-gated}}$}
+    \caption[Data flow of the gated condition loss]{
+        Data flow for evaluating the combined $\rho$-gated condition loss $\loss_{\rho\mathrm{-gated}}$ 
+        defined in \labelcref{eq:rho-gated-condition-loss}, integrating the relative decrease loss, 
+        state invariance loss, and soft sublevel weighting.}
     \label{fig:rho-gated-loss}
 \end{figure}
 
@@ -159,7 +164,8 @@ causing the loss to decrease.
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/box_shell_sampling.tex}
-    \caption[Box Shell Sampling]{Illustration of uniformly drawn samples in the shell batch $\mathcal{B}_{\mathrm{ROA}}$ with $\xi = 0.6$.}
+    \caption[Box Shell Sampling]{
+        Illustration of uniformly drawn samples in the shell batch $\mathcal{B}_{\mathrm{ROA}}$ with $\xi = 0.6$.}
     \label{fig:box-shell}
 \end{figure}
 
@@ -202,11 +208,12 @@ Finally, the LIRPA-condition loss over $N_{\mathrm{L}}$ regions is computed as
         \sum_{i=1}^{N_{\mathrm{L}}} w_{\mathrm{L}}^{(i)}
     }.
 \end{equation}
-
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/lirpa_region_selection.tex}
-    \caption[Lirpa region selection]{Lirpa regions selection with $\mathcal{V}_\rho$.}
+    \caption[LIRPA region selection]{
+        Region selection for the LIRPA condition loss over the partitioned domain $\mathcal{X}_V$, 
+        where a cell is selected as active as soon as at least one of its green evaluation points lies within $\mathcal{V}_\rho$}
     \label{fig:lirpa-regions}
 \end{figure}
 
@@ -229,28 +236,29 @@ The reference value $\ell_{V,0}$ is determined once using the initial
 Lyapunov candidate prior to training. To prevent the Lyapunov candidate from 
 overfitting to a static point cloud, a new batch $\mathcal{B}_V$ is resampled from $\mathcal{X}_V$ 
 with a specified probability at each optimization step.
-
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/box_sobol_sampling.tex}
-    \caption[Sobol sequence illustration]{Comparisson of Sobol and uniform sampling in two dimensions.}
+    \caption[Sobol sequence illustration]{
+        Comparison of two-dimensional state sampling, showing uniform random sampling on the left and 
+        a quasi-random Sobol sequence on the right.}
     \label{fig:sobol-sampling}
 \end{figure}
 
 
 \paragraph{Policy Scaling Loss} encourages the learned policy $\pi_V$ to remain close 
-to the output of the original imitation controller $\pi$, which is based on the MPC teacher. 
+to the output of the original imitation controller $\pi_\theta$, which is based on the MPC teacher. 
 A quasi-Monte Carlo batch $\mathcal{B}_{\mathrm{pol}} \subset \mathcal{X}_V$ is sampled using a 
 low-discrepancy Sobol sequence~\cite{joeConstructingSobolSequences2008}. 
-To prevent overfitting to a static set of states, this batch also is resampled from $\mathcal{X}_V$ 
-with a given probability each optimization step. 
+To prevent overfitting to a static set of states, this batch is also resampled from $\mathcal{X}_V$ 
+with a given probability at each optimization step. 
 The normalized deviation between the learned policy and the imitation controller over this batch is formulated as
 \begin{equation}
     \label{eq:policy-scaling-loss}
     \loss_{\mathrm{pol}} = \frac{
-        \sum_{x \in \mathcal{B}_{\mathrm{pol}}} \lVert \pi_V(x) - \pi(x) \rVert_2^2
+        \sum_{x \in \mathcal{B}_{\mathrm{pol}}} \lVert \pi_V(x) - \pi_\theta(x) \rVert_2^2
     }{
-        \sum_{x \in \mathcal{B}_{\mathrm{pol}}} \lVert \pi(x) \rVert_2^2
+        \sum_{x \in \mathcal{B}_{\mathrm{pol}}} \lVert \pi_\theta(x) \rVert_2^2
     }
 \end{equation}
 
@@ -346,7 +354,7 @@ significantly reducing their likelihood of being selected.
 \end{algorithm}
 
 The counterexample pool $\mathcal{C}$ stores the critical violations identified during the PGD falsification step. 
-An age-tracking mechanism limits sample lifespan, preventing overfitting outdated violations.
+An age-tracking mechanism limits sample lifespan, preventing overfitting to outdated violations.
 Each injected counterexample is assigned an initial age $\tau = 0$, which is incremented after every subsequent falsification phase. 
 Once a counterexample reaches the maximum age $\tau_{\max}$, it is removed from the pool. 
 Consequently, the condition loss continuously penalizes recent violations while discarding resolved edge cases as the Lyapunov candidate evolves.
@@ -422,7 +430,7 @@ Finally, to reduce fluctuations caused by changes in the estimated boundary mini
 the gating bound $\rho$ is updated using an exponential moving average (EMA):
 \begin{equation}
     \label{eq:rho-ema}
-    \rho \leftarrow \upsilon_\rho \rho + (1 - \upsilon) \tilde{\rho},
+    \rho \leftarrow \upsilon_\rho \rho + (1 - \upsilon_\rho) \tilde{\rho},
 \end{equation}
 where $\upsilon_\rho \in [0, 1)$ denotes the EMA decay rate.
 
@@ -453,11 +461,10 @@ attraction.
 \begin{figure}[htbp]
     \centering
     \input{tikz/methods/train_flow.tex}
-    \caption[Falsification-guided training flow]{
-        Overview of the falsification-guided training framework. 
-        The architecture is divided into an outer epoch-level loop responsible for state space exploration, 
-        boundary estimation, and adversarial mining, and an inner step-level loop that optimizes 
-        the network parameters based on the generated sample pools.}
+    \caption[Falsification-guided co-training data flow]{
+        Overview of the falsification-guided co-training data flow, showing the outer epoch loop for boundary estimation, 
+        region selection, and adversarial mining into the replay buffer, alongside the inner optimization loop for 
+        neural network parameter updates.}
     \label{fig:train-flow}
 \end{figure}
 

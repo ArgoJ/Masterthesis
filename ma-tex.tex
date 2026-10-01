@@ -15,7 +15,7 @@
   captions=oneline, % Einzeilige Captions zentrieren
   captions=tableheading,
   IMRAD=false,
-  pdfa=false,
+  pdfa=true,
 ]{tudapub}
 
 
@@ -34,7 +34,16 @@
 
 \input{common/includes.tex}
 
-\usepackage[backend=biber,style=ieee,bibencoding=utf8,url=false,doi=false,eprint=false]{biblatex}
+\usepackage[
+  backend=biber,
+  style=ieee,
+  bibencoding=utf8,
+  url=false,
+  doi=false,
+  eprint=false,
+  maxnames=3,
+  minnames=3
+]{biblatex}
 \AtEveryBibitem{
   \clearfield{url}
   \clearfield{urldate}
@@ -49,11 +58,11 @@
 \input{common/custommacros.tex}
 \input{common/cite_preamble.tex}
 
-% \Metadata{  % Metadaten im erzeugten PDF/A
-%   title=Hinweise zum Abfassen einer (Abschluss-)Arbeit am IAT,
-%   author=Josua Christoph Lindemann,
-%   keywords={TU Darmstadt \sep Corporate Design \sep LaTeX},
-% }
+\Metadata{  % Metadaten im erzeugten PDF/A
+  title=Certification of Imitation Controllers using Learned Lyapunov Functions,
+  author=Josua Christoph Lindemann,
+  keywords={TU Darmstadt \sep Corporate Design \sep LaTeX},
+}
 
 \title{Certification of Imitation Controllers using Learned Lyapunov Functions}
 \author{Josua Christoph Lindemann}
@@ -83,6 +92,7 @@
 
 \cleardoublepage
 \input{./inc/abstract.tex}
+\input{./inc/zusammenfassung.tex}
 
 \tableofcontents
 \cleardoublepage

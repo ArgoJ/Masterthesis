@@ -71,10 +71,10 @@ pre-activation bounds $[l_j^{(l)}, u_j^{(l)}]$, as shown in \cref{fig:crown-rela
 \begin{figure}[htbp]
     \centering
     \input{tikz/verification/linear_relaxation.tex}
-    \caption{
+    \caption[Linear relaxation for general activations]{
         Linear bounds for general S-shaped activation functions $\sigma(z) = \tanh(z)$, 
         inspired by Zhang et al.~\cite{zhangEfficientNeuralNetwork2018}. 
-        The green dotted lines denote the upper bounds and the red dotted lines denote the lower bounds. 
+        The navy dotted lines denote the upper bounds and the amber dotted lines denote the lower bounds. 
     }
     \label{fig:crown-relaxations}
 \end{figure}
@@ -131,7 +131,7 @@ The verification problem is then formulated as a maximization of this lower boun
     \underline{\psi}^\star_\alpha = \max_{\alpha \in [0, 1]^K} \mathcal{G}(\alpha) \;\le\; \psi^\star.
 \end{equation}
 The objective $\mathcal{G}(\alpha)$ can be optimized efficiently on GPUs using projected gradient-based methods, 
-such as projected Adam~\cite{kingmaAdamMethodStochastic2017}. 
+such as projected Adam~\cite{kingmaAdamMethodStochastic2015}. 
 Crucially, every intermediate configuration $\alpha \in [0, 1]^K$ defines a valid relaxation. 
 Therefore, early stopping inherently ensures soundness while also providing potentially tighter bounds 
 than static heuristics. 

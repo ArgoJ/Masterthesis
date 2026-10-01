@@ -1,0 +1,16 @@
+\chapter*{Zusammenfassung}
+\label{ch:zusammenfassung}
+
+Neuronale Regelungsstrategien haben sich als wirksamer Ansatz zur Regelung
+komplexer dynamischer Systeme etabliert und ermöglichen die Nachahmung modellprädiktiver Regler.
+Dennoch ist ihr praktischer Einsatz in sicherheitskritischen Anwendungen nach wie vor durch das
+Fehlen strenger Stabilitätsgarantien im geschlossenen Regelkreis eingeschränkt.
+Diese Arbeit stellt einen Rahmen zum Lernen und zur formalen Zertifizierung neuronaler Imitationsregler
+mithilfe gelernter Lyapunov-Funktionen vor.
+Die vorgeschlagene Methodik kombiniert überwachtes Imitationslernen anhand eines MPC-Experten mit einem durch 
+Falsifikation geleiteten gemeinsamen Training der Steuerungsstrategie und eines neuronalen Lyapunov-Kandidaten. 
+Dabei werden extrahierte adversarische Gegenbeispiele verwendet, um die Steuerungsstrategie und den Lyapunov-Kandidaten 
+hin zu einer verifikatorfreundlichen Stabilitätslandschaft zu verfeinern. 
+Anschließend wird mithilfe des GPU-beschleunigten Verifikators $\alpha,\beta$-CROWN lokaler Stabilität und 
+Vorwärtsinvarianz gesucht, um die Attraktionsbereich formal zu verifizieren. 
+Die Pipeline wird sowohl an einem Doppelintegrator als auch an einem nichtlinearen Cart-Pole-System evaluiert.
