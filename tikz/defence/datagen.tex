@@ -1,0 +1,110 @@
+\begin{tikzpicture}[>=Latex, font=\scriptsize]
+
+    % =========================================================================
+    % 1. Subplot 1 (Zustand x1)
+    % =========================================================================
+    \begin{scope}[yshift=0cm]
+        % Achsen mit Beschriftungen x1 und t
+        \draw[->, thick, black] (0,0) -- (3.2,0) node[right, text=black] {$t$};
+        \draw[->, thick, black] (0,-1.15) -- (0,1.25) node[left, text=black] {$x_1$};
+
+        % Grenzen (Constraints)
+        \draw[dashed, black!25, thin] (0, 0.9) -- (3.0, 0.9);
+        \draw[dashed, black!25, thin] (0,-0.9) -- (3.0,-0.9);
+
+        % Feasible Trajektorien (teal)
+        \draw[very thick, teal] (0, 0.80) to[out=-20, in=170] (1.4, 0.15) to[out=-10, in=180] (2.4, 0.0) -- (2.9, 0.0);
+        \draw[very thick, teal] (0,-0.70) to[out=25, in=190] (1.2,-0.10) to[out=10, in=180] (2.2, 0.0) -- (2.9, 0.0);
+        \draw[very thick, teal] (0, 0.35) to[out=-15, in=180] (1.1, 0.05) to[out=0, in=180] (2.0, 0.0) -- (2.9, 0.0);
+
+        % Infeasible Trajektorie (red, bricht bei t=1.40 ab)
+        \draw[thick, red!85!black, dashed] (0,-0.40) to[out=35, in=200] (0.8, 0.45) to[out=20, in=-120] (1.40, 0.90);
+        % Abbruch-Kreuz
+        \draw[thick, red!85!black] (1.40-0.08, 0.90-0.08) -- (1.40+0.08, 0.90+0.08);
+        \draw[thick, red!85!black] (1.40-0.08, 0.90+0.08) -- (1.40+0.08, 0.90-0.08);
+    \end{scope}
+
+    % =========================================================================
+    % 2. Subplot 2 (Zustand x2)
+    % =========================================================================
+    \begin{scope}[yshift=-2.5cm]
+        % Achsen mit Beschriftungen x2 und t
+        \draw[->, thick, black] (0,0) -- (3.2,0) node[right, text=black] {$t$};
+        \draw[->, thick, black] (0,-1.15) -- (0,1.25) node[left, text=black] {$x_2$};
+
+        % Grenzen (Constraints)
+        \draw[dashed, black!25, thin] (0, 0.9) -- (3.0, 0.9);
+        \draw[dashed, black!25, thin] (0,-0.9) -- (3.0,-0.9);
+
+        % Feasible Trajektorien (teal)
+        \draw[very thick, teal] (0,-0.60) to[out=30, in=180] (1.0, 0.20) to[out=0, in=180] (2.0,-0.05) to[out=0, in=180] (2.6, 0.0) -- (2.9, 0.0);
+        \draw[very thick, teal] (0, 0.70) to[out=-30, in=180] (0.9,-0.25) to[out=0, in=180] (1.9, 0.05) to[out=0, in=180] (2.5, 0.0) -- (2.9, 0.0);
+        \draw[very thick, teal] (0,-0.20) to[out=15, in=180] (1.0, 0.08) to[out=0, in=180] (2.0, 0.0) -- (2.9, 0.0);
+
+        % Infeasible Trajektorie (red, bricht bei t=1.40 ab)
+        \draw[thick, red!85!black, dashed] (0, 0.50) to[out=-40, in=140] (0.7,-0.20) to[out=-40, in=60] (1.40,-0.90);
+        % Abbruch-Kreuz
+        \draw[thick, red!85!black] (1.40-0.08, -0.90-0.08) -- (1.40+0.08, -0.90+0.08);
+        \draw[thick, red!85!black] (1.40-0.08, -0.90+0.08) -- (1.40+0.08, -0.90-0.08);
+    \end{scope}
+
+    % =========================================================================
+    % 3. Subplot 3 (Stellgröße u in ZOH-Steps)
+    % =========================================================================
+    \begin{scope}[yshift=-5.0cm]
+        % Achsen mit Beschriftungen u und t
+        \draw[->, thick, black] (0,0) -- (3.2,0) node[right, text=black] {$t$};
+        \draw[->, thick, black] (0,-1.15) -- (0,1.25) node[left, text=black] {$u$};
+
+        % Grenzen (Constraints)
+        \draw[dashed, black!25, thin] (0, 0.9) -- (3.0, 0.9);
+        \draw[dashed, black!25, thin] (0,-0.9) -- (3.0,-0.9);
+
+        % Feasible Trajektorien (teal in diskreten Stufen / Steps)
+        \draw[very thick, teal] 
+            (0.00, -0.80) -- (0.35, -0.80) -- 
+            (0.35, -0.50) -- (0.70, -0.50) -- 
+            (0.70, -0.25) -- (1.05, -0.25) -- 
+            (1.05, -0.10) -- (1.40, -0.10) -- 
+            (1.40, -0.04) -- (1.75, -0.04) -- 
+            (1.75,  0.00) -- (2.90,  0.00);
+
+        \draw[very thick, teal] 
+            (0.00,  0.80) -- (0.35,  0.80) -- 
+            (0.35,  0.45) -- (0.70,  0.45) -- 
+            (0.70,  0.20) -- (1.05,  0.20) -- 
+            (1.05,  0.05) -- (1.40,  0.05) -- 
+            (1.40,  0.00) -- (2.90,  0.00);
+
+        \draw[very thick, teal] 
+            (0.00,  0.35) -- (0.35,  0.35) -- 
+            (0.35,  0.15) -- (0.70,  0.15) -- 
+            (0.70,  0.05) -- (1.05,  0.05) -- 
+            (1.05,  0.00) -- (2.90,  0.00);
+
+        % Infeasible Trajektorie (red, saturiert gegen Grenze und bricht bei t=1.40 ab)
+        \draw[thick, red!85!black, dashed] 
+            (0.00,  0.20) -- (0.35,  0.20) -- 
+            (0.35,  0.65) -- (0.70,  0.65) -- 
+            (0.70,  0.90) -- (1.40,  0.90);
+        % Abbruch-Kreuz
+        \draw[thick, red!85!black] (1.40-0.08, 0.90-0.08) -- (1.40+0.08, 0.90+0.08);
+        \draw[thick, red!85!black] (1.40-0.08, 0.90+0.08) -- (1.40+0.08, 0.90-0.08);
+    \end{scope}
+
+    % =========================================================================
+    % 4. Legende (zentriert unten)
+    % =========================================================================
+    \begin{scope}[shift={(1.5, -6.6)}]
+        % Feasible Eintrag
+        \draw[very thick, teal] (-1.8, 0) -- (-1.2, 0);
+        \node[anchor=west, font=\scriptsize, text=black] at (-1.1, 0) {feasible};
+
+        % Infeasible Eintrag
+        \draw[thick, red!85!black, dashed] (0.8, 0) -- (1.4, 0);
+        \draw[thick, red!85!black] (1.1-0.07, -0.07) -- (1.1+0.07, 0.07);
+        \draw[thick, red!85!black] (1.1-0.07, 0.07) -- (1.1+0.07, -0.07);
+        \node[anchor=west, font=\scriptsize, text=black] at (1.5, 0) {infeasible};
+    \end{scope}
+
+\end{tikzpicture}
