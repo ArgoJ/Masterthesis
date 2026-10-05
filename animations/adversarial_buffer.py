@@ -16,6 +16,17 @@ import matplotlib.patches as patches
 import imageio
 
 # -----------------------------------------------------------------------------
+# LaTeX Typography & Styling (Computer Modern font matching thesis document)
+# -----------------------------------------------------------------------------
+plt.rcParams.update({
+    "font.family": "serif",
+    "font.serif": ["Computer Modern Roman", "DejaVu Serif", "Times New Roman"],
+    "mathtext.fontset": "cm",
+    "axes.unicode_minus": False,
+})
+
+
+# -----------------------------------------------------------------------------
 # 1. Thesis Color Palette (matching pgfplotssetup.tex & defence)
 # -----------------------------------------------------------------------------
 COLOR_NAVY       = "#1B365D"   # Primary thesis blue
@@ -105,7 +116,7 @@ SLIDE_BG         = "#D9D9D9"   # Right card background (or set to "#F2F2F2" if u
 # -----------------------------------------------------------------------------
 # 4. Matplotlib Setup (Compact Bounds for Card)
 # -----------------------------------------------------------------------------
-fig, ax = plt.subplots(figsize=(7.2, 5.2), dpi=100)
+fig, ax = plt.subplots(figsize=(7.2, 5.28), dpi=100)
 fig.subplots_adjust(left=0.01, right=0.99, bottom=0.01, top=0.99)
 output_filename = "adversarial_buffer.mp4"
 writer = imageio.get_writer(output_filename, fps=30, quality=9)
@@ -140,7 +151,7 @@ def draw_layout(highlight_loss=False):
     # ONLY symbol S
     ax.text(
         1.35, 4.88, r"$\mathcal{S}$",
-        fontsize=22, fontweight="bold", color=COLOR_TEAL, ha="center", va="center"
+        fontsize=28, fontweight="bold", color=COLOR_TEAL, ha="center", va="center"
     )
 
     # Box 2 (Bottom): Counterexample Buffer C
@@ -154,7 +165,7 @@ def draw_layout(highlight_loss=False):
     # ONLY symbol C
     ax.text(
         1.35, 2.38, r"$\mathcal{C}$",
-        fontsize=22, fontweight="bold", color=COLOR_AMBER, ha="center", va="center"
+        fontsize=28, fontweight="bold", color=COLOR_AMBER, ha="center", va="center"
     )
 
     # Conduit Tracks (Bahnen) with sampling fraction labels
@@ -162,24 +173,24 @@ def draw_layout(highlight_loss=False):
     ax.plot(track_s_pts[:, 0], track_s_pts[:, 1], color=COLOR_TRACK, linewidth=3.5, zorder=2)
     ax.plot(track_s_pts[:, 0], track_s_pts[:, 1], color="white", linewidth=1.5, zorder=2)
     ax.text(
-        6.05, 4.48, r"$1 - r_{\mathcal{C}}$",
-        fontsize=12, fontweight="bold", color=COLOR_TEAL, ha="center", va="bottom"
+        6.05, 4.52, r"$1 - r_{\mathcal{C}}$",
+        fontsize=17, fontweight="bold", color=COLOR_TEAL, ha="center", va="bottom"
     )
     ax.annotate(
         "", xy=(6.50, 3.45), xytext=(6.20, 3.85),
-        arrowprops=dict(arrowstyle="->", color=COLOR_TEAL, lw=1.6)
+        arrowprops=dict(arrowstyle="->", color=COLOR_TEAL, lw=1.8)
     )
 
     # Lower track
     ax.plot(track_c_pts[:, 0], track_c_pts[:, 1], color=COLOR_TRACK, linewidth=3.5, zorder=2)
     ax.plot(track_c_pts[:, 0], track_c_pts[:, 1], color="white", linewidth=1.5, zorder=2)
     ax.text(
-        6.05, 1.68, r"$r_{\mathcal{C}}$",
-        fontsize=12, fontweight="bold", color=COLOR_CEX_FRESH, ha="center", va="top"
+        6.05, 1.62, r"$r_{\mathcal{C}}$",
+        fontsize=17, fontweight="bold", color=COLOR_CEX_FRESH, ha="center", va="top"
     )
     ax.annotate(
         "", xy=(6.50, 2.35), xytext=(6.20, 1.95),
-        arrowprops=dict(arrowstyle="->", color=COLOR_CEX_FRESH, lw=1.6)
+        arrowprops=dict(arrowstyle="->", color=COLOR_CEX_FRESH, lw=1.8)
     )
 
     # Target Block: L_cond
@@ -198,7 +209,7 @@ def draw_layout(highlight_loss=False):
     # ONLY symbol L_cond
     ax.text(
         8.525, 4.15, r"$\mathcal{L}_{\mathrm{cond}}$",
-        fontsize=21, fontweight="bold", color=COLOR_NAVY, ha="center", va="center"
+        fontsize=26, fontweight="bold", color=COLOR_NAVY, ha="center", va="center"
     )
 
     # Mini-batch container B_rho inside loss block
@@ -212,7 +223,7 @@ def draw_layout(highlight_loss=False):
     # ONLY symbol B_rho
     ax.text(
         8.525, 1.98, r"$\mathcal{B}_\rho$",
-        fontsize=15, fontweight="bold", color="#64748B", ha="center", va="center"
+        fontsize=20, fontweight="bold", color="#64748B", ha="center", va="center"
     )
 
 def render_frame_to_writer():

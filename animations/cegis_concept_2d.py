@@ -1,17 +1,22 @@
 """
-2D CEGIS Concept Animation (Matplotlib LaTeX Style)
----------------------------------------------------
-Demonstrates the 3-step CEGIS loop for Lyapunov function synthesis and 
-Region of Attraction (ROA) sublevel set expansion in a 2D state space:
+2D CEGIS Concept Animation with Dual Neural Networks & Lyapunov Condition (LaTeX Style)
+----------------------------------------------------------------------------------------
+Left:
+- Policy Network pi_theta(x) completely in Teal (#0D9488): produces control u
+- Lyapunov Network V_phi(x) completely in Amber (#D97706): produces energy V
+- Between them: Discrete-time Lyapunov condition check:
+    V_phi(x^+) > (1 - kappa) V_phi(x),  with x^+ = f(x, u)
+- When a stability violation occurs, the condition block pulses Red and emits
+  a Counterexample (CEX) particle that flies into the phase portrait to the defect!
+- Forward pass pulses once through layers during trajectory rollout
+- Backward pass runs once upon CEX detection, gently updating weights layer-by-layer
+- Full reset after backprop: clean default state before the next phase
 
-- Pure 2D phase portrait (x1, x2) in clean LaTeX / Thesis aesthetic
-- Subtle iso-contour lines of the Lyapunov function V(x)
-- Sublevel set V_rho = {x | V(x) <= rho} in warm Amber (#D97706)
-- Counterexamples (cex) appear in vivid Red (#DC2626) at defect regions
-- Dynamic test trajectories show violation / get trapped, then adapt to reach origin
-- As the basin steepens, rho grows outward across 3 CEGIS iterations
-- Final state: strictly decreasing Lyapunov function with converging trajectory family
-- Minimalist: only axes (x1, x2) and origin (x*), no intrusive text overlays
+Right:
+- 2D Phase Portrait (x1, x2) in authentic Computer Modern LaTeX aesthetic
+- Lyapunov iso-contours & Sublevel set V_rho = {x | V(x) <= rho} (boundary minimum)
+- Trajectory flows, gets trapped, receives CEX, and upon model update flows to origin
+- Final state: certified Lyapunov function with converging trajectory family
 """
 
 import numpy as np
@@ -20,14 +25,25 @@ import matplotlib.patches as patches
 import imageio
 
 # -----------------------------------------------------------------------------
-# 1. Thesis Color Palette (matching pgfplotssetup.tex & defence)
+# LaTeX Typography & Styling (Computer Modern font matching thesis document)
+# -----------------------------------------------------------------------------
+plt.rcParams.update({
+    "font.family": "serif",
+    "font.serif": ["Computer Modern Roman", "DejaVu Serif", "Times New Roman"],
+    "mathtext.fontset": "cm",
+    "axes.unicode_minus": False,
+})
+
+# -----------------------------------------------------------------------------
+# 1. Thesis Color Palette
 # -----------------------------------------------------------------------------
 COLOR_NAVY      = "#1B365D"   # Primary thesis blue (domain boundary, trajectories)
-COLOR_SUBLEVEL  = "#D97706"   # Amber: Sublevel set V_rho
+COLOR_SUBLEVEL  = "#D97706"   # Amber: Sublevel set V_rho & Lyapunov MLP
 COLOR_CEX       = "#DC2626"   # Vivid Red: Counterexamples x_adv
-COLOR_DARK      = "#1F2937"   # Structural: Axes, origin marker
-COLOR_TEAL      = "#0D9488"   # Secondary: Trajectory family
+COLOR_DARK      = "#1F2937"   # Structural: Axes, origin marker, text
+COLOR_TEAL      = "#0D9488"   # Teal: Policy MLP
 COLOR_CONTOUR   = "#94A3B8"   # Slate gray: Iso-contours of V(x)
+SLIDE_BG        = "#FFFFFF"   # Pure white background
 
 # -----------------------------------------------------------------------------
 # 2. State Space Grid & Lyapunov Function Mathematics
@@ -38,29 +54,60 @@ x_vals = np.linspace(-2.15, 2.15, n_grid)
 y_vals = np.linspace(-2.15, 2.15, n_grid)
 X, Y = np.meshgrid(x_vals, y_vals)
 
-# Defect centers for 3 concentric zones / steps
-ce_step1 = [
-    (0.60, 0.40),
-    (-0.55, 0.45),
-    (0.35, -0.60),
-    (-0.50, -0.40),
-]
+ELLIPSE_THETA   = np.radians(-25)
+COS_THETA       = float(np.cos(ELLIPSE_THETA))
+SIN_THETA       = float(np.sin(ELLIPSE_THETA))
+A_SCALE         = 1.35
+B_SCALE         = 0.75
 
-ce_step2 = [
-    (1.05, 0.30),
-    (-0.90, 0.70),
-    (0.65, -1.00),
-    (-1.00, -0.50),
-    (0.15, 1.15),
-]
+def ellipse_metric(x, y):
+    xi = COS_THETA * x + SIN_THETA * y
+    eta = -SIN_THETA * x + COS_THETA * y
+    return (xi / A_SCALE)**2 + (eta / B_SCALE)**2
 
-ce_step3 = [
-    (1.40, 0.50),
-    (-1.25, 0.80),
-    (1.00, -1.20),
-    (-0.75, -1.40),
-    (-1.45, -0.25),
-]
+def get_ellipse_point(angle_rad, scale):
+    xi = scale * A_SCALE * np.cos(angle_rad)
+    eta = scale * B_SCALE * np.sin(angle_rad)
+    x = COS_THETA * xi - SIN_THETA * eta
+    y = SIN_THETA * xi + COS_THETA * eta
+    return float(x), float(y)
+
+# -----------------------------------------------------------------------------
+# 3. Dynamics & Trajectory Simulation (Elliptic Spiral Inward Flow)
+# -----------------------------------------------------------------------------
+def simulate_trajectory(x0, y0, t_max=3.5, steps=90):
+    dt = t_max / (steps - 1)
+    xs, ys = np.zeros(steps), np.zeros(steps)
+    xs[0], ys[0] = x0, y0
+    for i in range(steps - 1):
+        xc, yc = xs[i], ys[i]
+        xi = COS_THETA * xc + SIN_THETA * yc
+        eta = -SIN_THETA * xc + COS_THETA * yc
+        d_xi = -0.75 * xi + 1.35 * (A_SCALE / B_SCALE) * eta
+        d_eta = -1.35 * (B_SCALE / A_SCALE) * xi - 0.75 * eta
+        dx = COS_THETA * d_xi - SIN_THETA * d_eta
+        dy = SIN_THETA * d_xi + COS_THETA * d_eta
+        xs[i+1] = xc + dt * dx
+        ys[i+1] = yc + dt * dy
+    return xs, ys
+
+# Trajectories starting on boundary of estimated sublevel set (scale ~ 1.25)
+x1_0, y1_0 = get_ellipse_point(np.radians(50), scale=1.25)
+traj1_x, traj1_y = simulate_trajectory(x1_0, y1_0, t_max=3.5, steps=90)
+p1_trap = (float(traj1_x[36]), float(traj1_y[36]))
+
+x2_0, y2_0 = get_ellipse_point(np.radians(150), scale=1.25)
+traj2_x, traj2_y = simulate_trajectory(x2_0, y2_0, t_max=3.5, steps=90)
+p2_trap = (float(traj2_x[36]), float(traj2_y[36]))
+
+x3_0, y3_0 = get_ellipse_point(np.radians(-50), scale=1.25)
+traj3_x, traj3_y = simulate_trajectory(x3_0, y3_0, t_max=3.5, steps=90)
+p3_trap = (float(traj3_x[36]), float(traj3_y[36]))
+
+# Defect centers
+ce_step1 = [p1_trap, (-0.45, 0.35), (0.42, 0.25)]
+ce_step2 = [p2_trap, (-0.65, 0.45), (0.15, -0.75), (-0.35, -0.65)]
+ce_step3 = [p3_trap, (0.95, -0.60), (-1.10, 0.65), (0.35, 1.05)]
 
 def gaussian_dent(x, y, cx, cy, depth=0.22, width=0.09):
     return -depth * np.exp(-((x - cx)**2 + (y - cy)**2) / width)
@@ -87,7 +134,8 @@ def ripple_field(x, y):
     return 0.025 * np.sin(2.5 * x) * np.cos(2.5 * y)
 
 def compute_v(x, y, k_quad=0.075, w1=1.0, w2=1.0, w3=1.0, wr=1.0):
-    base = k_quad * (x**2 + y**2) + 0.015 * (x**4 + y**4) / 4.0
+    em = ellipse_metric(x, y)
+    base = k_quad * em + 0.012 * (em**2)
     val = (base 
            + w1 * defect_field_1(x, y) 
            + w2 * defect_field_2(x, y) 
@@ -95,7 +143,7 @@ def compute_v(x, y, k_quad=0.075, w1=1.0, w2=1.0, w3=1.0, wr=1.0):
            + wr * ripple_field(x, y))
     return np.maximum(val, 0.015)
 
-def get_domain_min_boundary_val(k_quad, w1, w2, w3, wr, n_edge=80):
+def get_domain_min_boundary_val(k_quad, w1=0.0, w2=0.0, w3=0.0, wr=0.0, n_edge=80):
     edge = np.linspace(-b_domain, b_domain, n_edge)
     v_top = compute_v(edge, np.full_like(edge, b_domain), k_quad, w1, w2, w3, wr)
     v_bottom = compute_v(edge, np.full_like(edge, -b_domain), k_quad, w1, w2, w3, wr)
@@ -103,89 +151,228 @@ def get_domain_min_boundary_val(k_quad, w1, w2, w3, wr, n_edge=80):
     v_left = compute_v(np.full_like(edge, -b_domain), edge, k_quad, w1, w2, w3, wr)
     return float(np.min([np.min(v_top), np.min(v_bottom), np.min(v_right), np.min(v_left)]))
 
-# -----------------------------------------------------------------------------
-# 3. Dynamics & Trajectory Simulation
-# -----------------------------------------------------------------------------
-def simulate_trajectory(x0, y0, t_max=2.5, steps=90):
-    dt = t_max / (steps - 1)
-    xs = np.zeros(steps)
-    ys = np.zeros(steps)
-    xs[0], ys[0] = x0, y0
-    for i in range(steps - 1):
-        xc, yc = xs[i], ys[i]
-        r2 = xc**2 + yc**2
-        dx = -0.45 * xc + 1.15 * yc - 0.04 * xc * r2
-        dy = -1.15 * xc - 0.45 * yc - 0.04 * yc * r2
-        xs[i+1] = xc + dt * dx
-        ys[i+1] = yc + dt * dy
-    return xs, ys
-
-# Trajectories for the 3 iterations
-traj1_x, traj1_y = simulate_trajectory(1.10, 0.15, t_max=2.2, steps=80)
-traj2_x, traj2_y = simulate_trajectory(-1.35, 0.75, t_max=2.2, steps=80)
-traj3_x, traj3_y = simulate_trajectory(1.60, -0.50, t_max=2.4, steps=85)
-
 # Final trajectory bundle
 final_trajs_xy = []
 for angle in np.linspace(0, 2*np.pi, 8, endpoint=False):
-    r_start = 1.65
-    tx, ty = simulate_trajectory(r_start * np.cos(angle), r_start * np.sin(angle), t_max=3.0, steps=85)
+    x0, y0 = get_ellipse_point(angle, scale=1.25)
+    tx, ty = simulate_trajectory(x0, y0, t_max=3.5, steps=90)
     final_trajs_xy.append((tx, ty))
 
 final_colors = [COLOR_NAVY, COLOR_TEAL, "#0F766E", "#1E3A8A", COLOR_NAVY, COLOR_TEAL, "#0F766E", "#1E3A8A"]
 
-# Slide background color: pure white
-SLIDE_BG        = "#FFFFFF"   # White background
+# -----------------------------------------------------------------------------
+# 4. Neural Network Geometry & Precomputed Weights
+# -----------------------------------------------------------------------------
+layer_counts = [2, 4, 3, 1]
+# Compact layer coordinates shifted left to provide ample space for the condition pill
+xs = [0.07, 0.20, 0.33, 0.46]
+
+def get_node_coords(y_center):
+    node_coords = []
+    for l_idx, count in enumerate(layer_counts):
+        lx = xs[l_idx]
+        spacing = 0.068 if count == 4 else (0.086 if count == 3 else 0.108)
+        start_y = y_center - (count - 1) * spacing / 2.0
+        coords = [(lx, start_y + i * spacing) for i in range(count)]
+        node_coords.append(coords)
+    return node_coords
+
+nodes_pi = get_node_coords(y_center=0.74)
+nodes_v  = get_node_coords(y_center=0.26)
+
+# Condition check block coordinates (wide pill)
+chk_x = 0.73
+chk_y = 0.50
+chk_w = 0.48
+chk_h = 0.14
+
+# Weight sequences for 4 iteration stages
+weight_states_pi = []
+weight_states_v  = []
+for it in range(4):
+    rng_pi = np.random.RandomState(101 + it * 37)
+    w_pi = [rng_pi.uniform(0.85, 1.45, size=(len(nodes_pi[g]), len(nodes_pi[g+1]))) for g in range(3)]
+    weight_states_pi.append(w_pi)
+    
+    rng_v = np.random.RandomState(202 + it * 43)
+    w_v = [rng_v.uniform(0.85, 1.45, size=(len(nodes_v[g]), len(nodes_v[g+1]))) for g in range(3)]
+    weight_states_v.append(w_v)
+
+def draw_network(ax, node_coords, title, out_name, accent_color, node_fill, 
+                 fwd_layer=None, fwd_prog=0.0, bp_layer=None, bp_prog=0.0, 
+                 iteration=0, all_weights=None):
+    y_title = node_coords[1][-1][1] + 0.055
+    ax.text(0.26, y_title, title, fontsize=15.0, color=accent_color, va="center", ha="center")
+    
+    curr_it = min(iteration, 3)
+    next_it = min(iteration + 1, 3)
+    w_curr_mats = all_weights[curr_it]
+    w_next_mats = all_weights[next_it]
+    
+    for g in range(3):
+        is_active_bp  = (bp_layer == g)
+        has_updated   = (bp_layer is not None and g > bp_layer)
+        is_active_fwd = (fwd_layer == g)
+        
+        W_c = w_curr_mats[g]
+        W_n = w_next_mats[g]
+        
+        for i, (x1, y1) in enumerate(node_coords[g]):
+            for j, (x2, y2) in enumerate(node_coords[g+1]):
+                wc = W_c[i, j]
+                wn = W_n[i, j]
+                
+                if is_active_bp:
+                    if bp_prog < 0.45:
+                        s = np.sin(bp_prog / 0.45 * np.pi / 2)
+                        lw = wc * 1.20 * (1.0 + 0.35 * s)
+                        alp = 0.95
+                    else:
+                        d = np.cos((bp_prog - 0.45) / 0.55 * np.pi / 2)
+                        lw = (1.0 - d) * (wn * 1.25) + d * (wc * 1.20 * 1.35)
+                        alp = 0.88
+                    ax.plot([x1, x2], [y1, y2], color=accent_color, linewidth=lw, alpha=alp, zorder=3)
+                elif is_active_fwd:
+                    s = np.sin(fwd_prog * np.pi)
+                    lw = wc * 1.20 * (1.0 + 0.32 * s)
+                    ax.plot([x1, x2], [y1, y2], color=accent_color, linewidth=lw, alpha=0.92, zorder=3)
+                elif has_updated:
+                    ax.plot([x1, x2], [y1, y2], color=accent_color, linewidth=wn * 1.25, alpha=0.75, zorder=2)
+                else:
+                    ax.plot([x1, x2], [y1, y2], color=accent_color, linewidth=wc * 1.15, alpha=0.48, zorder=1)
+                    
+    # Draw nodes
+    for l_idx, coords in enumerate(node_coords):
+        is_layer_active = False
+        if bp_layer is not None and bp_layer >= 0 and (l_idx == bp_layer or l_idx == bp_layer + 1):
+            is_layer_active = True
+        elif fwd_layer is not None and (l_idx == fwd_layer or l_idx == fwd_layer + 1 or (fwd_layer == 3 and l_idx == 3)):
+            is_layer_active = True
+        
+        for n_idx, (nx, ny) in enumerate(coords):
+            if is_layer_active:
+                ax.scatter(nx, ny, s=260, facecolor=accent_color, alpha=0.25, edgecolors="none", zorder=4)
+                face = accent_color
+                edge = accent_color
+            else:
+                face = node_fill
+                edge = accent_color
+                
+            ax.scatter(nx, ny, s=145, facecolor=face, edgecolors=edge, linewidth=1.5, zorder=5)
+            
+            if l_idx == 0:
+                inp_lbl = r"$x_1$" if n_idx == 1 else r"$x_2$"
+                ax.text(nx - 0.040, ny, inp_lbl, fontsize=12.5, color=COLOR_DARK, va="center", ha="right", zorder=6)
+            elif l_idx == len(node_coords) - 1:
+                ax.text(nx + 0.040, ny, out_name, fontsize=13.5, color=COLOR_DARK, va="center", ha="left", zorder=6)
 
 # -----------------------------------------------------------------------------
-# 4. Matplotlib Setup (Compact Square for Card)
+# 5. Matplotlib Setup (16:9 Aspect Ratio: 960x544 divisible by 16)
 # -----------------------------------------------------------------------------
-fig, ax = plt.subplots(figsize=(5.4, 5.4), dpi=100)
-fig.subplots_adjust(left=0.06, right=0.94, bottom=0.06, top=0.94)
+fig = plt.figure(figsize=(9.6, 5.44), dpi=100)
+gs = fig.add_gridspec(1, 2, width_ratios=[0.90, 1.10], left=0.03, right=0.97, bottom=0.06, top=0.94, wspace=0.08)
+
+ax_nn = fig.add_subplot(gs[0, 0])
+ax_plot = fig.add_subplot(gs[0, 1])
+
 output_filename = "cegis_concept_2d.mp4"
 writer = imageio.get_writer(output_filename, fps=30, quality=9)
-print("Rendering 2D CEGIS Concept Animation (MP4)...")
+print("Rendering 2D CEGIS Concept with Dual Neural Networks & Lyapunov Condition (MP4)...")
 
-def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_bundle_frac=None):
-    ax.clear()
-    ax.set_xlim(-2.25, 2.25)
-    ax.set_ylim(-2.25, 2.25)
-    ax.set_aspect("equal")
+def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_bundle_frac=None, 
+                 fwd_layer=None, fwd_prog=0.0, bp_layer=None, bp_prog=0.0, iteration=0,
+                 chk_active=False, flying_cexs=None):
     fig.patch.set_facecolor(SLIDE_BG)
-    ax.set_facecolor(SLIDE_BG)
-
-    # Clean axes styling (only x1, x2 and ticks, no bulky titles)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_position("zero")
-    ax.spines["bottom"].set_position("zero")
-    ax.spines["left"].set_color(COLOR_DARK)
-    ax.spines["bottom"].set_color(COLOR_DARK)
-    ax.spines["left"].set_linewidth(1.1)
-    ax.spines["bottom"].set_linewidth(1.1)
     
-    ax.set_xticks([-2, -1, 1, 2])
-    ax.set_yticks([-2, -1, 1, 2])
-    ax.tick_params(colors=COLOR_DARK, labelsize=8.5, width=1.0)
+    # -------------------------------------------------------------------------
+    # Draw Left Subplot: Neural Networks & Lyapunov Condition
+    # -------------------------------------------------------------------------
+    ax_nn.clear()
+    ax_nn.set_xlim(0, 1)
+    ax_nn.set_ylim(0, 1)
+    ax_nn.axis("off")
+    ax_nn.set_facecolor(SLIDE_BG)
+    
+    draw_network(ax_nn, nodes_pi, title=r"$\pi_\theta(x)$", out_name=r"$u$", 
+                 accent_color=COLOR_TEAL, node_fill="#E6FFFA",
+                 fwd_layer=fwd_layer, fwd_prog=fwd_prog,
+                 bp_layer=bp_layer, bp_prog=bp_prog, 
+                 iteration=iteration, all_weights=weight_states_pi)
+    
+    draw_network(ax_nn, nodes_v,  title=r"$V_\phi(x)$",  out_name=r"$V$", 
+                 accent_color=COLOR_SUBLEVEL, node_fill="#FFFBEB",
+                 fwd_layer=fwd_layer, fwd_prog=fwd_prog,
+                 bp_layer=bp_layer, bp_prog=bp_prog, 
+                 iteration=iteration, all_weights=weight_states_v)
 
-    # Axis labels at the tips
-    ax.text(2.18, -0.02, r"$x_1$", fontsize=11, fontweight="bold", color=COLOR_DARK, va="top", ha="left")
-    ax.text(-0.02, 2.18, r"$x_2$", fontsize=11, fontweight="bold", color=COLOR_DARK, va="bottom", ha="right")
+    # Connecting arrows from u and V into the Lyapunov Condition block (smooth large curve, more distance)
+    arr_u_col = COLOR_CEX if chk_active else COLOR_TEAL
+    arr_v_col = COLOR_CEX if chk_active else COLOR_SUBLEVEL
+    # increase horizontal distance to MLP outputs
+    offset = 0.18
+    ax_nn.annotate("", xy=(chk_x, chk_y + chk_h/2), xytext=(xs[-1] + offset, 0.74),
+                   arrowprops=dict(arrowstyle="->", color=arr_u_col, lw=1.6, connectionstyle="arc3,rad=0.4"))
+    ax_nn.annotate("", xy=(chk_x, chk_y - chk_h/2), xytext=(xs[-1] + offset, 0.26),
+                   arrowprops=dict(arrowstyle="->", color=arr_v_col, lw=1.6, connectionstyle="arc3,rad=-0.4"))
 
-    # Training domain boundary d X_V (dashed box)
+    # Lyapunov Condition Pill: V_phi(x^+) > (1 - kappa) V_phi(x)
+    box_bg = "#FEF2F2" if chk_active else "#F8FAFC"
+    box_edge = COLOR_CEX if chk_active else "#CBD5E1"
+    box_lw = 1.6 if chk_active else 1.1
+    txt_col = COLOR_CEX if chk_active else "#334155"
+    sub_col = COLOR_CEX if chk_active else "#64748B"
+
+    pill = patches.FancyBboxPatch(
+        (chk_x - chk_w/2, chk_y - chk_h/2), chk_w, chk_h,
+        boxstyle="round,pad=0.015,rounding_size=0.035",
+        facecolor=box_bg, edgecolor=box_edge, linewidth=box_lw, zorder=6
+    )
+    ax_nn.add_patch(pill)
+
+    ax_nn.text(chk_x, chk_y + 0.026, r"$V_\phi(x^+) > (1-\kappa)V_\phi(x)$", 
+               fontsize=12.0, color=txt_col, va="center", ha="center", zorder=7)
+    ax_nn.text(chk_x, chk_y - 0.026, r"$x^+ = f(x, u)$", 
+               fontsize=11.0, color=sub_col, va="center", ha="center", zorder=7)
+
+    # -------------------------------------------------------------------------
+    # Draw Right Subplot: Phase Portrait
+    # -------------------------------------------------------------------------
+    ax_plot.clear()
+    ax_plot.set_xlim(-2.25, 2.25)
+    ax_plot.set_ylim(-2.25, 2.25)
+    ax_plot.set_aspect("equal")
+    ax_plot.set_facecolor(SLIDE_BG)
+
+    ax_plot.spines["top"].set_visible(False)
+    ax_plot.spines["right"].set_visible(False)
+    ax_plot.spines["left"].set_position("zero")
+    ax_plot.spines["bottom"].set_position("zero")
+    ax_plot.spines["left"].set_color(COLOR_DARK)
+    ax_plot.spines["bottom"].set_color(COLOR_DARK)
+    ax_plot.spines["left"].set_linewidth(1.2)
+    ax_plot.spines["bottom"].set_linewidth(1.2)
+    
+    ax_plot.set_xticks([])
+    ax_plot.set_yticks([])
+    ax_plot.tick_params(colors=COLOR_DARK, labelsize=12.0, width=1.1)
+
+    ax_plot.text(2.18, -0.02, r"$x_1$", fontsize=15.0, color=COLOR_DARK, va="top", ha="left")
+    ax_plot.text(-0.02, 2.18, r"$x_2$", fontsize=15.0, color=COLOR_DARK, va="bottom", ha="right")
+
+    # Training domain boundary
     dom_box = patches.Rectangle(
         (-b_domain, -b_domain), 2 * b_domain, 2 * b_domain,
         linewidth=1.2, edgecolor=COLOR_NAVY, facecolor="none", linestyle="--", alpha=0.55
     )
-    ax.add_patch(dom_box)
+    ax_plot.add_patch(dom_box)
 
-    # Compute current V field
+    # Compute current V field and exact boundary minimum rho
     V_field = compute_v(X, Y, k_quad, w1, w2, w3, wr)
     rho_val = get_domain_min_boundary_val(k_quad, w1, w2, w3, wr)
 
-    # 1. Subtle Iso-Contours of V(x) in the background
+    # 1. Iso-Contours of V(x)
     contour_levels = np.linspace(0.02, float(np.max(V_field)) * 0.95, 12)
-    ax.contour(
+    ax_plot.contour(
         X, Y, V_field,
         levels=contour_levels,
         colors=COLOR_CONTOUR,
@@ -193,41 +380,47 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
         alpha=0.45
     )
 
-    # 2. Sublevel set V_rho = {x | V(x) <= rho} (Amber filled region & solid boundary)
-    ax.contourf(
+    # 2. Sublevel set V_rho
+    ax_plot.contourf(
         X, Y, V_field,
         levels=[0.0, rho_val],
         colors=[COLOR_SUBLEVEL],
         alpha=0.28
     )
-    ax.contour(
+    ax_plot.contour(
         X, Y, V_field,
         levels=[rho_val],
         colors=[COLOR_SUBLEVEL],
         linewidths=2.0
     )
 
-    # 3. Origin marker x* = (0,0)
-    ax.scatter(0, 0, s=28, color=COLOR_DARK, zorder=6)
-    ax.text(-0.08, -0.15, r"$x^\star$", fontsize=8.5, color=COLOR_DARK, fontweight="bold")
+    # 3. Origin marker
+    ax_plot.scatter(0, 0, s=36, color=COLOR_DARK, zorder=6)
+    ax_plot.text(-0.09, -0.16, r"$x^\star$", fontsize=13.0, color=COLOR_DARK)
 
     # 4. Active Counterexamples
     for cx, cy, alpha_cex, r_cex in active_cexs:
         if alpha_cex > 0:
-            ax.scatter(cx, cy, s=r_cex, color=COLOR_CEX, edgecolors="white", linewidth=1.1, alpha=alpha_cex, zorder=8)
+            ax_plot.scatter(cx, cy, s=r_cex, color=COLOR_CEX, edgecolors="white", linewidth=1.1, alpha=alpha_cex, zorder=8)
 
-    # 5. Diagnostic Test Trajectory
+    # 5. Flying CEX particles from condition block to defects
+    if flying_cexs:
+        for fx, fy in flying_cexs:
+            ax_plot.scatter(fx, fy, s=140, facecolor=COLOR_CEX, edgecolors="none", alpha=0.30, clip_on=False, zorder=11)
+            ax_plot.scatter(fx, fy, s=75, facecolor=COLOR_CEX, edgecolors="white", linewidth=1.1, clip_on=False, zorder=12)
+
+    # 6. Diagnostic Test Trajectory
     if traj_data is not None:
         tx, ty = traj_data
-        ax.plot(tx, ty, color=COLOR_NAVY, linewidth=2.0, zorder=7)
-        ax.scatter(tx[-1], ty[-1], s=22, color=COLOR_NAVY, zorder=7)
+        ax_plot.plot(tx, ty, color=COLOR_NAVY, linewidth=2.0, zorder=7)
+        ax_plot.scatter(tx[-1], ty[-1], s=22, color=COLOR_NAVY, zorder=7)
 
-    # 6. Final Trajectory Bundle
+    # 7. Final Trajectory Bundle
     if final_bundle_frac is not None:
         for idx, (tx, ty) in enumerate(final_trajs_xy):
             curr_len = max(2, int(final_bundle_frac * len(tx)))
             col = final_colors[idx]
-            ax.plot(tx[:curr_len], ty[:curr_len], color=col, linewidth=1.8, zorder=7)
+            ax_plot.plot(tx[:curr_len], ty[:curr_len], color=col, linewidth=1.8, zorder=7)
 
     fig.canvas.draw()
     rgba = np.asarray(fig.canvas.buffer_rgba())
@@ -235,156 +428,218 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
     writer.append_data(rgba[:h - h%2, :w - w%2, :3])
 
 # =============================================================================
+# ANIMATION LOOP HELPERS
+# =============================================================================
+
+def get_flight_source():
+    inv_plot = ax_plot.transData.inverted()
+    p_src_disp = ax_nn.transData.transform((chk_x + chk_w/2, chk_y))
+    return inv_plot.transform(p_src_disp)
+
+def run_single_forward_pass_rollout(traj_x, traj_y, k_quad, w1, w2, w3, wr, iteration):
+    """Executes a strictly monotonic trajectory rollout to index 36 with a single forward pass."""
+    total_rollout_steps = 36
+    n_rollout = 24  # Total frames to reach defect smoothly
+    fwd_duration = 15  # 5 frames for layer 0, 5 for layer 1, 5 for layer 2
+    
+    for f in range(n_rollout):
+        idx = max(2, int((f + 1) / n_rollout * total_rollout_steps))
+        
+        if f < fwd_duration:
+            f_layer = min(2, f // 5)
+            f_prog = (f % 5 + 1) / 5.0
+        elif f < fwd_duration + 3:
+            f_layer = 3
+            f_prog = 1.0
+        else:
+            f_layer = None
+            f_prog = 0.0
+            
+        render_frame(k_quad, w1, w2, w3, wr, traj_data=(traj_x[:idx], traj_y[:idx]), 
+                     fwd_layer=f_layer, fwd_prog=f_prog, bp_layer=None, iteration=iteration)
+
+def run_cex_violation_and_flight(ce_group, k_quad, w1, w2, w3, wr, traj_trap, iteration):
+    """
+    1. Condition block flashes Red as violation occurs.
+    2. ALL counterexample particles emerge from the condition block and fly across to their respective points!
+    3. CEX dots land and establish at their defect coordinates.
+    """
+    p_src = get_flight_source()
+    
+    # Delay: trajectory settles at defect
+    for _ in range(8):
+        render_frame(k_quad, w1, w2, w3, wr, traj_data=traj_trap, 
+                     chk_active=False, bp_layer=None, iteration=iteration)
+        
+    # Violation triggers in the condition block
+    for _ in range(6):
+        render_frame(k_quad, w1, w2, w3, wr, traj_data=traj_trap, 
+                     chk_active=True, bp_layer=None, iteration=iteration)
+        
+    # All CEX particles fly simultaneously from the decrease field to their points (slower, 32 frames)
+    n_flight = 32
+    for f in range(n_flight):
+        t = (f + 1) / n_flight
+        t_ease = 0.5 - 0.5 * np.cos(t * np.pi)
+        current_particles = []
+        for idx, (cx, cy) in enumerate(ce_group):
+            arc_val = 0.35 * (1.0 if cy >= p_src[1] else -1.0) * (0.8 + 0.3 * (idx % 2))
+            curr_x = (1 - t_ease) * p_src[0] + t_ease * cx
+            curr_y = (1 - t_ease) * p_src[1] + t_ease * cy + arc_val * np.sin(t_ease * np.pi)
+            current_particles.append((curr_x, curr_y))
+            
+        render_frame(k_quad, w1, w2, w3, wr, traj_data=traj_trap, 
+                     chk_active=True, flying_cexs=current_particles, bp_layer=None, iteration=iteration)
+        
+    # Landed: all counterexamples are active at their target spots
+    cexs = [(cx, cy, 1.0, 70) for cx, cy in ce_group]
+    for _ in range(10):
+        render_frame(k_quad, w1, w2, w3, wr, active_cexs=cexs, traj_data=traj_trap, 
+                     chk_active=True, bp_layer=None, iteration=iteration)
+    return cexs
+
+def run_backward_pass_with_delays(k_quad, w1, w2, w3, wr, active_cexs, traj_trap, iteration):
+    """
+    Runs backward pass from condition block backwards through layers,
+    then cleanly RESETS all layers before the Lyapunov function expands.
+    """
+    n_bp_frames = 5
+    for layer in [2, 1, 0]:
+        for f in range(n_bp_frames):
+            p = (f + 1) / n_bp_frames
+            render_frame(k_quad, w1, w2, w3, wr, active_cexs=active_cexs, traj_data=traj_trap, 
+                         chk_active=True, bp_layer=layer, bp_prog=p, iteration=iteration)
+            
+    # RESET IMMEDIATELY! Condition block and all layers return to clean default
+    new_iteration = min(iteration + 1, 3)
+    for _ in range(8):
+        render_frame(k_quad, w1, w2, w3, wr, active_cexs=active_cexs, traj_data=traj_trap, 
+                     chk_active=False, bp_layer=None, fwd_layer=None, iteration=new_iteration)
+    return new_iteration
+
+# =============================================================================
 # ANIMATION LOOP
 # =============================================================================
 
-# Initial state: Lyapunov basin with initial rho sublevel set
 k_quad = 0.075
 w1, w2, w3, wr = 1.0, 1.0, 1.0, 1.0
 
-for _ in range(25):
-    render_frame(k_quad, w1, w2, w3, wr)
-
-# -----------------------------------------------------------------------------
-# ITERATION 1: Counterexamples in inner zone -> Inductive synthesis -> Growth
-# -----------------------------------------------------------------------------
-# Trajectory 1 enters and gets trapped near dent 1
-for f in range(24):
-    idx = max(2, int((f + 1) / 24 * 38))
-    render_frame(k_quad, w1, w2, w3, wr, traj_data=(traj1_x[:idx], traj1_y[:idx]))
-
-# 1. Counterexamples appear
-for f in range(12):
-    alpha = min(1.0, (f + 1) / 8.0)
-    cexs = [(cx, cy, alpha, 70) for cx, cy in ce_step1]
-    render_frame(k_quad, w1, w2, w3, wr, active_cexs=cexs, traj_data=(traj1_x[:38], traj1_y[:38]))
-
+# Initial hold
 for _ in range(15):
-    cexs = [(cx, cy, 1.0, 70) for cx, cy in ce_step1]
-    render_frame(k_quad, w1, w2, w3, wr, active_cexs=cexs, traj_data=(traj1_x[:38], traj1_y[:38]))
+    render_frame(k_quad, w1, w2, w3, wr, bp_layer=None, iteration=0)
 
-# 2. Inductive synthesis: w1 -> 0 (dent disappears, trajectory flows to origin)
-n_synth1 = 30
+# -----------------------------------------------------------------------------
+# ITERATION 1
+# -----------------------------------------------------------------------------
+# 1. Single forward pass as trajectory 1 rolls out
+run_single_forward_pass_rollout(traj1_x, traj1_y, k_quad, w1, w2, w3, wr, iteration=0)
+
+# 2. Condition block triggers and emits flying CEX particles into defect 1
+cexs1 = run_cex_violation_and_flight(ce_step1, k_quad, w1, w2, w3, wr, (traj1_x[:36], traj1_y[:36]), iteration=0)
+
+# 3. Backward pass runs, updates weights, and resets cleanly
+it1 = run_backward_pass_with_delays(k_quad, w1, w2, w3, wr, cexs1, (traj1_x[:36], traj1_y[:36]), iteration=0)
+
+# 4. Exactly as weights update: Lyapunov function enlarges & defect vanishes!
+n_synth1 = 34
+k_start1, k_end1 = 0.075, 0.155
 for f in range(n_synth1):
     prog = (f + 1) / n_synth1
     w1 = 1.0 - prog
     wr = 1.0 - 0.33 * prog
+    k_quad = k_start1 + (k_end1 - k_start1) * prog
     
     alpha_ce = max(0.0, 1.0 - prog)
-    cexs = [(cx, cy, alpha_ce, 70 * alpha_ce) for cx, cy in ce_step1]
+    curr_cexs = [(cx, cy, alpha_ce, 70 * alpha_ce) for cx, cy in ce_step1]
     
-    # Trajectory reaches origin
-    idx = max(2, int(38 + prog * 42))
-    render_frame(k_quad, w1, w2, w3, wr, active_cexs=cexs, traj_data=(traj1_x[:idx], traj1_y[:idx]))
+    idx = max(2, int(36 + prog * (90 - 36)))
+    render_frame(k_quad, w1, w2, w3, wr, active_cexs=curr_cexs, traj_data=(traj1_x[:idx], traj1_y[:idx]), 
+                 chk_active=False, bp_layer=None, iteration=it1)
 
-# Hold solved trajectory at origin, then remove
-for _ in range(10):
-    render_frame(k_quad, w1, w2, w3, wr, traj_data=(traj1_x, traj1_y))
+for _ in range(8):
+    render_frame(k_quad, w1, w2, w3, wr, traj_data=(traj1_x, traj1_y), bp_layer=None, iteration=it1)
 
-# Trajectory removed
 for _ in range(6):
-    render_frame(k_quad, w1, w2, w3, wr)
-
-# 3. Learner steepens basin: k_quad grows from 0.075 to 0.155 (rho expands!)
-n_grow1 = 40
-k_start1, k_end1 = 0.075, 0.155
-for f in range(n_grow1):
-    k_quad = k_start1 + (k_end1 - k_start1) * (f + 1) / n_grow1
-    render_frame(k_quad, w1, w2, w3, wr)
+    render_frame(k_quad, w1, w2, w3, wr, bp_layer=None, iteration=it1)
 
 # -----------------------------------------------------------------------------
-# ITERATION 2: New CEX in expanded sublevel set -> Resolve & Growth
+# ITERATION 2
 # -----------------------------------------------------------------------------
-# Trajectory 2 approaches middle zone defect
-for f in range(20):
-    idx = max(2, int((f + 1) / 20 * 40))
-    render_frame(k_quad, w1, w2, w3, wr, traj_data=(traj2_x[:idx], traj2_y[:idx]))
+# 1. Single forward pass as trajectory 2 rolls out
+run_single_forward_pass_rollout(traj2_x, traj2_y, k_quad, w1, w2, w3, wr, iteration=it1)
 
-# 1. New counterexamples appear in expanded region
-for f in range(12):
-    alpha = min(1.0, (f + 1) / 8.0)
-    cexs = [(cx, cy, alpha, 70) for cx, cy in ce_step2]
-    render_frame(k_quad, w1, w2, w3, wr, active_cexs=cexs, traj_data=(traj2_x[:40], traj2_y[:40]))
+# 2. Condition block triggers and emits flying CEX particles into defect 2
+cexs2 = run_cex_violation_and_flight(ce_step2, k_quad, w1, w2, w3, wr, (traj2_x[:36], traj2_y[:36]), iteration=it1)
 
-for _ in range(15):
-    cexs = [(cx, cy, 1.0, 70) for cx, cy in ce_step2]
-    render_frame(k_quad, w1, w2, w3, wr, active_cexs=cexs, traj_data=(traj2_x[:40], traj2_y[:40]))
+# 3. Backward pass runs and resets cleanly
+it2 = run_backward_pass_with_delays(k_quad, w1, w2, w3, wr, cexs2, (traj2_x[:36], traj2_y[:36]), iteration=it1)
 
-# 2. Inductive synthesis: w2 -> 0
-n_synth2 = 30
+# 4. Basin steepens & defect vanishes, trajectory completes to origin
+n_synth2 = 34
+k_start2, k_end2 = 0.155, 0.280
 for f in range(n_synth2):
     prog = (f + 1) / n_synth2
     w2 = 1.0 - prog
     wr = 0.67 - 0.33 * prog
+    k_quad = k_start2 + (k_end2 - k_start2) * prog
     
     alpha_ce = max(0.0, 1.0 - prog)
-    cexs = [(cx, cy, alpha_ce, 70 * alpha_ce) for cx, cy in ce_step2]
+    curr_cexs = [(cx, cy, alpha_ce, 70 * alpha_ce) for cx, cy in ce_step2]
     
-    idx = max(2, int(40 + prog * 40))
-    render_frame(k_quad, w1, w2, w3, wr, active_cexs=cexs, traj_data=(traj2_x[:idx], traj2_y[:idx]))
+    idx = max(2, int(36 + prog * (90 - 36)))
+    render_frame(k_quad, w1, w2, w3, wr, active_cexs=curr_cexs, traj_data=(traj2_x[:idx], traj2_y[:idx]), 
+                 chk_active=False, bp_layer=None, iteration=it2)
 
-for _ in range(10):
-    render_frame(k_quad, w1, w2, w3, wr, traj_data=(traj2_x, traj2_y))
+for _ in range(8):
+    render_frame(k_quad, w1, w2, w3, wr, traj_data=(traj2_x, traj2_y), bp_layer=None, iteration=it2)
 
-# Remove trajectory 2
 for _ in range(6):
-    render_frame(k_quad, w1, w2, w3, wr)
-
-# 3. Learner steepens basin: k_quad grows from 0.155 to 0.280 (rho expands further!)
-n_grow2 = 40
-k_start2, k_end2 = 0.155, 0.280
-for f in range(n_grow2):
-    k_quad = k_start2 + (k_end2 - k_start2) * (f + 1) / n_grow2
-    render_frame(k_quad, w1, w2, w3, wr)
+    render_frame(k_quad, w1, w2, w3, wr, bp_layer=None, iteration=it2)
 
 # -----------------------------------------------------------------------------
-# ITERATION 3: Outer zone defects -> Resolve -> Fully certified ROA
+# ITERATION 3
 # -----------------------------------------------------------------------------
-# Trajectory 3 approaches outer defect
-for f in range(20):
-    idx = max(2, int((f + 1) / 20 * 42))
-    render_frame(k_quad, w1, w2, w3, wr, traj_data=(traj3_x[:idx], traj3_y[:idx]))
+# 1. Single forward pass as trajectory 3 rolls out
+run_single_forward_pass_rollout(traj3_x, traj3_y, k_quad, w1, w2, w3, wr, iteration=it2)
 
-# 1. New counterexamples appear in outer band
-for f in range(12):
-    alpha = min(1.0, (f + 1) / 8.0)
-    cexs = [(cx, cy, alpha, 70) for cx, cy in ce_step3]
-    render_frame(k_quad, w1, w2, w3, wr, active_cexs=cexs, traj_data=(traj3_x[:42], traj3_y[:42]))
+# 2. Condition block triggers and emits flying CEX particles into defect 3
+cexs3 = run_cex_violation_and_flight(ce_step3, k_quad, w1, w2, w3, wr, (traj3_x[:36], traj3_y[:36]), iteration=it2)
 
-for _ in range(15):
-    cexs = [(cx, cy, 1.0, 70) for cx, cy in ce_step3]
-    render_frame(k_quad, w1, w2, w3, wr, active_cexs=cexs, traj_data=(traj3_x[:42], traj3_y[:42]))
+# 3. Backward pass runs and resets cleanly
+it3 = run_backward_pass_with_delays(k_quad, w1, w2, w3, wr, cexs3, (traj3_x[:36], traj3_y[:36]), iteration=it2)
 
-# 2. Inductive synthesis: w3 -> 0 (surface becomes fully convex)
-n_synth3 = 30
+# 4. Surface fully convex, final trajectory reaches origin
+n_synth3 = 34
 for f in range(n_synth3):
     prog = (f + 1) / n_synth3
     w3 = 1.0 - prog
     wr = max(0.0, 0.34 * (1.0 - prog))
     
     alpha_ce = max(0.0, 1.0 - prog)
-    cexs = [(cx, cy, alpha_ce, 70 * alpha_ce) for cx, cy in ce_step3]
+    curr_cexs = [(cx, cy, alpha_ce, 70 * alpha_ce) for cx, cy in ce_step3]
     
-    idx = max(2, int(42 + prog * 43))
-    render_frame(k_quad, w1, w2, w3, wr, active_cexs=cexs, traj_data=(traj3_x[:idx], traj3_y[:idx]))
+    idx = max(2, int(36 + prog * (90 - 36)))
+    render_frame(k_quad, w1, w2, w3, wr, active_cexs=curr_cexs, traj_data=(traj3_x[:idx], traj3_y[:idx]), 
+                 chk_active=False, bp_layer=None, iteration=it3)
 
-for _ in range(10):
-    render_frame(k_quad, w1, w2, w3, wr, traj_data=(traj3_x, traj3_y))
-
-# Remove trajectory 3
 for _ in range(8):
-    render_frame(k_quad, w1, w2, w3, wr)
+    render_frame(k_quad, w1, w2, w3, wr, traj_data=(traj3_x, traj3_y), bp_layer=None, iteration=it3)
+
+for _ in range(6):
+    render_frame(k_quad, w1, w2, w3, wr, bp_layer=None, iteration=it3)
 
 # -----------------------------------------------------------------------------
-# FINAL STATE: Strictly Decreasing Lyapunov Function & Converging Trajectory Family
+# FINAL STATE: Strictly Decreasing Lyapunov Function & Full Trajectory Family
 # -----------------------------------------------------------------------------
-n_final = 55
+n_final = 42
 for f in range(n_final):
-    frac = min(1.0, (f + 1) / 38.0)
-    render_frame(k_quad, w1, w2, w3, wr, final_bundle_frac=frac)
+    frac = min(1.0, (f + 1) / 35.0)
+    render_frame(k_quad, w1, w2, w3, wr, final_bundle_frac=frac, 
+                 chk_active=False, fwd_layer=None, bp_layer=None, iteration=it3)
 
-for _ in range(35):
-    render_frame(k_quad, w1, w2, w3, wr, final_bundle_frac=1.0)
+for _ in range(25):
+    render_frame(k_quad, w1, w2, w3, wr, final_bundle_frac=1.0, 
+                 chk_active=False, fwd_layer=None, bp_layer=None, iteration=it3)
 
 writer.close()
 plt.close(fig)
