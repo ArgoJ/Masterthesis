@@ -355,24 +355,28 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
     ax_nn.add_patch(pill)
 
     if chk_active:
-        # 1. Formula parts with red bold operator
+        # Decrease
         t_left  = TextArea(r"$V_\phi(x^+)$", textprops=dict(color=COLOR_DARK, size=12.5))
         t_mid   = TextArea(r"$\mathbf{\nless}$",   textprops=dict(color=COLOR_CEX, size=13.5))
         t_right = TextArea(r"$(1-\kappa)V_\phi(x)$", textprops=dict(color=COLOR_DARK, size=12.5))
 
-        # 2. Horizontal assembly with crisp spacing
-        formula_box = HPacker(children=[t_left, t_mid, t_right], align="center", pad=0, sep=1)
-        ab = AnnotationBbox(formula_box, (chk_x, chk_y + 0.026), frameon=False, box_alignment=(0.5, 0.5), zorder=7)
+        decrease_box = HPacker(children=[t_left, t_mid, t_right], align="center", pad=0, sep=1)
+        ab = AnnotationBbox(decrease_box, (chk_x, chk_y + 0.026), frameon=False, box_alignment=(0.5, 0.5), zorder=7)
         ax_nn.add_artist(ab)
 
-        # Subtitle highlights counterexample generation
-        ax_nn.text(chk_x, chk_y - 0.026, r"$x^+ = f(x, u) \Rightarrow x_{\mathrm{cex}}$", 
-                   fontsize=10.5, color=COLOR_DARK, va="center", ha="center", zorder=7)
+        # Invariance
+        t_left  = TextArea(r"$f(\mathcal{S})$", textprops=dict(color=COLOR_DARK, size=12.5))
+        t_mid   = TextArea(r"$\not\subseteq$",   textprops=dict(color=COLOR_CEX, size=13.5))
+        t_right = TextArea(r"$\mathcal{S}$", textprops=dict(color=COLOR_DARK, size=12.5))
+
+        invariance_box = HPacker(children=[t_left, t_mid, t_right], align="center", pad=0, sep=1)
+        ab = AnnotationBbox(invariance_box, (chk_x, chk_y - 0.026), frameon=False, box_alignment=(0.5, 0.5), zorder=7)
+        ax_nn.add_artist(ab)
     else:
         # Clean default: satisfied Lyapunov decrease condition
         ax_nn.text(chk_x, chk_y + 0.026, r"$V_\phi(x^+) < (1-\kappa)V_\phi(x)$", 
                    fontsize=12.0, color=COLOR_DARK, va="center", ha="center", zorder=7)
-        ax_nn.text(chk_x, chk_y - 0.026, r"$x^+ = f(x, u)$", 
+        ax_nn.text(chk_x, chk_y - 0.026, r"$f(\mathcal{S}) \subseteq \mathcal{S}$", 
                    fontsize=11.0, color="#64748B", va="center", ha="center", zorder=7)
 
     # -------------------------------------------------------------------------
