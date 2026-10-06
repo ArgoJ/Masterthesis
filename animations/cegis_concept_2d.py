@@ -365,9 +365,9 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
         ax_nn.add_artist(ab)
 
         # Invariance
-        t_left  = TextArea(r"$f(\mathcal{S})$", textprops=dict(color=COLOR_DARK, size=12.5))
-        t_mid   = TextArea(r"$\nsubseteq$",   textprops=dict(color=COLOR_CEX, size=13.5))
-        t_right = TextArea(r"$\mathcal{S}$", textprops=dict(color=COLOR_DARK, size=12.5))
+        t_left  = TextArea(r"$\forall x \in \mathcal{X}: \; x^+ $", textprops=dict(color=COLOR_DARK, size=12.5))
+        t_mid   = TextArea(r"$\notin$",   textprops=dict(color=COLOR_CEX, size=13.5))
+        t_right = TextArea(r"$\mathcal{X}$", textprops=dict(color=COLOR_DARK, size=12.5))
 
         invariance_box = HPacker(children=[t_left, t_mid, t_right], align="center", pad=0, sep=1)
         ab = AnnotationBbox(invariance_box, (chk_x, chk_y - 0.026), frameon=False, box_alignment=(0.5, 0.5), zorder=7)
@@ -376,7 +376,7 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
         # Clean default: satisfied Lyapunov decrease condition
         ax_nn.text(chk_x, chk_y + 0.026, r"$V_\phi(x^+) < (1-\kappa)V_\phi(x)$", 
                    fontsize=12.0, color=COLOR_DARK, va="center", ha="center", zorder=7)
-        ax_nn.text(chk_x, chk_y - 0.026, r"$f(\mathcal{S}) \subseteq \mathcal{S}$", 
+        ax_nn.text(chk_x, chk_y - 0.026, r"$\forall x \in \mathcal{X}: \; x^+ \in \mathcal{X}$", 
                    fontsize=11.0, color="#64748B", va="center", ha="center", zorder=7)
 
     # -------------------------------------------------------------------------
@@ -441,7 +441,7 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
 
     # 3. Origin marker
     ax_plot.scatter(0, 0, s=36, color=COLOR_DARK, zorder=6)
-    ax_plot.text(-0.09, -0.16, r"$x^\star$", fontsize=13.0, color=COLOR_DARK)
+    ax_plot.text(-0.18, -0.16, r"$x^\star$", fontsize=13.0, color=COLOR_DARK)
 
     # 4. Active Counterexamples
     for cx, cy, alpha_cex, r_cex in active_cexs:

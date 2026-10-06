@@ -48,7 +48,7 @@ ax_plot.text(-0.02, 2.18, r"$x_2$", fontsize=12, color=COLOR_DARK, va="bottom", 
 circ = patches.Circle((0, 0), 1.2, facecolor=COLOR_SUBLEVEL, alpha=0.25, edgecolor=COLOR_SUBLEVEL, linewidth=2.0)
 ax_plot.add_patch(circ)
 ax_plot.scatter(0, 0, s=28, color=COLOR_DARK, zorder=6)
-ax_plot.text(-0.08, -0.15, r"$x^\star$", fontsize=9.5, color=COLOR_DARK)
+ax_plot.text(-0.18, -0.15, r"$x^\star$", fontsize=9.5, color=COLOR_DARK)
 
 ax_nn.set_xlim(0, 1)
 ax_nn.set_ylim(0, 1)
@@ -127,9 +127,9 @@ ab = AnnotationBbox(decrease_box, (chk_x, chk_y + 0.026), frameon=False, box_ali
 ax_nn.add_artist(ab)
 
 # Invariance
-t_left  = TextArea(r"$f(\mathcal{S})$", textprops=dict(color=COLOR_DARK, size=12.5))
-t_mid   = TextArea(r"$\nsubseteq$",   textprops=dict(color=COLOR_CEX, size=13.5))
-t_right = TextArea(r"$\mathcal{S}$", textprops=dict(color=COLOR_DARK, size=12.5))
+t_left  = TextArea(r"$\forall x \in \mathcal{X}: \; x^+ $", textprops=dict(color=COLOR_DARK, size=12.5))
+t_mid   = TextArea(r"$\notin$",   textprops=dict(color=COLOR_CEX, size=13.5))
+t_right = TextArea(r"$\mathcal{X}$", textprops=dict(color=COLOR_DARK, size=12.5))
 
 invariance_box = HPacker(children=[t_left, t_mid, t_right], align="center", pad=0, sep=1)
 ab = AnnotationBbox(invariance_box, (chk_x, chk_y - 0.026), frameon=False, box_alignment=(0.5, 0.5), zorder=7)
