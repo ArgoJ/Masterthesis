@@ -42,12 +42,12 @@ fi
 JOBNAME="temp_tikz_export"
 
 echo "==> Kompiliere '$INPUT_FILE' mit \\linewidth = $WIDTH..."
-lualatex -interaction=nonstopmode --jobname="$JOBNAME" \
-    "\def\customwidth{$WIDTH}\def\tikzfile{$INPUT_FILE}\input{tikz_helper.tex}" > /dev/null
-
-if [ ! -f "${JOBNAME}.pdf" ]; then
-    echo "Fehler: Kompilierung fehlgeschlagen! Bitte '${JOBNAME}.log' prüfen."
-    exit 1
+if ! lualatex -interaction=nonstopmode --jobname="$JOBNAME" \
+    "\def\customwidth{$WIDTH}\def\tikzfile{$INPUT_FILE}\input{tikz_helper.tex}" > /dev/null 2>&1; then
+    if [ ! -f "${JOBNAME}.pdf" ]; then
+        echo "Fehler: Kompilierung fehlgeschlagen! Bitte '${JOBNAME}.log' prüfen."
+        exit 1
+    fi
 fi
 
 echo "==> Konvertiere zu SVG via pdftocairo..."

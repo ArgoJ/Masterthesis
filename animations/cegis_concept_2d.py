@@ -22,6 +22,7 @@ Right:
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from matplotlib.offsetbox import AnnotationBbox, HPacker, TextArea
 import imageio
 
 # -----------------------------------------------------------------------------
@@ -305,22 +306,46 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
                  bp_layer=bp_layer, bp_prog=bp_prog, 
                  iteration=iteration, all_weights=weight_states_v)
 
-    # Connecting arrows from u and V into the Lyapunov Condition block (smooth large curve, more distance)
-    arr_u_col = COLOR_CEX if chk_active else COLOR_TEAL
-    arr_v_col = COLOR_CEX if chk_active else COLOR_SUBLEVEL
-    # increase horizontal distance to MLP outputs
-    offset = 0.18
-    ax_nn.annotate("", xy=(chk_x, chk_y + chk_h/2), xytext=(xs[-1] + offset, 0.74),
-                   arrowprops=dict(arrowstyle="->", color=arr_u_col, lw=1.6, connectionstyle="arc3,rad=0.4"))
-    ax_nn.annotate("", xy=(chk_x, chk_y - chk_h/2), xytext=(xs[-1] + offset, 0.26),
-                   arrowprops=dict(arrowstyle="->", color=arr_v_col, lw=1.6, connectionstyle="arc3,rad=-0.4"))
+    # Connecting arrows from u and V into the Lyapunov Condition block
+    # Colors stay authentic Teal and Amber (never turn red)
+    arr_u_col = COLOR_TEAL
+    arr_v_col = COLOR_SUBLEVEL
 
-    # Lyapunov Condition Pill: V_phi(x^+) > (1 - kappa) V_phi(x)
+    # Dynamic line width: pulse thicker during forward pass (when output/condition is reached)
+    # and during backward pass (when backprop starts at the condition block)
+    is_arrow_active = False
+    arr_lw = 1.6
+    arr_alpha = 0.80
+    if fwd_layer == 3:
+        is_arrow_active = True
+        s = np.sin(fwd_prog * np.pi)
+        arr_lw = 1.6 + 2.2 * s
+        arr_alpha = 1.0
+    elif bp_layer == 3:  # Initial backprop phase from condition block into MLP outputs
+        is_arrow_active = True
+        s = np.sin(bp_prog * np.pi)
+        arr_lw = 1.6 + 2.2 * s
+        arr_alpha = 1.0
+    elif bp_layer is not None and bp_layer >= 0:
+        # Subtle emphasis while backprop travels through the network
+        arr_alpha = 0.90
+
+    outtxt_w = 0.07
+    eps = 0.02
+
+    # Upper Arrow (from pi / u to Condition Block):
+    ax_nn.annotate("", xy=(chk_x, chk_y + chk_h/2 + eps), xytext=(xs[-1] + outtxt_w + eps, 0.74),
+                   arrowprops=dict(arrowstyle="->", color=arr_u_col, lw=arr_lw, alpha=arr_alpha,
+                                   connectionstyle="angle,angleA=0,angleB=90,rad=45"))
+    # Lower Arrow (from V to Condition Block):
+    ax_nn.annotate("", xy=(chk_x, chk_y - chk_h/2 - eps), xytext=(xs[-1] + outtxt_w + eps, 0.26),
+                   arrowprops=dict(arrowstyle="->", color=arr_v_col, lw=arr_lw, alpha=arr_alpha,
+                                   connectionstyle="angle,angleA=0,angleB=90,rad=45"))
+
+    # Lyapunov Condition Pill: V_phi(x^+) <= (1 - kappa) V_phi(x)
     box_bg = "#FEF2F2" if chk_active else "#F8FAFC"
     box_edge = COLOR_CEX if chk_active else "#CBD5E1"
     box_lw = 1.6 if chk_active else 1.1
-    txt_col = COLOR_CEX if chk_active else "#334155"
-    sub_col = COLOR_CEX if chk_active else "#64748B"
 
     pill = patches.FancyBboxPatch(
         (chk_x - chk_w/2, chk_y - chk_h/2), chk_w, chk_h,
@@ -329,10 +354,26 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
     )
     ax_nn.add_patch(pill)
 
-    ax_nn.text(chk_x, chk_y + 0.026, r"$V_\phi(x^+) > (1-\kappa)V_\phi(x)$", 
-               fontsize=12.0, color=txt_col, va="center", ha="center", zorder=7)
-    ax_nn.text(chk_x, chk_y - 0.026, r"$x^+ = f(x, u)$", 
-               fontsize=11.0, color=sub_col, va="center", ha="center", zorder=7)
+    if chk_active:
+        # 1. Formula parts with red bold operator
+        t_left  = TextArea(r"$V_\phi(x^+)$", textprops=dict(color=COLOR_DARK, size=12.5))
+        t_mid   = TextArea(r"$\mathbf{\ngtr}$",   textprops=dict(color=COLOR_CEX, size=13.5))
+        t_right = TextArea(r"$(1-\kappa)V_\phi(x)$", textprops=dict(color=COLOR_DARK, size=12.5))
+
+        # 2. Horizontal assembly with crisp spacing
+        formula_box = HPacker(children=[t_left, t_mid, t_right], align="center", pad=0, sep=1)
+        ab = AnnotationBbox(formula_box, (chk_x, chk_y + 0.026), frameon=False, box_alignment=(0.5, 0.5), zorder=7)
+        ax_nn.add_artist(ab)
+
+        # Subtitle highlights counterexample generation
+        ax_nn.text(chk_x, chk_y - 0.026, r"$x^+ = f(x, u) \Rightarrow x_{\mathrm{cex}}$", 
+                   fontsize=10.5, color=COLOR_DARK, va="center", ha="center", zorder=7)
+    else:
+        # Clean default: satisfied Lyapunov decrease condition
+        ax_nn.text(chk_x, chk_y + 0.026, r"$V_\phi(x^+) > (1-\kappa)V_\phi(x)$", 
+                   fontsize=12.0, color=COLOR_DARK, va="center", ha="center", zorder=7)
+        ax_nn.text(chk_x, chk_y - 0.026, r"$x^+ = f(x, u)$", 
+                   fontsize=11.0, color="#64748B", va="center", ha="center", zorder=7)
 
     # -------------------------------------------------------------------------
     # Draw Right Subplot: Phase Portrait
@@ -448,9 +489,9 @@ def run_single_forward_pass_rollout(traj_x, traj_y, k_quad, w1, w2, w3, wr, iter
         if f < fwd_duration:
             f_layer = min(2, f // 5)
             f_prog = (f % 5 + 1) / 5.0
-        elif f < fwd_duration + 3:
+        elif f < fwd_duration + 5:
             f_layer = 3
-            f_prog = 1.0
+            f_prog = (f - fwd_duration + 1) / 5.0
         else:
             f_layer = None
             f_prog = 0.0
@@ -504,7 +545,7 @@ def run_backward_pass_with_delays(k_quad, w1, w2, w3, wr, active_cexs, traj_trap
     then cleanly RESETS all layers before the Lyapunov function expands.
     """
     n_bp_frames = 5
-    for layer in [2, 1, 0]:
+    for layer in [3, 2, 1, 0]:
         for f in range(n_bp_frames):
             p = (f + 1) / n_bp_frames
             render_frame(k_quad, w1, w2, w3, wr, active_cexs=active_cexs, traj_data=traj_trap, 

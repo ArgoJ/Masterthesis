@@ -39,5 +39,6 @@
   "latex-workshop.latex.rootFile.useSubFile": false,
   "editor.renderWhitespace": "all",
   "editor.unicodeHighlight.nonBasicASCII": true,
-  "editor.unicodeHighlight.invisibleCharacters": true
+  "editor.unicodeHighlight.invisibleCharacters": true,
+  "python.defaultInterpreterPath": "/home/josua/.ma/bin/python"
 }

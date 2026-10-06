@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from matplotlib.offsetbox import AnnotationBbox, HPacker, TextArea
 
 plt.rcParams.update({
     "font.family": "serif",
@@ -98,12 +99,15 @@ chk_x = 0.73
 chk_y = 0.50
 chk_w = 0.48
 chk_h = 0.14
+eps = 0.02
+text_w = 0.07
 
-offset = 0.12
-ax_nn.annotate("", xy=(chk_x, chk_y + chk_h/2), xytext=(xs[-1] + offset, 0.74),
-                arrowprops=dict(arrowstyle="->", color=COLOR_TEAL, lw=1.6, connectionstyle="arc3,rad=0.4"))
-ax_nn.annotate("", xy=(chk_x, chk_y - chk_h/2), xytext=(xs[-1] + offset, 0.26),
-                arrowprops=dict(arrowstyle="->", color=COLOR_SUBLEVEL, lw=1.6, connectionstyle="arc3,rad=-0.4"))
+# Upper Arrow (from pi / u to Condition Block):
+ax_nn.annotate("", xy=(chk_x, chk_y + chk_h/2 + eps), xytext=(xs[-1] + text_w + eps, 0.74),
+                arrowprops=dict(arrowstyle="->", color=COLOR_TEAL, lw=1.6, connectionstyle="angle,angleA=0,angleB=90,rad=45"))
+# Lower Arrow (from V to Condition Block):
+ax_nn.annotate("", xy=(chk_x, chk_y - chk_h/2 - eps), xytext=(xs[-1] + text_w + eps, 0.26),
+                arrowprops=dict(arrowstyle="->", color=COLOR_SUBLEVEL, lw=1.6, connectionstyle="angle,angleA=0,angleB=90,rad=45"))
 
 # Condition check pill
 pill = patches.FancyBboxPatch(
@@ -113,10 +117,21 @@ pill = patches.FancyBboxPatch(
 )
 ax_nn.add_patch(pill)
 
-ax_nn.text(chk_x, chk_y + 0.026, r"$V_\phi(x^+) > (1-\kappa)V_\phi(x)$", 
-           fontsize=12.0, color=COLOR_CEX, va="center", ha="center", zorder=7)
-ax_nn.text(chk_x, chk_y - 0.026, r"$x^+ = f(x, u)$", 
-           fontsize=11.0, color="#64748B", va="center", ha="center", zorder=7)
+# Three-part formula: Left operand (dark), Operator (red & bold), Right operand (dark)
+t_left  = TextArea(r"$V_\phi(x^+)$", textprops=dict(color=COLOR_DARK, size=12.5))
+t_mid   = TextArea(r"$\mathbf{\ngtr}$",   textprops=dict(color=COLOR_CEX, size=13.5))
+t_right = TextArea(r"$(1-\kappa)V_\phi(x)$", textprops=dict(color=COLOR_DARK, size=12.5))
+
+# 2. Horizontal assembly with crisp spacing
+formula_box = HPacker(children=[t_left, t_mid, t_right], align="center", pad=0, sep=1)
+ab = AnnotationBbox(formula_box, (chk_x, chk_y + 0.026), frameon=False, box_alignment=(0.5, 0.5), zorder=7)
+ax_nn.add_artist(ab)
+
+# Subtitle highlights counterexample generation
+ax_nn.text(chk_x, chk_y - 0.026, r"$\mathbf{x^+ = f(x, u) \Rightarrow x_{\mathrm{cex}}}$", 
+        fontsize=10.5, color=COLOR_CEX, va="center", ha="center", zorder=7)
+ax_nn.text(chk_x, chk_y - 0.026, r"$\mathbf{x^+ = f(x, u) \Rightarrow x_{\mathrm{cex}}}$", 
+           fontsize=10.5, color=COLOR_CEX, va="center", ha="center", zorder=7)
 
 # Compute start point of flight in ax_plot coordinates
 fig.canvas.draw()
@@ -132,5 +147,5 @@ curr_y = (1 - t_flight) * p_src_plot[1] + t_flight * cy_target + 0.35 * np.sin(t
 # Scatter with clip_on=False: perfectly circular, no distortion!
 ax_plot.scatter(curr_x, curr_y, s=75, facecolor=COLOR_CEX, edgecolors="white", linewidth=1.1, clip_on=False, zorder=12)
 
-plt.savefig("/home/josua/programming_stuff/projects/ma-tex/animations/test_frame.png", dpi=100)
+plt.savefig("test_frame.png", dpi=100)
 print("Saved test_frame.png with wide pill and large fonts")
