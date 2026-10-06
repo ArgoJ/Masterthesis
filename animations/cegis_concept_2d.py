@@ -366,7 +366,7 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
 
         # Invariance
         t_left  = TextArea(r"$f(\mathcal{S})$", textprops=dict(color=COLOR_DARK, size=12.5))
-        t_mid   = TextArea(r"$\not\subseteq$",   textprops=dict(color=COLOR_CEX, size=13.5))
+        t_mid   = TextArea(r"$\nsubseteq$",   textprops=dict(color=COLOR_CEX, size=13.5))
         t_right = TextArea(r"$\mathcal{S}$", textprops=dict(color=COLOR_DARK, size=12.5))
 
         invariance_box = HPacker(children=[t_left, t_mid, t_right], align="center", pad=0, sep=1)
