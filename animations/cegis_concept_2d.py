@@ -357,7 +357,7 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
     if chk_active:
         # 1. Formula parts with red bold operator
         t_left  = TextArea(r"$V_\phi(x^+)$", textprops=dict(color=COLOR_DARK, size=12.5))
-        t_mid   = TextArea(r"$\mathbf{\ngtr}$",   textprops=dict(color=COLOR_CEX, size=13.5))
+        t_mid   = TextArea(r"$\mathbf{\nless}$",   textprops=dict(color=COLOR_CEX, size=13.5))
         t_right = TextArea(r"$(1-\kappa)V_\phi(x)$", textprops=dict(color=COLOR_DARK, size=12.5))
 
         # 2. Horizontal assembly with crisp spacing
@@ -370,7 +370,7 @@ def render_frame(k_quad, w1, w2, w3, wr, active_cexs=[], traj_data=None, final_b
                    fontsize=10.5, color=COLOR_DARK, va="center", ha="center", zorder=7)
     else:
         # Clean default: satisfied Lyapunov decrease condition
-        ax_nn.text(chk_x, chk_y + 0.026, r"$V_\phi(x^+) > (1-\kappa)V_\phi(x)$", 
+        ax_nn.text(chk_x, chk_y + 0.026, r"$V_\phi(x^+) < (1-\kappa)V_\phi(x)$", 
                    fontsize=12.0, color=COLOR_DARK, va="center", ha="center", zorder=7)
         ax_nn.text(chk_x, chk_y - 0.026, r"$x^+ = f(x, u)$", 
                    fontsize=11.0, color="#64748B", va="center", ha="center", zorder=7)
